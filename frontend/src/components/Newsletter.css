@@ -1,0 +1,39 @@
+.newsletter-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 80vw;
+    align-items: center;
+    height: 40vh;
+    margin-left: 8.5vw;
+}
+
+form{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    align-items: center;
+}
+input{
+    width: 40%;
+    height: 40px;
+    
+    
+    padding-left: 10px;
+    font-size: 16px;
+}
+
+button{
+    
+    width: 20%;
+    height: 40px;
+    
+    
+    border: none;
+    background-color: black;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    margin-left: 20pxs;
+}

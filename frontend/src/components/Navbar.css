@@ -1,0 +1,622 @@
+/* ============================================
+   NAVBAR CONTAINER
+   ============================================ */
+.navbar-container {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.navbar-container.scrolled {
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+/* ============================================
+   NAVBAR CONTENT
+   ============================================ */
+.navbar-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 40px;
+  max-width: 1400px;
+  max-height: 8vh;
+  margin: 0 auto;
+}
+
+/* ============================================
+   LOGO
+   ============================================ */
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+
+.navbar-logo:hover {
+  transform: scale(1.05);
+}
+
+.navbar-logo img {
+  width: 160px;
+  height: auto;
+}
+
+/* ============================================
+   DESKTOP NAVIGATION LINKS
+   ============================================ */
+.navbar-links {
+  display: none;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  height: 5vh;
+}
+
+@media (min-width: 768px) {
+  .navbar-links {
+    display: flex;
+  }
+}
+
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: #2d3748;
+  padding: 10px 16px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.nav-link:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+  transform: translateY(-2px);
+}
+
+.nav-link p {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  margin: 0;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover p {
+  color: #667eea;
+}
+
+/* Active Link Underline */
+.nav-underline {
+  width: 0;
+  border: none;
+  height: 3px;
+  background: transparent;
+  margin: 0;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.nav-link.active .nav-underline {
+  width: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+}
+
+.nav-link.active p {
+  color: #667eea;
+  font-weight: 700;
+}
+
+/* ============================================
+   ORDERS LINK (SPECIAL STYLING)
+   ============================================ */
+.orders-nav-link {
+  position: relative;
+  width: 8vw;
+  margin-left: 14vw;
+  height: 7vh;
+  
+}
+
+.orders-link-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 8vw;
+  margin-top: -2vh;
+  height: 7vh;
+}
+
+.orders-text {
+  font-size: 10px;
+  
+  color: #667eea !important;
+  font-weight: 700 !important;
+  width: 6vw;
+  margin-bottom: 9vh;
+  height: 7vh;
+}
+
+.orders-icon {
+  font-size: 16px;
+  animation: bounce 2s infinite;
+  height: 7vh;
+  margin-bottom: 5vh;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.orders-badge {
+  position: absolute;
+  top: -50px;
+  right: 30px;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  color: white;
+  border-radius: 50%;
+  max-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 0 4px;
+  box-shadow: 0 3px 10px rgba(255, 107, 107, 0.5);
+  animation: pulse 2s infinite;
+}
+
+#user-image{
+  margin-right:-10vw;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 3px 10px rgba(255, 107, 107, 0.5);
+  }
+  50% {
+    transform: scale(1.15);
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.7);
+  }
+}
+
+.orders-nav-link:hover .orders-text {
+  color: #5568d3 !important;
+}
+
+.orders-nav-link.active {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+}
+
+/* ============================================
+   NAVBAR ACTIONS (RIGHT SIDE ICONS)
+   ============================================ */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.nav-icon-wrapper {
+  position: relative;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.nav-icon-wrapper:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  transform: scale(1.1);
+}
+
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  transition: all 0.3s ease;
+  object-fit: contain;
+  /* margin-left: 10vw; */
+  
+}
+
+.nav-icon-wrapper:hover .nav-icon {
+  filter: brightness(0.8);
+}
+
+/* Profile Wrapper - Fixed Clerk Component Size */
+.profile-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+}
+
+.profile-wrapper button {
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.profile-wrapper img {
+  width: 20px !important;
+  height: 20px !important;
+  object-fit: contain !important;
+}
+
+/* Clerk UserButton Styling */
+.profile-wrapper > div {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.profile-wrapper > div > button {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.profile-wrapper > div > button > div {
+  width: 32px !important;
+  height: 32px !important;
+}
+
+/* Cart Wrapper */
+.cart-wrapper {
+  position: relative;
+  text-decoration: none;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -42px;
+  right: 2px;
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  color: white;
+  border-radius: 50%;
+  max-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 0 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  animation: cartPulse 2s infinite;
+}
+
+@keyframes cartPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+/* Menu Toggle (Mobile) */
+.menu-toggle {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .menu-toggle {
+    display: flex;
+  }
+}
+
+/* ============================================
+   MOBILE SIDEBAR
+   ============================================ */
+.mobile-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 0;
+  background: white;
+  overflow: hidden;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: -4px 0 30px rgba(0, 0, 0, 0.2);
+  z-index: 2000;
+}
+
+.mobile-sidebar.visible {
+  width: 85%;
+  max-width: 320px;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Sidebar Header */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px;
+  cursor: pointer;
+  border-bottom: 2px solid #e9ecef;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.sidebar-header:hover {
+  background: linear-gradient(135deg, #5568d3 0%, #6a3d8f 100%);
+}
+
+.sidebar-header p {
+  margin: 0;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+}
+
+.back-icon {
+  height: 18px;
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+  filter: brightness(0) invert(1);
+}
+
+.sidebar-header:hover .back-icon {
+  transform: rotate(180deg) translateX(-4px);
+}
+
+/* Sidebar Links */
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 24px;
+  text-decoration: none;
+  color: #2d3748;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #f1f3f5;
+  transition: all 0.3s ease;
+}
+
+.sidebar-link:hover {
+  background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 100%);
+  color: #667eea;
+  padding-left: 32px;
+}
+
+.sidebar-link.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 700;
+  border-left: 4px solid #fff;
+}
+
+.link-icon {
+  font-size: 20px;
+}
+
+/* Orders Sidebar Link */
+.orders-sidebar-link {
+  background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 100%);
+  color: #667eea;
+  font-weight: 700;
+  border-left: 4px solid #667eea;
+}
+
+.orders-sidebar-link:hover {
+  background: linear-gradient(135deg, #e8eeff 0%, #d4dcff 100%);
+  padding-left: 32px;
+}
+
+.sidebar-orders-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.sidebar-orders-badge {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  color: white;
+  border-radius: 50%;
+  min-width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 6px;
+  box-shadow: 0 3px 10px rgba(255, 107, 107, 0.5);
+  animation: mobilePulse 2s infinite;
+}
+
+@keyframes mobilePulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Sidebar Overlay */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1999;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+@media (max-width: 767px) {
+  .navbar-content {
+    padding: 16px 20px;
+  }
+
+  .navbar-logo img {
+    width: 130px;
+  }
+
+  .navbar-actions {
+    gap: 12px;
+  }
+
+  .nav-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    padding: 6px;
+  }
+
+  .nav-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .profile-wrapper {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-content {
+    padding: 14px 16px;
+  }
+
+  .navbar-logo img {
+    width: 110px;
+  }
+
+  .navbar-actions {
+    gap: 8px;
+  }
+
+  .nav-icon-wrapper {
+    width: 32px;
+    height: 32px;
+    padding: 4px;
+  }
+
+  .nav-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .profile-wrapper {
+    width: 32px;
+    height: 32px;
+  }
+
+  .cart-badge {
+    max-width: 16px;
+    height: 16px;
+    font-size: 9px;
+  }
+}
+
+
+
+
+
+
+
+
+/* ============================================
+   CLERK USER BUTTON FIX - Avatar Alignment
+   ============================================ */
+
+/* Target Clerk's UserButton root */
+.profile-wrapper .cl-userButtonBox {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Target Clerk's button */
+.profile-wrapper .cl-userButtonTrigger {
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Target Clerk's avatar container */
+.profile-wrapper .cl-avatarBox {
+  width: 32px !important;
+  height: 32px !important;
+  margin: 0 !important;
+}
+
+/* Target Clerk's avatar image */
+.profile-wrapper .cl-avatarImage {
+  width: 32px !important;
+  height: 32px !important;
+  object-fit: cover !important;
+}
+
+/* Target Clerk's popup menu positioning */
+.profile-wrapper .cl-userButtonPopoverCard {
+  margin-top: 8px !important;
+}
+
+/* Remove any default margins/paddings */
+.profile-wrapper * {
+  margin: 0 !important;
+}
+
+.profile-wrapper .cl-userButtonTrigger * {
+  margin: 0 !important;
+}

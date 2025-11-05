@@ -1,0 +1,14 @@
+.navbar-container{
+    width: 98vw;
+    height: 10vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 0vh;
+
+}
+
+.adminlogo{
+    width: 9vw;
+    height: 10vh;
+}

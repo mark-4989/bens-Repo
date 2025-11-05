@@ -1,0 +1,49 @@
+.carttotal-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    width: 28.2vw;
+    border-radius: 14px;
+    height: 40vh;
+    color: #000;
+    margin-left: -2vw;
+    gap: 2vh;
+    background-color: #000;
+}
+
+.cart-total-mini{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1vh;
+    width: 20vw;
+    height: auto;
+    margin-left: 8vw;
+    
+    margin-top: -10vh;
+    color: #fff;
+    
+}
+
+.sub-total{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-bottom: 1px solid#f8f6f6;
+}
+
+.sub-total b {
+    margin-left: 1vw;
+}
+.sub-total p {
+    margin:10px;
+    font-size: 15px;
+    color: #000;
+    
+}
+
+.title-box{
+    width: 20vw;
+    margin-left: -30vw;
+    color: #000;
+}

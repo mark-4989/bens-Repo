@@ -1,0 +1,198 @@
+.main-product-container{
+    width: 100vw;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.product-container{
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.image-box-holder{
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    margin-left: 3vw;
+    width: 40.5vw;
+    height: 63vh;
+    align-items: left;
+    margin-top: 20px;
+    
+}
+
+.image-box{
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    width: 5vw;
+    margin-left: 1vw;
+}
+
+.image-box img{
+    width: 5vw;
+    height: 12vh;
+    object-fit: contain;
+    cursor: pointer;
+}
+
+.image-box2{
+    width: 30vw;
+    height: 60vh;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-box2 img{
+    width: 28vw;
+    height: 58vh;
+    object-fit: contain;
+}
+
+
+.product-info-container{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    width: 30vw;
+    margin-right: 2vw;
+    border: 1px solid rgb(176, 176, 176);
+    padding: 20px;
+    font-family: 'Outfit', sans-serif;
+}
+
+.product-header{
+    font-family: 'outfit', sans-serif;
+    font-weight: 700;
+    font-size: 23px;
+}
+
+.star-rating{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+}
+.star-rating img{
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+.product-price{
+    font-size: 20px;
+    font-weight: 600;
+    color: #000;
+}
+
+.product-description{
+    font-size: 18px;
+    font-weight: 500;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+}
+
+.product-size-section{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    font-family: 'Outfit', sans-serif;
+}
+
+.size-select{
+    width: 200px;
+    height: 30px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    padding: 5px;
+    font-family: 'Outfit', sans-serif;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+}
+
+.size-select button{
+    width: 100px;
+    height: 30px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    padding: 5px;
+    font-family: 'Outfit', sans-serif;
+}
+
+#add-to-cart-btn{
+    width: 200px;
+    height: 50px;
+    background-color: black;
+    color: white;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+    border-radius: 4px;
+}
+
+.descrption-review-section{
+    display: flex;
+    width: 80vw;
+    flex-direction: column;
+    gap: 50px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.header-box{
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    border: ipx solid rgb(176, 176, 176)    ;
+}
+.header-box p{
+    font-size: 20px;
+    font-weight: 600;
+    color: #000;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    margin-left: -2vw;
+    border: 1px solid rgb(10, 10, 10);
+    padding: 4px 8px;
+}
+
+.header-box b{
+    font-size: 20px;
+    font-weight: 600;
+    color: #000;
+    border: 1px solid rgb(10, 10, 10);
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+     padding: 4px 8px;
+}
+
+.description-widget{
+    font-size: 22px;
+    font-weight: 500;
+    color: #000;
+    font-family: 'Outfit', sans-serif;
+    line-height: 1.5;
+    margin-top: -6.9vh;
+    border: 1px solid rgb(9, 9, 9);
+}
+
+.description-widget p{
+    margin-left: 3vw;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    line-height: 1.8;
+}

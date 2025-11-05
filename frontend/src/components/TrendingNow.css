@@ -1,0 +1,66 @@
+/* Trending Now Section */
+.trending-section {
+  margin: 40px 0;
+  padding: 0 20px;
+}
+
+.trending-header {
+  text-align: center;
+  padding: 32px 0;
+}
+
+.trending-description {
+  width: 75%;
+  margin: 16px auto 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* Loading State */
+.trending-loading {
+  text-align: center;
+  padding: 32px;
+  color: #666;
+  font-size: 16px;
+}
+
+/* Products Grid */
+.trending-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .trending-section {
+    margin: 30px 0;
+    padding: 0 15px;
+  }
+
+  .trending-description {
+    width: 90%;
+    font-size: 12px;
+  }
+
+  .trending-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .trending-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .trending-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 24px;
+  }
+}

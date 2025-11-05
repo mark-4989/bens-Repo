@@ -1,0 +1,19 @@
+.related-products-container{
+    width: 80vw;
+    /* display: flex;
+    flex-direction: column; */
+    margin-left: -22.5vw;
+    align-items: center;
+    
+
+}
+.related-products-holder{
+    display: flex;
+    gap: 20px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 80vw;
+    align-items: center;
+    margin-left: 19vw;
+    
+}

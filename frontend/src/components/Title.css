@@ -1,0 +1,43 @@
+.title-container {
+  text-align: center;
+
+  width: 80vw;
+  margin-left: 8.5vw;
+  height: 7vh;
+  
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 10px;
+}
+
+.title-container p {
+  font-size: 36px;
+  font-weight: 500;
+  color: #fff;
+  font-family: "Outfit";
+  margin-bottom: 10px;
+}
+.title-container b {
+  font-size: 30px;
+  font-weight: 400;
+  color: #fff;
+  font-family: "Outfit";
+  margin-bottom: 10px;
+}
+
+/* .title-container span {
+  font-size: 76px;
+  color: #666;
+  font-family: 'Poppins', sans-serif;
+} */
+
+span {
+  width: 50vw;
+  height: 4px;
+  font-size: 20px;
+  margin-left: 10px;
+  /* vertical-align: middle; */
+  margin-top: 70px;
+}

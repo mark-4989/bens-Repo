@@ -1,0 +1,38 @@
+
+
+.nav-link-container{
+
+    width: 89vw;
+    
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    margin-left: 7vw;
+    
+}
+
+.admin-nav {
+    width: 17vw;
+    height: 5vh;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: 1px solid #000;
+    align-items: center;
+    justify-content: center;
+    margin: 19px;
+}
+
+.navlink-img{
+    width: 1vw;
+    height: 2vh;
+    margin-left: 1vw;
+}
+
+.navlink-text{
+    font-weight: 400;
+    font-size: 15px;
+    color: black;
+    margin-left: .5vw;
+    font-family: "Outfit";
+}

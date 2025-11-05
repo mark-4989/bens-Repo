@@ -1,0 +1,66 @@
+/* New Arrivals Section */
+.new-arrivals-section {
+  margin: 40px 0;
+  padding: 0 20px;
+}
+
+.new-arrivals-header {
+  text-align: center;
+  padding: 32px 0;
+}
+
+.new-arrivals-description {
+  width: 75%;
+  margin: 16px auto 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* Loading State */
+.new-arrivals-loading {
+  text-align: center;
+  padding: 32px;
+  color: #666;
+  font-size: 16px;
+}
+
+/* Products Grid */
+.new-arrivals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .new-arrivals-section {
+    margin: 30px 0;
+    padding: 0 15px;
+  }
+
+  .new-arrivals-description {
+    width: 90%;
+    font-size: 12px;
+  }
+
+  .new-arrivals-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .new-arrivals-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .new-arrivals-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 24px;
+  }
+}

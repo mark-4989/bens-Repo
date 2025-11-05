@@ -1,0 +1,33 @@
+.Footer-container{
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction:row;
+    width: 80vw;
+    height: 50vh;
+    margin-left: 8.5vw;
+    margin-top: 14vh;
+}
+
+.footer-starter{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+ img{
+    width: 150px;
+    height: 50px;
+    object-fit: contain;
+}
+ #footer-text{
+    width: 300px;
+    text-align: left;
+    font-size: 14px;
+    color: #fff;
+    font-family: 'outfit', sans-serif;
+}
+h2{
+    font-family: 'outfit', sans-serif;
+    font-weight: 600;
+    font-size: 28px;
+}

@@ -1,0 +1,245 @@
+/* Category Page Container */
+.category-page {
+  margin-left: 300px; /* Space for sidebar */
+  padding: 40px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+/* Category Header */
+.category-header {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 32px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.category-header-content {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.category-icon {
+  font-size: 64px;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 100%);
+  border-radius: 20px;
+  border: 3px solid #667eea;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+}
+
+.category-info {
+  flex: 1;
+}
+
+.category-description {
+  font-size: 16px;
+  color: #6c757d;
+  margin: 8px 0 0 0;
+  font-weight: 500;
+}
+
+/* Category Navigation */
+.category-nav {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 20px;
+  border-top: 2px solid #e9ecef;
+}
+
+.category-nav-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 2px solid #dee2e6;
+  border-radius: 25px;
+  color: #495057;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: capitalize;
+}
+
+.category-nav-btn:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: #667eea;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* Category Controls */
+.category-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  background: white;
+  padding: 20px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.products-count p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #212529;
+}
+
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sort-select {
+  padding: 10px 20px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #495057;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.sort-select:hover {
+  border-color: #667eea;
+}
+
+.sort-select:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Products Grid */
+.category-products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 24px;
+}
+
+/* No Products State */
+.no-products {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 20px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.no-products-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+  opacity: 0.3;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.no-products h3 {
+  font-size: 24px;
+  color: #212529;
+  margin: 0 0 12px 0;
+  font-weight: 700;
+}
+
+.no-products p {
+  font-size: 16px;
+  color: #6c757d;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .category-page {
+    margin-left: 0;
+    padding: 24px;
+  }
+
+  .category-products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .category-page {
+    padding: 16px;
+  }
+
+  .category-header {
+    padding: 20px;
+  }
+
+  .category-header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .category-icon {
+    font-size: 48px;
+    width: 80px;
+    height: 80px;
+  }
+
+  .category-nav {
+    justify-content: center;
+  }
+
+  .category-nav-btn {
+    font-size: 12px;
+    padding: 8px 16px;
+  }
+
+  .category-controls {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .products-count,
+  .sort-controls {
+    width: 100%;
+  }
+
+  .sort-select {
+    width: 100%;
+  }
+
+  .category-products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-products-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .category-header-content {
+    gap: 16px;
+  }
+
+  .category-icon {
+    font-size: 40px;
+    width: 70px;
+    height: 70px;
+  }
+}

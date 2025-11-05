@@ -1,0 +1,362 @@
+/* Form Container */
+.form-container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 32px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.form-container h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #212529;
+  margin: 0 0 24px 0;
+  text-align: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.form-container > p {
+  font-size: 16px;
+  font-weight: 600;
+  color: #495057;
+  margin: 24px 0 12px 0;
+}
+
+/* Image Upload Section */
+.label-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.label-container label {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.label-container label:hover {
+  transform: scale(1.05);
+}
+
+.upload-img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px dashed #dee2e6;
+  transition: all 0.3s ease;
+}
+
+.upload-img:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+/* Form Fields */
+.add-form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Form Sections */
+.form-section {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 24px;
+  border-radius: 12px;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.form-section:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.form-section h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #495057;
+  margin: 0 0 16px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #dee2e6;
+}
+
+/* Input Fields */
+.add-form-fields input[type="text"],
+.add-form-fields input[type="number"],
+.add-form-fields textarea,
+.add-form-fields select {
+  width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #495057;
+  background: white;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.add-form-fields input[type="text"]:focus,
+.add-form-fields input[type="number"]:focus,
+.add-form-fields textarea:focus,
+.add-form-fields select:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.add-form-fields textarea {
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+}
+
+.add-form-fields select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23495057' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+.add-form-fields select:disabled {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Checkbox Fields */
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #495057;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.checkbox-field:hover {
+  background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 100%);
+}
+
+.checkbox-field input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #667eea;
+}
+
+/* Submit Button */
+.submit-btn {
+  width: 100%;
+  padding: 16px 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+  margin-top: 16px;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(102, 126, 234, 0.6);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+/* Placeholder Styling */
+.add-form-fields input::placeholder,
+.add-form-fields textarea::placeholder,
+.add-form-fields select option:first-child {
+  color: #adb5bd;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .form-container {
+    padding: 20px;
+    margin: 12px;
+  }
+
+  .form-container h2 {
+    font-size: 24px;
+  }
+
+  .label-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .upload-img {
+    height: 120px;
+  }
+
+  .form-section {
+    padding: 16px;
+  }
+
+  .form-section h3 {
+    font-size: 16px;
+  }
+
+  .add-form-fields input[type="text"],
+  .add-form-fields input[type="number"],
+  .add-form-fields textarea,
+  .add-form-fields select {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  .submit-btn {
+    padding: 14px 24px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .label-container {
+    grid-template-columns: 1fr;
+  }
+
+  .form-container {
+    padding: 16px;
+  }
+
+  .add-form-fields {
+    gap: 16px;
+  }
+
+  .form-section {
+    padding: 12px;
+  }
+}
+
+/* Featured Section Styling */
+.featured-section {
+  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  border: 2px solid #667eea;
+}
+
+.section-help-text {
+  font-size: 13px;
+  color: #6c757d;
+  font-style: italic;
+  margin: -8px 0 16px 0;
+}
+
+.checkbox-field.featured {
+  background: white;
+  border: 2px solid #e9ecef;
+  padding: 16px;
+  margin: 12px 0;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.checkbox-field.featured:hover {
+  border-color: #667eea;
+  background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 100%);
+  transform: translateX(4px);
+}
+
+.checkbox-field.featured input:checked ~ .checkbox-label-content {
+  color: #667eea;
+}
+
+.checkbox-label-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.checkbox-icon {
+  font-size: 32px;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkbox-label-content > span:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.checkbox-label-content strong {
+  font-size: 15px;
+  font-weight: 700;
+  color: #212529;
+}
+
+.checkbox-label-content small {
+  font-size: 12px;
+  color: #6c757d;
+  font-weight: 400;
+}
+
+.checkbox-field.featured input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+}
+
+/* Success/Error States */
+.form-message {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.form-message.success {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  color: #155724;
+  border: 2px solid #28a745;
+}
+
+.form-message.error {
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  color: #721c24;
+  border: 2px solid #dc3545;
+}
+
+/* Form Grid for Side-by-Side Fields */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

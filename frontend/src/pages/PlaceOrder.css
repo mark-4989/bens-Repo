@@ -1,0 +1,146 @@
+.place-holder-container{
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.delivery-info {
+    width: 40vw;
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    
+    gap: 20px;
+    margin-top: -20vh;
+    margin-left: 4.5vw;
+}
+
+
+.title-box-delivery{
+    width: 40vw;
+    height: 8vh;
+    align-items: flex-start;
+    margin-left: -5.5vw;
+    margin-bottom: 2vh;
+}
+
+.row-deliver{
+    display: flex;
+    flex-direction: row;
+}
+
+input{
+    width: 15vw;
+    height: 5vh;
+    margin-right: 2vw;
+    margin-bottom: .5vh;
+}
+
+#long-input{
+     width: 32vw;
+    height: 5vh;
+    margin-right: 2vw;
+    margin-bottom: .5vh;
+}
+
+/* rightside styling */
+
+.rightside-cart-total{
+    width: 40vw;
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    
+    gap: 10px;
+    margin-top: -20vh;
+    margin-left: 4.5vw;
+}
+
+.cart-total-container-placeorder{
+     width: 40vw;
+    
+    align-items: flex-start;
+    margin-left: -5.5vw;
+    margin-bottom: 2vh;
+}
+
+.payment-section{
+    width: 40vw;
+    height: 8vh;
+    align-items: flex-start;
+    margin-left: -5.5vw;
+    margin-bottom: 2vh;
+
+}
+
+.payment-container{
+    width: 40vw;
+    display: flex;
+    flex-direction: row;
+     margin-left: 7vw;
+     align-items: center;
+     
+
+}
+
+.payment-box{
+    display: flex;
+    flex-direction: row;
+    width: 8vw;
+    height: 8vh;
+    border: 1px solid #000;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    align-items: center;
+    margin-right:5px ;
+}
+.payment-box:hover{
+    background-color: azure;
+    
+}
+
+.payment-box img{
+    width: 130px;
+    height: 3vh;
+    object-fit: contain;
+}
+
+.indicator{
+    width: 10px;
+    height: 10px;
+    background-color: aquamarine;
+    opacity: 0;
+    border-radius: 50%;
+    margin-left: -2vw;
+}
+
+.indicator:hover{
+    opacity: 1;
+    
+}
+
+#place-order-btn{
+    width: 180px;
+    height: 5vh;
+    border-radius: 5px;
+    color: #fff;
+    background-color: #000;
+    font-size: 20px;
+    font-weight: 400;
+    margin-left: 20vw;
+    margin-top: 2vh;
+    transition-duration: 1ms;
+
+
+}
+
+#place-order-btn:hover{
+    color: #000;
+    background-color: #fff;
+}

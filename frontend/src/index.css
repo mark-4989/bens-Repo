@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Prata&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: outfit,;
+}
+body {
+    
+    background-color: #d4ddd4;
+    color: #fff;
+    line-height: 1.6;
+}
+
+.prata-regular {
+    font-family: 'Prata', serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+a{
+    text-decoration: none;
+}
+
+/* 
+ * OPTIONAL: Dark Theme like MovieBox.ph
+ * Add this to your global CSS or App.css
+ * Wrap your app in a div with class "dark-theme" to enable
+ */
+
+/* Dark Theme Root Styles */
+.dark-theme {
+  background-color: #111827;
+  color: #f9fafb;
+  min-height: 100vh;
+}
+
+/* Update BestSeller for Dark Theme */
+.dark-theme .product-row-title {
+  color: white;
+}
+
+.dark-theme .product-card-image-wrapper {
+  background-color: #1f2937;
+}
+
+/* Update Navbar for Dark Theme (if needed) */
+.dark-theme .Navbar {
+  background-color: #1f2937;
+  border-bottom: 1px solid #374151;
+}
+
+.dark-theme .Navbar ul li {
+  color: #e5e7eb;
+}
+
+.dark-theme .Navbar ul a:hover li {
+  color: white;
+}
+
+/* Body Background */
+.dark-theme body {
+  background-color: #111827;
+}
+
+/* Scrollbar Styling for Dark Theme */
+.dark-theme ::-webkit-scrollbar {
+  width: 12px;
+}
+
+.dark-theme ::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+.dark-theme ::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 6px;
+}
+
+.dark-theme ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Usage Example:
+ * In App.jsx or your root component:
+ * 
+ * function App() {
+ *   return (
+ *     <div className="dark-theme">
+ *       <Navbar />
+ *       <Routes>
+ *         <Route path="/" element={<Home />} />
+ *         ...
+ *       </Routes>
+ *     </div>
+ *   );
+ * }
+ */
+
+ .home-container {
+  display: flex;
+  position: relative;
+}
+
+.home-content {
+  margin-left: 300px;
+  width: calc(100% - 300px);
+  padding: 20px;
+}
+
+@media (max-width: 768px) {
+  .home-content {
+    margin-left: 0;
+    width: 100%;
+  }
+}
