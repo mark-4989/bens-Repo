@@ -17,30 +17,32 @@ connectCloudinary();
 // Middlewares
 app.use(express.json());
 
-// CORS Configuration - UPDATED FOR PRODUCTION
+// ✅ FIXED: CORS Configuration with ALL your frontend URLs
 const corsOptions = {
   origin: [
-    // Production URLs (Vercel deployments)
-    "https://foreverecommerce-2-gae4.vercel.app", // Admin Panel
-    "https://foreverecommerce-2.vercel.app",      // Client Frontend
+    // ✅ Production URLs (Vercel deployments)
+    "https://bens-repo.vercel.app",           // Admin Panel
+    "https://clientside-teal.vercel.app",     // Client Frontend
     
-    // Add www versions if needed
-    "https://www.foreverecommerce-2.vercel.app",
+    // ✅ Add www versions if needed
+    "https://www.bens-repo.vercel.app",
+    "https://www.clientside-teal.vercel.app",
     
-    // Development URLs (for local testing)
+    // ✅ Development URLs (for local testing)
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:3000",
+    "http://localhost:4000",
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  optionsSuccessStatus: 200, // For legacy browser support
+  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
 
-// ✅ FIX: Change this line from app.options(/.*/, ...) to middleware
+// ✅ Handle preflight requests
 app.use((req, res, next) => {
   if (req.method === 'OPTIONS') {
     res.header('Access-Control-Allow-Origin', req.headers.origin);
@@ -95,7 +97,7 @@ app.listen(port, () => {
   console.log("╚═══════════════════════════════════════╝");
   console.log(`📡 Server started on PORT: ${port}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
-  console.log(`🔗 URL: ${process.env.NODE_ENV === "production" ? "https://foreverecommerce-2.onrender.com" : `http://localhost:${port}`}`);
+  console.log(`🔗 URL: ${process.env.NODE_ENV === "production" ? "https://bens-repo-99lb.onrender.com" : `http://localhost:${port}`}`);
   console.log("╚═══════════════════════════════════════╝");
 });
 
