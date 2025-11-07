@@ -3,6 +3,6 @@
   "installCommand": "cd frontend && npm install",
   "outputDirectory": "frontend/dist",
   "framework": null,
-  "devCommand": "cd frontend && npm run dev",
+  "devCommand": "cd frontend && npm run dev"
   
 }
