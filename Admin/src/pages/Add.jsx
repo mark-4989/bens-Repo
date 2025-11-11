@@ -1,3 +1,5 @@
+// UPDATED Add.jsx with ALL subcategories matching Sidebar
+
 import React, { useState } from "react";
 import { assets } from "../assets/assets";
 import "./Add.css";
@@ -28,53 +30,112 @@ const Add = () => {
     tags: "",
     rating: "0",
     reviewCount: "0",
-    // NEW: Collection flags
     isLatestCollection: false,
     isTrending: false,
     isNewArrival: false
   });
 
-  // State for previewing and storing image files
   const [images, setImages] = useState([null, null, null, null]);
 
-  // Category options
+  // ✅ COMPLETE Category options - matches Sidebar exactly
   const categories = [
-    { value: 'food-cupboard', label: '🥫 Food Cupboard' },
     { value: 'fresh-foods', label: '🥗 Fresh Foods' },
     { value: 'baby-kids', label: '👶 Baby & Kids' },
     { value: 'electronics', label: '📱 Electronics' },
     { value: 'liquor-store', label: '🍷 Liquor Store' },
-    { value: 'promos', label: '🎁 Promotions' },
-    { value: 'clothing', label: '👕 Clothing' },
-    { value: 'home-garden', label: '🏡 Home & Garden' },
-    { value: 'health-beauty', label: '💄 Health & Beauty' },
-    { value: 'sports-outdoors', label: '⚽ Sports & Outdoors' },
-    { value: 'other', label: '📦 Other' }
+    { value: 'food-cupboard', label: '🥫 Food Cupboard' },
+    { value: 'promos', label: '🎁 Promotions' }
   ];
 
-  // Subcategory options based on category
+  // ✅ COMPLETE Subcategory options - matches Sidebar exactly
   const subCategories = {
-    'food-cupboard': ['grains-cereals', 'cooking-oils', 'canned-foods', 'spices-seasonings', 'beverages'],
-    'fresh-foods': ['fruits-vegetables', 'meat-poultry', 'fish-seafood', 'dairy-products', 'bakery'],
-    'baby-kids': ['baby-food-formula', 'diapers-wipes', 'baby-care', 'kids-clothing', 'toys-games'],
-    'electronics': ['mobile-phones', 'computers-laptops', 'tvs-audio', 'home-appliances', 'gaming'],
-    'liquor-store': ['wines', 'spirits', 'beer-cider', 'liqueurs', 'bar-accessories'],
-    'promos': ['weekly-deals', 'flash-sales', 'clearance', 'bundles'],
-    'clothing': ['topwear', 'bottomwear', 'winterwear'],
-    'home-garden': ['furniture', 'decor', 'garden-tools'],
-    'health-beauty': ['skincare', 'haircare', 'makeup'],
-    'sports-outdoors': ['sports-equipment', 'outdoor-gear', 'fitness'],
-    'other': ['general']
+    'fresh-foods': [
+      'fruits-vegetables',
+      'dairy-products',
+      'meat-poultry',
+      'fish-seafood',
+      'bakery'
+    ],
+    'baby-kids': [
+      'baby-food-formula',
+      'diapers-wipes',
+      'baby-care',
+      'toys-games',
+      'kids-clothing'
+    ],
+    'electronics': [
+      'mobile-phones',
+      'computers-laptops',
+      'tvs-audio',
+      'home-appliances',
+      'gaming'
+    ],
+    'liquor-store': [
+      'wines',
+      'spirits',
+      'beer-cider',
+      'liqueurs',
+      'bar-accessories'
+    ],
+    'food-cupboard': [
+      'grains-cereals',
+      'cooking-oils',
+      'canned-foods',
+      'spices-seasonings',
+      'beverages'
+    ],
+    'promos': [
+      'weekly-deals'
+    ]
   };
 
-  // Handle file input changes
+  // ✅ Detailed subcategory items (for reference/autocomplete)
+  const detailedItems = {
+    // Fresh Foods
+    'fruits-vegetables': ['fruits', 'vegetables', 'organic', 'herbs'],
+    'dairy-products': ['milk', 'yoghurt', 'cheese', 'butter'],
+    'meat-poultry': ['beef', 'chicken', 'pork', 'lamb'],
+    'fish-seafood': ['fish', 'frozen', 'prawns', 'squid'],
+    'bakery': ['bread', 'cakes', 'pastries', 'cookies'],
+    
+    // Baby & Kids
+    'baby-food-formula': ['formula', 'food', 'cereals'],
+    'diapers-wipes': ['diapers', 'wipes', 'training'],
+    'baby-care': ['bath', 'toiletries', 'health'],
+    'toys-games': ['educational', 'action', 'dolls', 'board'],
+    'kids-clothing': ['boys', 'girls', 'uniforms'],
+    
+    // Electronics
+    'mobile-phones': ['smartphones', 'accessories', 'chargers'],
+    'computers-laptops': ['laptops', 'desktops', 'monitors'],
+    'tvs-audio': ['tvs', 'audio', 'headphones'],
+    'home-appliances': ['fridges', 'washing', 'microwaves'],
+    'gaming': ['consoles', 'games', 'accessories'],
+    
+    // Liquor Store
+    'wines': ['red', 'white', 'champagne', 'rose'],
+    'spirits': ['whisky', 'vodka', 'gin', 'rum'],
+    'beer-cider': ['local', 'imported', 'craft'],
+    'liqueurs': ['cream', 'fruit', 'coffee'],
+    'bar-accessories': ['glassware', 'tools', 'ice'],
+    
+    // Food Cupboard
+    'grains-cereals': ['rice', 'pasta', 'cereals'],
+    'cooking-oils': ['vegetable', 'olive', 'sunflower'],
+    'canned-foods': ['vegetables', 'fruits', 'soups'],
+    'spices-seasonings': ['herbs', 'salt', 'sauces'],
+    'beverages': ['coffee', 'tea', 'soft-drinks'],
+    
+    // Promos
+    'weekly-deals': ['flash', 'clearance', 'bundles']
+  };
+
   const handleImageChange = (index, file) => {
     const newImages = [...images];
     newImages[index] = file;
     setImages(newImages);
   };
 
-  // Handle text input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -88,15 +149,21 @@ const Add = () => {
         minimumAge: "21"
       }));
     }
+
+    // Reset subCategory when category changes
+    if (name === 'category') {
+      setFormData(prev => ({
+        ...prev,
+        subCategory: ""
+      }));
+    }
   };
 
-  // Handle checkbox toggle
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
     setFormData({ ...formData, [name]: checked });
   };
 
-  // Submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -106,10 +173,8 @@ const Add = () => {
       
       const fd = new FormData();
 
-      // Append form fields
       Object.entries(formData).forEach(([key, value]) => {
         if (key === 'tags' && typeof value === 'string') {
-          // Convert comma-separated tags to array
           const tagsArray = value.split(',').map(t => t.trim()).filter(t => t);
           fd.append(key, JSON.stringify(tagsArray));
         } else {
@@ -117,7 +182,6 @@ const Add = () => {
         }
       });
 
-      // Append image files
       images.forEach((img, idx) => {
         if (img) fd.append(`image${idx + 1}`, img);
       });
@@ -135,7 +199,6 @@ const Add = () => {
 
       if (result.success) {
         alert("✅ Product added successfully!");
-        // Reset form
         setFormData({
           name: "",
           description: "",
@@ -175,17 +238,12 @@ const Add = () => {
       <h2>Add New Product</h2>
       
       <p>Upload Images</p>
-      {/* Image Upload Section */}
       <div className="label-container">
         {[0, 1, 2, 3].map((index) => (
           <label htmlFor={`image${index + 1}`} key={index}>
             <img
               className="upload-img"
-              src={
-                images[index]
-                  ? URL.createObjectURL(images[index])
-                  : assets.upload_area
-              }
+              src={images[index] ? URL.createObjectURL(images[index]) : assets.upload_area}
               alt={`upload-${index + 1}`}
             />
             <input
@@ -198,7 +256,6 @@ const Add = () => {
         ))}
       </div>
 
-      {/* Product Fields */}
       <div className="add-form-fields">
         {/* Basic Info */}
         <div className="form-section">
@@ -312,10 +369,17 @@ const Add = () => {
           <input
             type="text"
             name="detailedCategory"
-            placeholder="Detailed Category (e.g., rice, beef, smartphones)"
+            placeholder="Detailed Category (e.g., smartphones, rice, toys)"
             value={formData.detailedCategory}
             onChange={handleInputChange}
           />
+          
+          {/* Show suggested items based on subcategory */}
+          {formData.subCategory && detailedItems[formData.subCategory] && (
+            <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
+              💡 Suggestions: {detailedItems[formData.subCategory].join(', ')}
+            </p>
+          )}
           
           <input
             type="text"
@@ -359,7 +423,7 @@ const Add = () => {
           </label>
         </div>
 
-        {/* ✅ NEW: Display Sections */}
+        {/* Display Sections */}
         <div className="form-section featured-section">
           <h3>⭐ Display Sections</h3>
           <p className="section-help-text">Select where this product should appear on the homepage</p>
