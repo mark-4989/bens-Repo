@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ShopContext } from '../context/ShopContext';
 import Title from './Title';
 import ProductItem from './ProductItem';
+import WhatshotIcon from '@mui/icons-material/Whatshot';
 import './TrendingNow.css';
 
 const TrendingNow = () => {
@@ -10,10 +11,8 @@ const TrendingNow = () => {
 
   useEffect(() => {
     if (products && products.length > 0) {
-      // Filter products where isTrending is true
       const trending = products.filter(item => item.isTrending === true);
-      setTrendingProducts(trending.slice(0, 10)); // Show max 10 trending products
-      console.log("🔥 Trending products:", trending.length);
+      setTrendingProducts(trending.slice(0, 10));
     }
   }, [products]);
 
@@ -25,7 +24,6 @@ const TrendingNow = () => {
     );
   }
 
-  // Only show section if there are trending products
   if (trendingProducts.length === 0) {
     return null;
   }
@@ -33,13 +31,12 @@ const TrendingNow = () => {
   return (
     <div className="trending-section">
       <div className="trending-header">
-        <Title text1={'TRENDING'} text2={'NOW'} />
+        <Title text1={'TRENDING'} text2={'NOW'} icon={WhatshotIcon} />
         <p className="trending-description">
           🔥 Hot products that everyone is buying right now!
         </p>
       </div>
 
-      {/* Render Products Grid */}
       <div className="trending-grid">
         {trendingProducts.map((item, index) => (
           <ProductItem

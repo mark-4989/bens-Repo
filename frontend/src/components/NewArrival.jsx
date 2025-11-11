@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ShopContext } from '../context/ShopContext';
 import Title from './Title';
 import ProductItem from './ProductItem';
+import CheckroomIcon from '@mui/icons-material/Checkroom';
 import './NewArrival.css';
 
 const NewArrivals = () => {
@@ -10,10 +11,8 @@ const NewArrivals = () => {
 
   useEffect(() => {
     if (products && products.length > 0) {
-      // Filter products where isNewArrival is true
       const newArrivals = products.filter(item => item.isNewArrival === true);
-      setNewArrivalProducts(newArrivals.slice(0, 10)); // Show max 10 new arrivals
-      console.log("✨ New arrival products:", newArrivals.length);
+      setNewArrivalProducts(newArrivals.slice(0, 10));
     }
   }, [products]);
 
@@ -25,7 +24,6 @@ const NewArrivals = () => {
     );
   }
 
-  // Only show section if there are new arrivals
   if (newArrivalProducts.length === 0) {
     return null;
   }
@@ -33,13 +31,12 @@ const NewArrivals = () => {
   return (
     <div className="new-arrivals-section">
       <div className="new-arrivals-header">
-        <Title text1={'NEW'} text2={'ARRIVALS'} />
+        <Title text1={'NEW'} text2={'ARRIVALS'} icon={CheckroomIcon} />
         <p className="new-arrivals-description">
           ✨ Fresh products just added to our store!
         </p>
       </div>
 
-      {/* Render Products Grid */}
       <div className="new-arrivals-grid">
         {newArrivalProducts.map((item, index) => (
           <ProductItem

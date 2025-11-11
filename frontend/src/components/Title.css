@@ -1,43 +1,140 @@
-.title-container {
-  text-align: center;
+/* ====================================
+   LIQUID GLASSMORPHISM TITLE COMPONENT
+   ==================================== */
 
-  width: 80vw;
-  margin-left: 8.5vw;
-  height: 7vh;
-  
+.title-container {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  padding-bottom: 10px;
+  gap: 12px;
+  padding: 24px 20px;
+  margin: 0 auto 40px;
+  width: fit-content;
+  position: relative;
+}
+
+/* Title Text Styling */
+.title-container b,
+.title-container p {
+  font-size: 42px;
+  font-weight: 600;
+  color: #ffffff;
+  font-family: "Outfit", sans-serif;
+  margin: 0;
+  letter-spacing: 2px;
+  
+  /* Glass Text Effect */
+  text-shadow: 
+    0 0 20px rgba(102, 126, 234, 0.6),
+    0 0 40px rgba(118, 75, 162, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.8);
+  
+  transition: all 0.4s ease;
+}
+
+.title-container b {
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .title-container p {
-  font-size: 36px;
-  font-weight: 500;
-  color: #fff;
-  font-family: "Outfit";
-  margin-bottom: 10px;
-}
-.title-container b {
-  font-size: 30px;
-  font-weight: 400;
-  color: #fff;
-  font-family: "Outfit";
-  margin-bottom: 10px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
 }
 
-/* .title-container span {
-  font-size: 76px;
-  color: #666;
-  font-family: 'Poppins', sans-serif;
-} */
+/* Animated Underline */
+.title-container::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 3px;
+  
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(102, 126, 234, 0.8),
+    rgba(118, 75, 162, 0.8),
+    transparent
+  );
+  
+  border-radius: 2px;
+  box-shadow: 
+    0 0 10px rgba(102, 126, 234, 0.6),
+    0 0 20px rgba(118, 75, 162, 0.4);
+  
+  animation: underlineGlow 3s ease-in-out infinite;
+}
 
-span {
-  width: 50vw;
-  height: 4px;
-  font-size: 20px;
-  margin-left: 10px;
-  /* vertical-align: middle; */
-  margin-top: 70px;
+@keyframes underlineGlow {
+  0%, 100% {
+    opacity: 0.6;
+    width: 60%;
+  }
+  50% {
+    opacity: 1;
+    width: 80%;
+  }
+}
+
+/* Icon Styling (if added) */
+.title-icon {
+  color: rgba(102, 126, 234, 0.8);
+  filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.6));
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.6));
+  }
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 15px rgba(102, 126, 234, 0.9));
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .title-container b,
+  .title-container p {
+    font-size: 32px;
+    letter-spacing: 1px;
+  }
+  
+  .title-container {
+    padding: 20px 15px;
+    margin-bottom: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .title-container {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .title-container b,
+  .title-container p {
+    font-size: 28px;
+  }
+  
+  .title-container::after {
+    width: 80%;
+  }
+}
+
+@media (min-width: 1440px) {
+  .title-container b,
+  .title-container p {
+    font-size: 48px;
+  }
 }

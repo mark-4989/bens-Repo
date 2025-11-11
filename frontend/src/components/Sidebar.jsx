@@ -1,331 +1,396 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './Sidebar.css';
+import RestaurantIcon from '@mui/icons-material/Restaurant';
+import ChildCareIcon from '@mui/icons-material/ChildCare';
+import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
+import WineBarIcon from '@mui/icons-material/WineBar';
+import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
+import DinnerDiningIcon from '@mui/icons-material/DinnerDining';
+import HomeIcon from '@mui/icons-material/Home';
+import CheckroomIcon from '@mui/icons-material/Checkroom';
+import LocalDrinkIcon from '@mui/icons-material/LocalDrink';
+import PetsIcon from '@mui/icons-material/Pets';
 
-const Sidebar = ({ isOpen = true, onClose }) => {
-  const [activeMenu, setActiveMenu] = useState(null);
+const Sidebar = () => {
+  const navigate = useNavigate();
+  const [hoveredCategory, setHoveredCategory] = useState(null);
 
-  const menuData = [
+  // ⚠️ CRITICAL: These category IDs MUST match your backend exactly
+  // Backend uses: 'fresh-foods', 'baby-kids', 'electronics', 'liquor-store', 'food-cupboard'
+  
+  const categories = [
     {
-      id: 1,
-      title: 'Categories',
-      icon: '📂',
-      link: '/categories',
-      submenu: [
-        { name: 'All Products', link: '/collection' },
-        { name: 'New Arrivals', link: '/new-arrivals' },
-        { name: 'Best Sellers', link: '/best-sellers' },
-        { name: 'On Sale', link: '/on-sale' }
-      ]
-    },
-    {
-      id: 2,
-      title: 'Promos',
-      icon: '🎁',
-      link: '/promos',
-      badge: 'HOT',
-      submenu: [
-        { name: 'Weekly Deals', link: '/promos/weekly-deals' },
-        { name: 'Flash Sales', link: '/promos/flash-sales' },
-        { name: 'Clearance', link: '/promos/clearance' },
-        { name: 'Bundle Offers', link: '/promos/bundles' }
-      ]
-    },
-    {
-      id: 3,
-      title: 'Food Cupboard',
-      icon: '🥫',
-      link: '/food-cupboard',
-      submenu: [
-        { 
-          name: 'Grains & Cereals',
-          subcategories: [
-            'Rice', 'Maize Flour', 'Wheat Flour', 'Oats', 'Pasta'
+      id: 'fresh-foods',  // ← Matches backend exactly
+      name: 'Fresh Food',
+      icon: <RestaurantIcon/>,
+      route: '/category/fresh-foods',
+      subcategories: [
+        {
+          title: 'Fruits & Vegetables',
+          route: '/category/fresh-foods/fruits-vegetables',
+          items: [
+            { name: 'Fresh Fruits', route: '/products/fresh-foods/fruits-vegetables?type=fruits' },
+            { name: 'Fresh Vegetables', route: '/products/fresh-foods/fruits-vegetables?type=vegetables' },
+            { name: 'Organic Produce', route: '/products/fresh-foods/fruits-vegetables?type=organic' },
+            { name: 'Herbs & Spices', route: '/products/fresh-foods/fruits-vegetables?type=herbs' }
           ]
         },
-        { 
-          name: 'Cooking Oils',
-          subcategories: [
-            'Vegetable Oil', 'Sunflower Oil', 'Olive Oil', 'Palm Oil'
+        {
+          title: 'Dairy Products',
+          route: '/category/fresh-foods/dairy-products',
+          items: [
+            { name: 'Fresh Milk', route: '/products/fresh-foods/dairy-products?type=milk' },
+            { name: 'Yoghurt', route: '/products/fresh-foods/dairy-products?type=yoghurt' },
+            { name: 'Cheese', route: '/products/fresh-foods/dairy-products?type=cheese' },
+            { name: 'Butter', route: '/products/fresh-foods/dairy-products?type=butter' }
           ]
         },
-        { 
-          name: 'Canned Foods',
-          subcategories: [
-            'Canned Vegetables', 'Canned Fruits', 'Canned Fish', 'Canned Meat'
+        {
+          title: 'Meat & Poultry',
+          route: '/category/fresh-foods/meat-poultry',
+          items: [
+            { name: 'Fresh Beef', route: '/products/fresh-foods/meat-poultry?type=beef' },
+            { name: 'Chicken', route: '/products/fresh-foods/meat-poultry?type=chicken' },
+            { name: 'Pork', route: '/products/fresh-foods/meat-poultry?type=pork' },
+            { name: 'Lamb', route: '/products/fresh-foods/meat-poultry?type=lamb' }
           ]
         },
-        { 
-          name: 'Spices & Seasonings',
-          subcategories: [
-            'Salt', 'Pepper', 'Curry', 'Mixed Spices', 'Herbs'
+        {
+          title: 'Fish & Seafood',
+          route: '/category/fresh-foods/fish-seafood',
+          items: [
+            { name: 'Fresh Fish', route: '/products/fresh-foods/fish-seafood?type=fish' },
+            { name: 'Frozen Fish', route: '/products/fresh-foods/fish-seafood?type=frozen' },
+            { name: 'Prawns', route: '/products/fresh-foods/fish-seafood?type=prawns' },
+            { name: 'Squid', route: '/products/fresh-foods/fish-seafood?type=squid' }
           ]
         },
-        { 
-          name: 'Beverages',
-          subcategories: [
-            'Tea', 'Coffee', 'Juice', 'Soda', 'Energy Drinks'
+        {
+          title: 'Bakery',
+          route: '/category/fresh-foods/bakery',
+          items: [
+            { name: 'Fresh Bread', route: '/products/fresh-foods/bakery?type=bread' },
+            { name: 'Cakes', route: '/products/fresh-foods/bakery?type=cakes' },
+            { name: 'Pastries', route: '/products/fresh-foods/bakery?type=pastries' },
+            { name: 'Cookies', route: '/products/fresh-foods/bakery?type=cookies' }
           ]
         }
       ]
     },
     {
-      id: 4,
-      title: 'Fresh Foods',
-      icon: '🥗',
-      link: '/fresh-foods',
-      submenu: [
-        { 
-          name: 'Fruits & Vegetables',
-          subcategories: [
-            'Fresh Fruits', 'Leafy Greens', 'Root Vegetables', 'Exotic Fruits'
+      id: 'baby-kids',  // ← Matches backend exactly
+      name: 'Baby & Kids',
+      icon: <ChildCareIcon/>,
+      route: '/category/baby-kids',
+      subcategories: [
+        {
+          title: 'Baby Food & Formula',
+          route: '/category/baby-kids/baby-food-formula',
+          items: [
+            { name: 'Baby Formula', route: '/products/baby-kids/baby-food-formula?type=formula' },
+            { name: 'Baby Food', route: '/products/baby-kids/baby-food-formula?type=food' },
+            { name: 'Baby Cereals', route: '/products/baby-kids/baby-food-formula?type=cereals' }
           ]
         },
-        { 
-          name: 'Meat & Poultry',
-          subcategories: [
-            'Beef', 'Chicken', 'Pork', 'Goat Meat', 'Processed Meat'
+        {
+          title: 'Diapers & Wipes',
+          route: '/category/baby-kids/diapers-wipes',
+          items: [
+            { name: 'Disposable Diapers', route: '/products/baby-kids/diapers-wipes?type=diapers' },
+            { name: 'Baby Wipes', route: '/products/baby-kids/diapers-wipes?type=wipes' },
+            { name: 'Training Pants', route: '/products/baby-kids/diapers-wipes?type=training' }
           ]
         },
-        { 
-          name: 'Fish & Seafood',
-          subcategories: [
-            'Fresh Fish', 'Frozen Fish', 'Prawns', 'Crab', 'Squid'
+        {
+          title: 'Baby Care',
+          route: '/category/baby-kids/baby-care',
+          items: [
+            { name: 'Baby Bath', route: '/products/baby-kids/baby-care?type=bath' },
+            { name: 'Baby Toiletries', route: '/products/baby-kids/baby-care?type=toiletries' },
+            { name: 'Baby Health', route: '/products/baby-kids/baby-care?type=health' }
           ]
         },
-        { 
-          name: 'Dairy Products',
-          subcategories: [
-            'Milk', 'Cheese', 'Yogurt', 'Butter', 'Cream'
+        {
+          title: 'Toys & Games',
+          route: '/category/baby-kids/toys-games',
+          items: [
+            { name: 'Educational Toys', route: '/products/baby-kids/toys-games?type=educational' },
+            { name: 'Action Figures', route: '/products/baby-kids/toys-games?type=action' },
+            { name: 'Dolls', route: '/products/baby-kids/toys-games?type=dolls' },
+            { name: 'Board Games', route: '/products/baby-kids/toys-games?type=board' }
           ]
         },
-        { 
-          name: 'Bakery',
-          subcategories: [
-            'Bread', 'Cakes', 'Pastries', 'Cookies', 'Donuts'
+        {
+          title: 'Kids Clothing',
+          route: '/category/baby-kids/kids-clothing',
+          items: [
+            { name: 'Boys Clothing', route: '/products/baby-kids/kids-clothing?type=boys' },
+            { name: 'Girls Clothing', route: '/products/baby-kids/kids-clothing?type=girls' },
+            { name: 'School Uniforms', route: '/products/baby-kids/kids-clothing?type=uniforms' }
           ]
         }
       ]
     },
     {
-      id: 5,
-      title: 'Baby & Kids',
-      icon: '👶',
-      link: '/baby-kids',
-      submenu: [
-        { 
-          name: 'Baby Food & Formula',
-          subcategories: [
-            'Infant Formula', 'Baby Cereals', 'Baby Snacks', 'Baby Juice'
+      id: 'electronics',  // ← Matches backend exactly
+      name: 'Electronics',
+      icon: <ElectricBoltIcon/>,
+      route: '/category/electronics',
+      subcategories: [
+        {
+          title: 'Mobile Phones',
+          route: '/category/electronics/mobile-phones',
+          items: [
+            { name: 'Smartphones', route: '/products/electronics/mobile-phones?type=smartphones' },
+            { name: 'Phone Accessories', route: '/products/electronics/mobile-phones?type=accessories' },
+            { name: 'Chargers', route: '/products/electronics/mobile-phones?type=chargers' }
           ]
         },
-        { 
-          name: 'Diapers & Wipes',
-          subcategories: [
-            'Disposable Diapers', 'Cloth Diapers', 'Baby Wipes', 'Diaper Cream'
+        {
+          title: 'Computers & Laptops',
+          route: '/category/electronics/computers-laptops',
+          items: [
+            { name: 'Laptops', route: '/products/electronics/computers-laptops?type=laptops' },
+            { name: 'Desktops', route: '/products/electronics/computers-laptops?type=desktops' },
+            { name: 'Monitors', route: '/products/electronics/computers-laptops?type=monitors' }
           ]
         },
-        { 
-          name: 'Baby Care',
-          subcategories: [
-            'Baby Shampoo', 'Baby Lotion', 'Baby Oil', 'Baby Powder'
+        {
+          title: 'TVs & Audio',
+          route: '/category/electronics/tvs-audio',
+          items: [
+            { name: 'Televisions', route: '/products/electronics/tvs-audio?type=tvs' },
+            { name: 'Sound Systems', route: '/products/electronics/tvs-audio?type=audio' },
+            { name: 'Headphones', route: '/products/electronics/tvs-audio?type=headphones' }
           ]
         },
-        { 
-          name: 'Kids Clothing',
-          subcategories: [
-            'Boys Wear', 'Girls Wear', 'Shoes', 'Accessories'
+        {
+          title: 'Home Appliances',
+          route: '/category/electronics/home-appliances',
+          items: [
+            { name: 'Refrigerators', route: '/products/electronics/home-appliances?type=fridges' },
+            { name: 'Washing Machines', route: '/products/electronics/home-appliances?type=washing' },
+            { name: 'Microwaves', route: '/products/electronics/home-appliances?type=microwaves' }
           ]
         },
-        { 
-          name: 'Toys & Games',
-          subcategories: [
-            'Educational Toys', 'Action Figures', 'Dolls', 'Board Games'
+        {
+          title: 'Gaming',
+          route: '/category/electronics/gaming',
+          items: [
+            { name: 'Gaming Consoles', route: '/products/electronics/gaming?type=consoles' },
+            { name: 'Video Games', route: '/products/electronics/gaming?type=games' },
+            { name: 'Gaming Accessories', route: '/products/electronics/gaming?type=accessories' }
           ]
         }
       ]
     },
     {
-      id: 6,
-      title: 'Electronics',
-      icon: '📱',
-      link: '/electronics',
-      submenu: [
-        { 
-          name: 'Mobile Phones',
-          subcategories: [
-            'Smartphones', 'Feature Phones', 'Accessories', 'Power Banks'
+      id: 'liquor-store',  // ← Matches backend exactly
+      name: 'Naivas Liquor',
+      icon: <WineBarIcon/>,
+      route: '/category/liquor-store',
+      subcategories: [
+        {
+          title: 'Wines',
+          route: '/category/liquor-store/wines',
+          items: [
+            { name: 'Red Wine', route: '/products/liquor-store/wines?type=red' },
+            { name: 'White Wine', route: '/products/liquor-store/wines?type=white' },
+            { name: 'Champagne', route: '/products/liquor-store/wines?type=champagne' },
+            { name: 'Rosé Wine', route: '/products/liquor-store/wines?type=rose' }
           ]
         },
-        { 
-          name: 'Computers & Laptops',
-          subcategories: [
-            'Laptops', 'Desktops', 'Tablets', 'Computer Accessories'
+        {
+          title: 'Spirits',
+          route: '/category/liquor-store/spirits',
+          items: [
+            { name: 'Whisky', route: '/products/liquor-store/spirits?type=whisky' },
+            { name: 'Vodka', route: '/products/liquor-store/spirits?type=vodka' },
+            { name: 'Gin', route: '/products/liquor-store/spirits?type=gin' },
+            { name: 'Rum', route: '/products/liquor-store/spirits?type=rum' }
           ]
         },
-        { 
-          name: 'TVs & Audio',
-          subcategories: [
-            'Smart TVs', 'LED TVs', 'Sound Systems', 'Headphones'
+        {
+          title: 'Beer & Cider',
+          route: '/category/liquor-store/beer-cider',
+          items: [
+            { name: 'Local Beer', route: '/products/liquor-store/beer-cider?type=local' },
+            { name: 'Imported Beer', route: '/products/liquor-store/beer-cider?type=imported' },
+            { name: 'Craft Beer', route: '/products/liquor-store/beer-cider?type=craft' }
           ]
         },
-        { 
-          name: 'Home Appliances',
-          subcategories: [
-            'Refrigerators', 'Washing Machines', 'Microwaves', 'Blenders'
+        {
+          title: 'Liqueurs',
+          route: '/category/liquor-store/liqueurs',
+          items: [
+            { name: 'Cream Liqueurs', route: '/products/liquor-store/liqueurs?type=cream' },
+            { name: 'Fruit Liqueurs', route: '/products/liquor-store/liqueurs?type=fruit' },
+            { name: 'Coffee Liqueurs', route: '/products/liquor-store/liqueurs?type=coffee' }
           ]
         },
-        { 
-          name: 'Gaming',
-          subcategories: [
-            'PlayStation', 'Xbox', 'Nintendo', 'PC Games', 'Gaming Accessories'
+        {
+          title: 'Bar Accessories',
+          route: '/category/liquor-store/bar-accessories',
+          items: [
+            { name: 'Glassware', route: '/products/liquor-store/bar-accessories?type=glassware' },
+            { name: 'Bar Tools', route: '/products/liquor-store/bar-accessories?type=tools' },
+            { name: 'Ice Buckets', route: '/products/liquor-store/bar-accessories?type=ice' }
           ]
         }
       ]
     },
     {
-      id: 7,
-      title: 'Forever Liquor Store',
-      icon: '🍷',
-      link: '/liquor-store',
-      badge: '21+',
-      submenu: [
-        { 
-          name: 'Wines',
-          subcategories: [
-            'Red Wine', 'White Wine', 'Rosé Wine', 'Sparkling Wine', 'Dessert Wine'
+      id: 'food-cupboard',  // ← Matches backend exactly
+      name: 'Food Cupboard',
+      icon: <DinnerDiningIcon/>,
+      route: '/category/food-cupboard',
+      subcategories: [
+        {
+          title: 'Grains & Cereals',
+          route: '/category/food-cupboard/grains-cereals',
+          items: [
+            { name: 'Rice', route: '/products/food-cupboard/grains-cereals?type=rice' },
+            { name: 'Pasta', route: '/products/food-cupboard/grains-cereals?type=pasta' },
+            { name: 'Breakfast Cereals', route: '/products/food-cupboard/grains-cereals?type=cereals' }
           ]
         },
-        { 
-          name: 'Spirits',
-          subcategories: [
-            'Whiskey', 'Vodka', 'Gin', 'Rum', 'Tequila', 'Brandy'
+        {
+          title: 'Cooking Oils',
+          route: '/category/food-cupboard/cooking-oils',
+          items: [
+            { name: 'Vegetable Oil', route: '/products/food-cupboard/cooking-oils?type=vegetable' },
+            { name: 'Olive Oil', route: '/products/food-cupboard/cooking-oils?type=olive' },
+            { name: 'Sunflower Oil', route: '/products/food-cupboard/cooking-oils?type=sunflower' }
           ]
         },
-        { 
-          name: 'Beer & Cider',
-          subcategories: [
-            'Local Beer', 'Imported Beer', 'Craft Beer', 'Cider'
+        {
+          title: 'Canned Foods',
+          route: '/category/food-cupboard/canned-foods',
+          items: [
+            { name: 'Canned Vegetables', route: '/products/food-cupboard/canned-foods?type=vegetables' },
+            { name: 'Canned Fruits', route: '/products/food-cupboard/canned-foods?type=fruits' },
+            { name: 'Soups', route: '/products/food-cupboard/canned-foods?type=soups' }
           ]
         },
-        { 
-          name: 'Liqueurs',
-          subcategories: [
-            'Fruit Liqueurs', 'Cream Liqueurs', 'Herbal Liqueurs'
+        {
+          title: 'Spices & Seasonings',
+          route: '/category/food-cupboard/spices-seasonings',
+          items: [
+            { name: 'Herbs & Spices', route: '/products/food-cupboard/spices-seasonings?type=herbs' },
+            { name: 'Salt & Pepper', route: '/products/food-cupboard/spices-seasonings?type=salt' },
+            { name: 'Sauces', route: '/products/food-cupboard/spices-seasonings?type=sauces' }
           ]
         },
-        { 
-          name: 'Bar Accessories',
-          subcategories: [
-            'Glasses', 'Cocktail Shakers', 'Wine Openers', 'Ice Buckets'
+        {
+          title: 'Beverages',
+          route: '/category/food-cupboard/beverages',
+          items: [
+            { name: 'Coffee', route: '/products/food-cupboard/beverages?type=coffee' },
+            { name: 'Tea', route: '/products/food-cupboard/beverages?type=tea' },
+            { name: 'Soft Drinks', route: '/products/food-cupboard/beverages?type=soft-drinks' }
+          ]
+        }
+      ]
+    },
+    {
+      id: 'promos',  // ← For promotional products
+      name: 'Promotions',
+      icon: <CardGiftcardIcon/>,
+      route: '/category/promos',
+      subcategories: [
+        {
+          title: 'Weekly Deals',
+          route: '/category/promos/weekly-deals',
+          items: [
+            { name: 'Flash Sales', route: '/products/promos/weekly-deals?type=flash' },
+            { name: 'Clearance', route: '/products/promos/weekly-deals?type=clearance' },
+            { name: 'Bundles', route: '/products/promos/weekly-deals?type=bundles' }
           ]
         }
       ]
     }
   ];
 
-  const handleMouseEnter = (menuId) => {
-    setActiveMenu(menuId);
+  const handleMouseEnter = (categoryId) => {
+    setHoveredCategory(categoryId);
   };
 
   const handleMouseLeave = () => {
-    setActiveMenu(null);
+    setHoveredCategory(null);
   };
 
-  const handleLinkClick = (e) => {
-    // Don't stop propagation - let the link work
-    // Close sidebar on mobile when a link is clicked
-    if (onClose && window.innerWidth <= 768) {
-      setTimeout(() => onClose(), 100);
-    }
+  const handleCategoryClick = (route) => {
+    navigate(route);
+    setHoveredCategory(null);
   };
 
-  const handleSubmenuClick = (e) => {
-    // Prevent submenu from closing when clicking inside it
-    e.stopPropagation();
+  const handleSubcategoryClick = (route) => {
+    navigate(route);
+    setHoveredCategory(null);
   };
 
   return (
-    <>
-      {/* Overlay for mobile */}
-      {isOpen && (
-        <div 
-          className={`sidebar-overlay ${isOpen ? 'active' : ''}`}
-          onClick={onClose}
-        />
-      )}
-
-      {/* Sidebar Container */}
-      <div className={`sidebar-container ${isOpen ? 'open' : 'closed'}`}>
-        {/* Mobile Close Button */}
-        <div className="sidebar-mobile-header">
-          <h3>Shop Categories</h3>
-          <button className="sidebar-close-btn" onClick={onClose}>
-            ✕
-          </button>
+    <div className="sidebar-container">
+      <div className="sidebar">
+        <div className="sidebar-header">
+          <span className="sidebar-icon">🛍️</span>
+          <h2 className="sidebar-title">Categories</h2>
         </div>
 
-        <div className="sidebar-main">
-          {menuData.map((menu) => (
+        <div className="category-list">
+          {categories.map((category) => (
             <div
-              key={menu.id}
-              className="sidebar-item"
-              onMouseEnter={() => handleMouseEnter(menu.id)}
+              key={category.id}
+              className="category-item"
+              onMouseEnter={() => handleMouseEnter(category.id)}
               onMouseLeave={handleMouseLeave}
             >
-              <Link 
-                to={menu.link} 
-                className="sidebar-link"
-                onClick={handleLinkClick}
+              <button 
+                className="category-button"
+                onClick={() => handleCategoryClick(category.route)}
               >
-                <span className="sidebar-icon">{menu.icon}</span>
-                <span className="sidebar-title">{menu.title}</span>
-                {menu.badge && <span className="sidebar-badge">{menu.badge}</span>}
-                <span className="sidebar-arrow">›</span>
-              </Link>
+                <div className="category-content">
+                  <span className="category-icon">{category.icon}</span>
+                  <span className="category-name">{category.name}</span>
+                </div>
+                <span className="category-arrow">›</span>
+              </button>
 
-              {/* Submenu Panel */}
-              {activeMenu === menu.id && menu.submenu && (
-                <div className="submenu-panel">
-                  <div className="submenu-header">
-                    <h3>{menu.title}</h3>
-                    <Link 
-                      to={menu.link} 
-                      className="view-all-link"
-                      onClick={handleLinkClick}
-                    >
-                      View All →
-                    </Link>
-                  </div>
-                  <div className="submenu-grid">
-                    {menu.submenu.map((item, index) => (
-                      <div key={index} className="submenu-section">
-                        <h4 className="submenu-category-title">
-                          {item.subcategories ? (
-                            <span>{item.name}</span>
-                          ) : (
-                            <Link 
-                              to={item.link}
-                              onClick={handleLinkClick}
-                            >
-                              {item.name}
-                            </Link>
-                          )}
+              {hoveredCategory === category.id && (
+                <div 
+                  className="mega-menu"
+                  onMouseEnter={() => handleMouseEnter(category.id)}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <h3 className="mega-menu-title">{category.name}</h3>
+                  
+                  <div className="mega-menu-grid">
+                    {category.subcategories.map((sub, idx) => (
+                      <div key={idx} className="subcategory">
+                        <h4 
+                          className="subcategory-title"
+                          onClick={() => handleSubcategoryClick(sub.route)}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          {sub.title}
                         </h4>
-                        {item.subcategories && (
-                          <ul className="subcategory-list">
-                            {item.subcategories.map((sub, subIndex) => (
-                              <li key={subIndex}>
-                                <Link 
-                                  to={`${menu.link}/${item.name.toLowerCase().replace(/\s+/g, '-')}/${sub.toLowerCase().replace(/\s+/g, '-')}`}
-                                  onClick={handleLinkClick}
-                                >
-                                  {sub}
-                                </Link>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
+                        <ul className="subcategory-list">
+                          {sub.items.map((item, itemIdx) => (
+                            <li key={itemIdx} className="subcategory-item">
+                              <a 
+                                href="#" 
+                                className="subcategory-link"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleSubcategoryClick(item.route);
+                                }}
+                              >
+                                {item.name}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
                     ))}
                   </div>
@@ -335,7 +400,7 @@ const Sidebar = ({ isOpen = true, onClose }) => {
           ))}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

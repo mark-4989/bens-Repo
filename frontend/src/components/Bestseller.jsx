@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ShopContext } from '../context/ShopContext';
 import Title from './Title';
 import ProductItem from './ProductItem';
+import StarIcon from '@mui/icons-material/Star';
 import './BestSeller.css';
 
 const Bestseller = () => {
@@ -10,16 +11,12 @@ const Bestseller = () => {
 
   useEffect(() => {
     if (products && products.length > 0) {
-      // ✅ Filter products where bestseller is true
       const bestsellers = products.filter(item => item.bestseller === true);
       
-      // If no bestsellers, show random 5 products
       if (bestsellers.length === 0) {
         setBestsellerProducts(products.slice(0, 5));
-        console.log("ℹ️ No bestsellers marked, showing random products");
       } else {
         setBestsellerProducts(bestsellers.slice(0, 5));
-        console.log("⭐ Bestseller products:", bestsellers.length);
       }
     }
   }, [products]);
@@ -39,13 +36,12 @@ const Bestseller = () => {
   return (
     <div className="bestseller-section">
       <div className="bestseller-header">
-        <Title text1={'BEST'} text2={'SELLERS'} />
+        <Title text1={'BEST'} text2={'SELLERS'} icon={StarIcon} />
         <p className="bestseller-description">
           ⭐ Our most popular products loved by customers!
         </p>
       </div>
 
-      {/* Render Products Grid */}
       <div className="bestseller-grid">
         {bestsellerProducts.map((item, index) => (
           <ProductItem

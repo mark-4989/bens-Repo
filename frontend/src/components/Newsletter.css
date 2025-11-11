@@ -1,39 +1,295 @@
-.newsletter-container{
-    display: flex;
+/* ====================================
+   PREMIUM IPHONE LIQUID GLASS NEWSLETTER
+   ==================================== */
+
+.newsletter-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  
+  width: 90%;
+  max-width: 900px;
+  margin: 80px auto;
+  padding: 60px 40px;
+  
+  position: relative;
+  border-radius: 32px;
+  overflow: hidden;
+  
+  /* iPhone-Style Liquid Glass */
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+    0 40px 120px rgba(102, 126, 234, 0.2);
+  
+  /* Depth Layers */
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Multi-layer Glass Depth Effect */
+.newsletter-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 32px;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.4) 0%,
+    rgba(118, 75, 162, 0.2) 50%,
+    rgba(102, 126, 234, 0.4) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  z-index: -1;
+  animation: borderGlow 4s ease-in-out infinite;
+}
+
+@keyframes borderGlow {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Inner Glass Layer */
+.newsletter-container::after {
+  content: '';
+  position: absolute;
+  inset: 20px;
+  border-radius: 24px;
+  background: radial-gradient(
+    circle at 30% 20%,
+    rgba(255, 255, 255, 0.08) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Floating Particles Effect */
+.newsletter-container > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Big Text - Hero Style */
+.big-text {
+  font-size: 42px;
+  font-weight: 700;
+  color: #ffffff;
+  font-family: 'Outfit', sans-serif;
+  text-align: center;
+  margin: 0;
+  letter-spacing: -0.5px;
+  
+  /* Premium Text Shadow */
+  text-shadow: 
+    0 0 30px rgba(102, 126, 234, 0.6),
+    0 0 60px rgba(118, 75, 162, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.8);
+  
+  background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Small Text - Description */
+.small-text {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  max-width: 600px;
+  line-height: 1.6;
+  margin: 0;
+  
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* Form Container */
+.newsletter-form {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+  max-width: 600px;
+  margin-top: 8px;
+}
+
+/* Input Field - Glass Style */
+.newsletter-form input {
+  flex: 1;
+  height: 56px;
+  padding: 0 24px;
+  
+  font-size: 16px;
+  color: #ffffff;
+  font-family: 'Outfit', sans-serif;
+  
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  
+  box-shadow: 
+    inset 0 2px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  outline: none;
+}
+
+.newsletter-form input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.newsletter-form input:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(102, 126, 234, 0.5);
+  box-shadow: 
+    inset 0 2px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 3px rgba(102, 126, 234, 0.2),
+    0 8px 24px rgba(102, 126, 234, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Button - Gradient Glass with Depth */
+.newsletter-form button {
+  height: 56px;
+  padding: 0 40px;
+  
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  color: #ffffff;
+  
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  
+  box-shadow: 
+    0 8px 24px rgba(102, 126, 234, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+    0 16px 48px rgba(118, 75, 162, 0.3);
+  
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Button Shimmer Effect */
+.newsletter-form button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.6s;
+}
+
+.newsletter-form button:hover::before {
+  left: 100%;
+}
+
+.newsletter-form button:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 
+    0 12px 32px rgba(102, 126, 234, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset,
+    0 20px 60px rgba(118, 75, 162, 0.4);
+  background: linear-gradient(135deg, #7689f0 0%, #8659b8 100%);
+}
+
+.newsletter-form button:active {
+  transform: translateY(-1px) scale(0.98);
+  box-shadow: 
+    0 4px 16px rgba(102, 126, 234, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .newsletter-container {
+    width: 95%;
+    padding: 40px 24px;
+    margin: 60px auto;
+    border-radius: 24px;
+  }
+  
+  .big-text {
+    font-size: 32px;
+  }
+  
+  .small-text {
+    font-size: 14px;
+  }
+  
+  .newsletter-form {
     flex-direction: column;
-    justify-content: center;
-    width: 80vw;
-    align-items: center;
-    height: 40vh;
-    margin-left: 8.5vw;
-}
-
-form{
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
+    gap: 12px;
+  }
+  
+  .newsletter-form input,
+  .newsletter-form button {
     width: 100%;
-    align-items: center;
-}
-input{
-    width: 40%;
-    height: 40px;
-    
-    
-    padding-left: 10px;
-    font-size: 16px;
+    height: 52px;
+  }
+  
+  .newsletter-form button {
+    padding: 0 32px;
+  }
 }
 
-button{
-    
-    width: 20%;
-    height: 40px;
-    
-    
-    border: none;
-    background-color: black;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    margin-left: 20pxs;
+@media (max-width: 480px) {
+  .newsletter-container {
+    padding: 32px 20px;
+    margin: 50px auto;
+  }
+  
+  .big-text {
+    font-size: 28px;
+  }
+  
+  .newsletter-form input,
+  .newsletter-form button {
+    height: 48px;
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .newsletter-container {
+    max-width: 1000px;
+    padding: 70px 50px;
+  }
+  
+  .big-text {
+    font-size: 48px;
+  }
+  
+  .small-text {
+    font-size: 18px;
+  }
 }

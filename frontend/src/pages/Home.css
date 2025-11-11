@@ -1,0 +1,179 @@
+/* ====================================
+   HOME PAGE LAYOUT - LIQUID GLASS ENHANCED
+   ==================================== */
+
+.home-container {
+  display: flex;
+  gap: 24px;
+  width: 89vw;
+  margin-left: 20vw;
+  margin: 0 auto;
+  padding: 0 20px;
+  min-height: 100vh;
+  position: relative;
+  overflow: visible;
+}
+
+.home-content {
+  flex: 1;
+  width: 89vw;
+  padding: 20px 0;
+  overflow: visible;
+  position: relative;
+  z-index: 1;
+  margin-left: 20vw;
+}
+
+/* Smooth Spacing Between Sections */
+.home-content > * {
+  margin-bottom: 80px;
+  animation: fadeInUp 0.8s ease-out backwards;
+}
+
+.home-content > *:nth-child(1) { animation-delay: 0.1s; }
+.home-content > *:nth-child(2) { animation-delay: 0.2s; }
+.home-content > *:nth-child(3) { animation-delay: 0.3s; }
+.home-content > *:nth-child(4) { animation-delay: 0.4s; }
+.home-content > *:nth-child(5) { animation-delay: 0.5s; }
+.home-content > *:nth-child(6) { animation-delay: 0.6s; }
+.home-content > *:nth-child(7) { animation-delay: 0.7s; }
+
+.home-content > *:last-child {
+  margin-bottom: 60px;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ====================================
+   RESPONSIVE LAYOUT
+   ==================================== */
+
+@media (max-width: 1440px) {
+  .home-container {
+    max-width: 100%;
+    gap: 20px;
+  }
+  
+  .home-content > * {
+    margin-bottom: 70px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .home-container {
+    gap: 20px;
+    padding: 0 16px;
+  }
+  
+  .home-content {
+    padding: 16px 0;
+  }
+  
+  .home-content > * {
+    margin-bottom: 60px;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-container {
+    flex-direction: column;
+    gap: 0;
+    padding: 0 12px;
+  }
+  
+  .home-content {
+    padding: 12px 0;
+    width: 100%;
+  }
+  
+  .home-content > * {
+    margin-bottom: 50px;
+  }
+}
+
+/* ====================================
+   MOBILE SIDEBAR TOGGLE - GLASS STYLE
+   ==================================== */
+
+.mobile-sidebar-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-sidebar-toggle {
+    display: flex;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 999;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    
+    /* Enhanced Glass Effect */
+    background: rgba(102, 126, 234, 0.15);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    
+    box-shadow: 
+      0 8px 32px rgba(102, 126, 234, 0.4),
+      0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+      0 0 60px rgba(118, 75, 162, 0.3);
+    
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .mobile-sidebar-toggle:hover {
+    transform: scale(1.1) translateY(-2px);
+    background: rgba(102, 126, 234, 0.25);
+    box-shadow: 
+      0 12px 40px rgba(102, 126, 234, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.2) inset,
+      0 0 80px rgba(118, 75, 162, 0.4);
+  }
+
+  .mobile-sidebar-toggle:active {
+    transform: scale(0.95);
+  }
+}
+
+/* Overlay for mobile sidebar - Enhanced */
+.sidebar-overlay {
+  display: none;
+}
+
+.sidebar-overlay.active {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  z-index: 999;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
