@@ -1,35 +1,17 @@
 /* ====================================
-   DARK WHATSAPP-STYLE FORM WITH GLASS
+   BEAUTIFUL NAVY STYLE - MATCHING DISPLAY SECTIONS
    ==================================== */
 
-/* Form Container - WhatsApp Gray Background */
-.form-container {
-  max-width: 900px;
-  margin: 20px auto;
-  padding: 40px;
-  
-  /* Dark Glass Effect */
-  background: rgba(30, 30, 40, 0.8);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-/* Page Background - WhatsApp Style */
+/* Page Background - Deep Navy */
 body,
 .add-page-wrapper {
   background: linear-gradient(
     135deg,
-    #1a1a24 0%,
-    #252530 25%,
-    #1a1a24 50%,
-    #252530 75%,
-    #1a1a24 100%
+    #1a1d2e 0%,
+    #252841 25%,
+    #1a1d2e 50%,
+    #252841 75%,
+    #1a1d2e 100%
   ) !important;
   background-size: 400% 400% !important;
   animation: gradientShift 15s ease infinite !important;
@@ -41,12 +23,31 @@ body,
   50% { background-position: 100% 50%; }
 }
 
-/* Title - Bright & Glowing */
+/* Form Container - Deep Navy Card */
+.form-container {
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 48px;
+  
+  /* Beautiful Navy Glass */
+  background: rgba(30, 34, 54, 0.95);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  
+  border-radius: 24px;
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(102, 126, 234, 0.2) inset,
+    0 0 100px rgba(102, 126, 234, 0.1);
+}
+
+/* Title - Vibrant & Glowing */
 .form-container h2 {
-  font-size: 32px;
+  font-size: 36px;
   font-weight: 700;
   color: #ffffff;
-  margin: 0 0 32px 0;
+  margin: 0 0 40px 0;
   text-align: center;
   
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -55,31 +56,47 @@ body,
   background-clip: text;
   
   text-shadow: 
-    0 0 30px rgba(102, 126, 234, 0.5),
-    0 0 60px rgba(118, 75, 162, 0.3);
+    0 0 40px rgba(102, 126, 234, 0.6),
+    0 0 80px rgba(118, 75, 162, 0.4);
   
-  letter-spacing: 1px;
+  letter-spacing: 2px;
+  position: relative;
 }
 
-/* Section Labels */
+.form-container h2::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #667eea, #764ba2, transparent);
+  border-radius: 2px;
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
+}
+
+/* Section Labels - Bright White */
 .form-container > p {
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 600;
-  color: #e0e0e0;
-  margin: 32px 0 16px 0;
+  color: #ffffff;
+  margin: 36px 0 20px 0;
   
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  text-shadow: 
+    0 2px 10px rgba(0, 0, 0, 0.8),
+    0 0 20px rgba(102, 126, 234, 0.3);
 }
 
 /* ====================================
-   IMAGE UPLOAD SECTION
+   IMAGE UPLOAD - VIBRANT CARDS
    ==================================== */
 
 .label-container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
-  margin-bottom: 40px;
+  margin-bottom: 48px;
 }
 
 .label-container label {
@@ -88,24 +105,29 @@ body,
   border-radius: 16px;
   overflow: hidden;
   
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  border: 2px dashed rgba(255, 255, 255, 0.15);
+  /* Beautiful Navy Background */
+  background: rgba(47, 53, 80, 0.6);
+  backdrop-filter: blur(15px);
+  border: 2px dashed rgba(102, 126, 234, 0.4);
   
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(102, 126, 234, 0.1) inset;
 }
 
 .label-container label:hover {
-  transform: translateY(-4px) scale(1.02);
-  border-color: rgba(102, 126, 234, 0.6);
+  transform: translateY(-6px) scale(1.03);
+  border-color: rgba(102, 126, 234, 0.8);
+  background: rgba(102, 126, 234, 0.15);
   box-shadow: 
-    0 8px 24px rgba(102, 126, 234, 0.3),
-    0 0 40px rgba(118, 75, 162, 0.2);
+    0 12px 36px rgba(102, 126, 234, 0.4),
+    0 0 60px rgba(118, 75, 162, 0.3),
+    0 0 0 1px rgba(102, 126, 234, 0.3) inset;
 }
 
 .upload-img {
   width: 100%;
-  height: 150px;
+  height: 160px;
   object-fit: cover;
   border-radius: 14px;
   transition: all 0.3s ease;
@@ -118,52 +140,58 @@ body,
 .add-form-fields {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 32px;
 }
 
-/* Form Sections - Dark Glass Cards */
+/* Form Sections - Beautiful Navy Cards */
 .form-section {
-  background: rgba(255, 255, 255, 0.04);
+  /* Matching Display Sections Style */
+  background: rgba(47, 53, 80, 0.7);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   
-  padding: 28px;
+  padding: 32px;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(102, 126, 234, 0.3);
   
   box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(102, 126, 234, 0.15) inset,
+    0 0 60px rgba(102, 126, 234, 0.1);
   
   transition: all 0.4s ease;
 }
 
 .form-section:hover {
-  border-color: rgba(102, 126, 234, 0.3);
+  border-color: rgba(102, 126, 234, 0.5);
+  background: rgba(47, 53, 80, 0.85);
   box-shadow: 
-    0 12px 32px rgba(102, 126, 234, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 12px 40px rgba(102, 126, 234, 0.3),
+    0 0 0 1px rgba(102, 126, 234, 0.2) inset,
+    0 0 80px rgba(102, 126, 234, 0.15);
   transform: translateY(-2px);
 }
 
-/* Section Headers */
+/* Section Headers - Vibrant with Icons */
 .form-section h3 {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: #ffffff;
-  margin: 0 0 20px 0;
-  padding-bottom: 16px;
-  border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+  margin: 0 0 24px 0;
+  padding-bottom: 18px;
+  border-bottom: 2px solid rgba(102, 126, 234, 0.4);
   
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  text-shadow: 
+    0 2px 10px rgba(0, 0, 0, 0.8),
+    0 0 20px rgba(102, 126, 234, 0.5);
 }
 
 /* ====================================
-   INPUT FIELDS - DARK GLASS STYLE
+   INPUT FIELDS - BEAUTIFUL NAVY STYLE
    ==================================== */
 
 .add-form-fields input[type="text"],
@@ -171,23 +199,23 @@ body,
 .add-form-fields textarea,
 .add-form-fields select {
   width: 100%;
-  padding: 14px 18px;
-  margin-bottom: 16px;
+  padding: 16px 20px;
+  margin-bottom: 18px;
   
-  /* Dark Glass Input */
-  background: rgba(0, 0, 0, 0.3);
+  /* Beautiful Input Style */
+  background: rgba(30, 34, 54, 0.8);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 14px;
   
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 500;
   color: #ffffff;
   font-family: 'Outfit', sans-serif;
   
   box-shadow: 
-    inset 0 2px 8px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.03);
+    inset 0 2px 10px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(102, 126, 234, 0.1);
   
   transition: all 0.3s ease;
   outline: none;
@@ -197,117 +225,122 @@ body,
 .add-form-fields input[type="number"]:focus,
 .add-form-fields textarea:focus,
 .add-form-fields select:focus {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(102, 126, 234, 0.6);
+  background: rgba(30, 34, 54, 0.95);
+  border: 1px solid rgba(102, 126, 234, 0.7);
   box-shadow: 
-    inset 0 2px 8px rgba(0, 0, 0, 0.4),
-    0 0 0 3px rgba(102, 126, 234, 0.2),
-    0 8px 24px rgba(102, 126, 234, 0.3);
+    inset 0 2px 10px rgba(0, 0, 0, 0.5),
+    0 0 0 4px rgba(102, 126, 234, 0.25),
+    0 8px 32px rgba(102, 126, 234, 0.4),
+    0 0 60px rgba(118, 75, 162, 0.3);
   transform: translateY(-2px);
 }
 
-/* Placeholder - Soft & Readable */
+/* Placeholder - Soft Purple Tint */
 .add-form-fields input::placeholder,
 .add-form-fields textarea::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(185, 195, 230, 0.5);
   font-style: italic;
 }
 
 /* Textarea */
 .add-form-fields textarea {
   resize: vertical;
-  min-height: 120px;
+  min-height: 130px;
   font-family: 'Outfit', sans-serif;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 /* Select Dropdown */
 .add-form-fields select {
   cursor: pointer;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 16px center;
-  padding-right: 44px;
+  background-position: right 18px center;
+  padding-right: 50px;
 }
 
 .add-form-fields select:disabled {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(30, 34, 54, 0.5);
   cursor: not-allowed;
   opacity: 0.5;
-  border-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(102, 126, 234, 0.15);
 }
 
 .add-form-fields select option {
-  background: #1a1a24;
+  background: #1e2236;
   color: #ffffff;
-  padding: 10px;
+  padding: 12px;
+  font-weight: 500;
 }
 
 /* ====================================
-   CHECKBOX FIELDS - GLASS STYLE
+   CHECKBOX FIELDS - MATCHING STYLE
    ==================================== */
 
 .checkbox-field {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 12px 0;
+  gap: 14px;
+  margin: 14px 0;
   cursor: pointer;
   
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 500;
-  color: #e0e0e0;
+  color: #e8ebf7;
   
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.03);
+  padding: 14px 18px;
+  background: rgba(30, 34, 54, 0.6);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 14px;
   
   transition: all 0.3s ease;
 }
 
 .checkbox-field:hover {
-  background: rgba(102, 126, 234, 0.08);
-  border-color: rgba(102, 126, 234, 0.3);
-  transform: translateX(4px);
+  background: rgba(102, 126, 234, 0.12);
+  border-color: rgba(102, 126, 234, 0.4);
+  transform: translateX(6px);
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
 }
 
 .checkbox-field input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   margin: 0;
   cursor: pointer;
   accent-color: #667eea;
 }
 
 /* ====================================
-   SUBMIT BUTTON - PREMIUM GLASS
+   SUBMIT BUTTON - VIBRANT & GLOWING
    ==================================== */
 
 .submit-btn {
   width: 100%;
-  padding: 18px 40px;
+  padding: 20px 44px;
   
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 18px;
   
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 700;
   font-family: 'Outfit', sans-serif;
+  letter-spacing: 1px;
   
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   
   box-shadow: 
-    0 8px 24px rgba(102, 126, 234, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset,
-    0 16px 48px rgba(118, 75, 162, 0.3);
+    0 10px 32px rgba(102, 126, 234, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.15) inset,
+    0 20px 60px rgba(118, 75, 162, 0.4),
+    0 0 80px rgba(102, 126, 234, 0.3);
   
-  margin-top: 24px;
+  margin-top: 32px;
   position: relative;
   overflow: hidden;
 }
@@ -323,7 +356,7 @@ body,
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0.4),
     transparent
   );
   transition: left 0.6s;
@@ -334,105 +367,114 @@ body,
 }
 
 .submit-btn:hover {
-  transform: translateY(-3px) scale(1.02);
+  transform: translateY(-4px) scale(1.02);
   box-shadow: 
-    0 12px 32px rgba(102, 126, 234, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.2) inset,
-    0 20px 60px rgba(118, 75, 162, 0.4);
+    0 16px 48px rgba(102, 126, 234, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.25) inset,
+    0 24px 80px rgba(118, 75, 162, 0.5),
+    0 0 120px rgba(102, 126, 234, 0.4);
   background: linear-gradient(135deg, #7689f0 0%, #8659b8 100%);
 }
 
 .submit-btn:active {
-  transform: translateY(-1px) scale(0.98);
-  box-shadow: 
-    0 4px 16px rgba(102, 126, 234, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  transform: translateY(-2px) scale(0.98);
 }
 
 /* ====================================
-   FEATURED SECTION - ENHANCED
+   FEATURED SECTION - EXACT MATCH!
    ==================================== */
 
 .featured-section {
-  background: rgba(102, 126, 234, 0.08);
-  border: 2px solid rgba(102, 126, 234, 0.3);
+  /* Matching Display Sections Exactly */
+  background: rgba(47, 53, 80, 0.8);
+  border: 2px solid rgba(102, 126, 234, 0.5);
   box-shadow: 
-    0 8px 24px rgba(102, 126, 234, 0.2),
-    inset 0 0 60px rgba(102, 126, 234, 0.05);
+    0 12px 40px rgba(102, 126, 234, 0.3),
+    0 0 0 1px rgba(102, 126, 234, 0.2) inset,
+    0 0 100px rgba(102, 126, 234, 0.15);
 }
 
 .section-help-text {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 15px;
+  color: rgba(185, 195, 230, 0.7);
   font-style: italic;
-  margin: -8px 0 20px 0;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  margin: -8px 0 24px 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
 }
 
-/* Featured Checkboxes - Premium Cards */
+/* Featured Checkboxes - EXACTLY Like Display Sections */
 .checkbox-field.featured {
-  background: rgba(255, 255, 255, 0.04);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  padding: 20px;
-  margin: 16px 0;
-  border-radius: 16px;
+  /* Matching the beautiful cards */
+  background: rgba(59, 66, 99, 0.7);
+  border: 2px solid rgba(102, 126, 234, 0.25);
+  padding: 24px;
+  margin: 18px 0;
+  border-radius: 18px;
   
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    0 6px 24px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(102, 126, 234, 0.1) inset;
+  
   transition: all 0.3s ease;
 }
 
 .checkbox-field.featured:hover {
-  border-color: rgba(102, 126, 234, 0.5);
-  background: rgba(102, 126, 234, 0.1);
-  transform: translateX(8px);
+  border-color: rgba(102, 126, 234, 0.6);
+  background: rgba(102, 126, 234, 0.15);
+  transform: translateX(10px);
   box-shadow: 
-    0 8px 24px rgba(102, 126, 234, 0.3),
-    0 0 40px rgba(118, 75, 162, 0.2);
+    0 10px 36px rgba(102, 126, 234, 0.4),
+    0 0 60px rgba(118, 75, 162, 0.3),
+    0 0 0 1px rgba(102, 126, 234, 0.3) inset;
 }
 
 .checkbox-label-content {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 18px;
   width: 100%;
 }
 
 .checkbox-icon {
-  font-size: 36px;
-  min-width: 48px;
+  font-size: 40px;
+  min-width: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.4));
+  filter: drop-shadow(0 0 12px rgba(102, 126, 234, 0.6));
 }
 
 .checkbox-label-content > span:last-child {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .checkbox-label-content strong {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
   color: #ffffff;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  text-shadow: 
+    0 2px 10px rgba(0, 0, 0, 0.8),
+    0 0 20px rgba(102, 126, 234, 0.4);
 }
 
 .checkbox-label-content small {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  color: rgba(185, 195, 230, 0.7);
   font-weight: 400;
 }
 
 .checkbox-field.featured input[type="checkbox"] {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
 }
 
 .checkbox-field.featured input:checked ~ .checkbox-label-content strong {
   color: #667eea;
-  text-shadow: 0 0 15px rgba(102, 126, 234, 0.8);
+  text-shadow: 
+    0 0 20px rgba(102, 126, 234, 1),
+    0 0 40px rgba(102, 126, 234, 0.6);
 }
 
 /* ====================================
@@ -440,29 +482,29 @@ body,
    ==================================== */
 
 .form-message {
-  padding: 16px 20px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  font-size: 15px;
+  padding: 18px 24px;
+  border-radius: 14px;
+  margin-bottom: 24px;
+  font-size: 16px;
   font-weight: 600;
   text-align: center;
   
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(15px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 .form-message.success {
-  background: rgba(16, 185, 129, 0.15);
+  background: rgba(16, 185, 129, 0.2);
   color: #10b981;
-  border: 2px solid rgba(16, 185, 129, 0.5);
-  text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+  border: 2px solid rgba(16, 185, 129, 0.6);
+  text-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
 }
 
 .form-message.error {
-  background: rgba(239, 68, 68, 0.15);
+  background: rgba(239, 68, 68, 0.2);
   color: #ef4444;
-  border: 2px solid rgba(239, 68, 68, 0.5);
-  text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+  border: 2px solid rgba(239, 68, 68, 0.6);
+  text-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
 }
 
 /* ====================================
@@ -472,21 +514,22 @@ body,
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 18px;
 }
 
 /* ====================================
-   SUGGESTION TEXT
+   SUGGESTION TEXT - PURPLE HIGHLIGHT
    ==================================== */
 
 .form-section p[style*="color"] {
-  font-size: 13px !important;
-  color: rgba(102, 126, 234, 0.8) !important;
-  margin-top: 8px !important;
-  padding: 8px 12px;
-  background: rgba(102, 126, 234, 0.1);
-  border-radius: 8px;
-  border-left: 3px solid rgba(102, 126, 234, 0.6);
+  font-size: 14px !important;
+  color: rgba(185, 195, 230, 0.9) !important;
+  margin-top: 10px !important;
+  padding: 12px 16px;
+  background: rgba(102, 126, 234, 0.15);
+  border-radius: 10px;
+  border-left: 4px solid rgba(102, 126, 234, 0.7);
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
 }
 
 /* ====================================
@@ -495,14 +538,14 @@ body,
 
 @media (max-width: 768px) {
   .form-container {
-    padding: 24px;
-    margin: 16px;
+    padding: 28px;
+    margin: 20px;
     border-radius: 20px;
   }
 
   .form-container h2 {
-    font-size: 26px;
-    margin-bottom: 24px;
+    font-size: 28px;
+    margin-bottom: 32px;
   }
 
   .label-container {
@@ -511,28 +554,28 @@ body,
   }
 
   .upload-img {
-    height: 130px;
+    height: 140px;
   }
 
   .form-section {
-    padding: 20px;
+    padding: 24px;
   }
 
   .form-section h3 {
-    font-size: 18px;
+    font-size: 19px;
   }
 
   .add-form-fields input[type="text"],
   .add-form-fields input[type="number"],
   .add-form-fields textarea,
   .add-form-fields select {
-    padding: 12px 16px;
-    font-size: 14px;
+    padding: 14px 18px;
+    font-size: 15px;
   }
 
   .submit-btn {
-    padding: 16px 32px;
-    font-size: 16px;
+    padding: 18px 36px;
+    font-size: 17px;
   }
 
   .form-grid {
@@ -540,12 +583,12 @@ body,
   }
   
   .checkbox-label-content strong {
-    font-size: 15px;
+    font-size: 16px;
   }
   
   .checkbox-icon {
-    font-size: 32px;
-    min-width: 40px;
+    font-size: 36px;
+    min-width: 44px;
   }
 }
 
@@ -555,23 +598,23 @@ body,
   }
 
   .form-container {
-    padding: 20px;
-    margin: 12px;
+    padding: 24px;
+    margin: 16px;
   }
 
   .form-container h2 {
-    font-size: 24px;
+    font-size: 26px;
   }
 
   .add-form-fields {
-    gap: 20px;
+    gap: 24px;
   }
 
   .form-section {
-    padding: 16px;
+    padding: 20px;
   }
   
   .checkbox-field.featured {
-    padding: 16px;
+    padding: 20px;
   }
 }
