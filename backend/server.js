@@ -6,7 +6,7 @@ import connectCloudinary from "./config/cloudinary.js";
 import userRouter from "./routes/UserRoute.js";
 import productRouter from "./routes/ProductRoute.js";
 import orderRouter from "./routes/OrderRoute.js";
-import trackingRouter from "./routes/TrackingRoutes.js";
+import trackingRouter from "./routes/TrackingRoutes.js"; // ✅ Already imported!
 
 // App Config
 const app = express();
@@ -17,7 +17,7 @@ connectCloudinary();
 // Middlewares
 app.use(express.json());
 
-// ✅ FIXED: CORS Configuration with ALL your frontend URLs
+// ✅ CORS Configuration with ALL your frontend URLs
 const corsOptions = {
   origin: [
     // ✅ Production URLs (Vercel deployments)
@@ -54,11 +54,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// API Endpoints
+// ✅ API Endpoints
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter);
 app.use("/api/orders", orderRouter);
-app.use("/api/tracking", trackingRouter);
+app.use("/api/tracking", trackingRouter); // ✅ Already connected! Just need to create the file
 
 // Health check endpoint
 app.get("/", (req, res) => {

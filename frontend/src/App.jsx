@@ -9,6 +9,7 @@ import Login1 from "./pages/Login1";
 import Orders1 from "./pages/Orders1";
 import PlaceOrder from "./pages/PlaceOrder";
 import Product from "./pages/Product";
+import DriverTracking from "./pages/DriverTracking"; // ✅ NEW: Driver tracking page
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import SearchBar from "./components/SearchBar";
@@ -38,6 +39,9 @@ const App = () => {
         <Route path="/orders1" element={<Orders1 />} />
         <Route path="/place-order" element={<PlaceOrder />} />
         <Route path="/product/:productId" element={<Product />} />
+
+        {/* ✅ NEW: Driver Tracking Route (No Navbar/Footer for cleaner interface) */}
+        <Route path="/driver/tracking" element={<DriverTracking />} />
 
         {/* ========================================
             CATEGORY ROUTES WITH SIDEBAR

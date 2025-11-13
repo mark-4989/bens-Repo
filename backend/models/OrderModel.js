@@ -17,13 +17,15 @@ const orderSchema = new mongoose.Schema(
     phone: {
       type: String
     },
+    
+    // ✅ ENHANCED: Address with GPS coordinates
     address: {
       street: String,
       city: String,
       state: String,
       zipcode: String,
       country: String,
-      // ✅ NEW: GPS coordinates for delivery
+      // ✅ Customer delivery location (from LocationPicker)
       latitude: Number,
       longitude: Number,
       locationType: {
@@ -32,6 +34,7 @@ const orderSchema = new mongoose.Schema(
         default: 'address'
       }
     },
+    
     items: [
       {
         productId: { 
@@ -55,32 +58,62 @@ const orderSchema = new mongoose.Schema(
         image: String,
       },
     ],
+    
     totalAmount: { 
       type: Number, 
       required: true,
       min: 0
     },
+    
     paymentMethod: {
       type: String,
       enum: ["cod", "stripe", "m-pesa"],
       default: "cod"
     },
+    
     paymentStatus: {
       type: String,
       enum: ["Paid", "Pending", "Failed"],
       default: "Pending"
     },
+    
     status: {
       type: String,
       enum: ["Order Received", "Cargo Packed", "Cargo on Route", "Delivered", "Cancelled"],
       default: "Order Received",
     },
+    
     cancellable: {
       type: Boolean,
       default: true
     },
     
-    // ✅ NEW: Tracking & Driver Information
+    // ✅ NEW: Driver Information (assigned by admin)
+    driver: {
+      id: {
+        type: String,
+        default: null
+      },
+      name: {
+        type: String,
+        default: null
+      },
+      phone: {
+        type: String,
+        default: null
+      },
+      vehicle: {
+        type: String,
+        default: null
+      }
+    },
+    
+    driverAssignedAt: {
+      type: Date,
+      default: null
+    },
+    
+    // ✅ KEEP your existing tracking fields (for compatibility)
     driverName: {
       type: String
     },
@@ -114,7 +147,7 @@ const orderSchema = new mongoose.Schema(
       default: false
     },
     
-    // M-Pesa payment fields
+    // ✅ M-Pesa payment fields (keep these for payment integration)
     mpesaCheckoutRequestId: {
       type: String
     },
@@ -132,6 +165,22 @@ const orderSchema = new mongoose.Schema(
     },
     paidAmount: {
       type: Number
+    },
+    
+    // ✅ NEW: Enhanced delivery info from PlaceOrder form
+    deliveryInfo: {
+      firstName: String,
+      lastName: String,
+      email: String,
+      street: String,
+      city: String,
+      state: String,
+      zipcode: String,
+      country: String,
+      phone: String,
+      latitude: Number,   // From LocationPicker
+      longitude: Number,  // From LocationPicker
+      locationType: String
     }
   },
   { 
@@ -139,10 +188,11 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
-// Index for faster queries
+// ✅ Indexes for faster queries
 orderSchema.index({ userId: 1, createdAt: -1 });
 orderSchema.index({ status: 1 });
-orderSchema.index({ trackingEnabled: 1, status: 1 }); // ✅ NEW: For tracking queries
+orderSchema.index({ trackingEnabled: 1, status: 1 });
+orderSchema.index({ 'driver.id': 1 }); // NEW: Index for driver queries
 
 const Order = mongoose.model("Order", orderSchema);
 export default Order;
