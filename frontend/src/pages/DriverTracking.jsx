@@ -1,6 +1,9 @@
+// frontend/src/pages/DriverTracking.jsx
+// ✅ Create this file in your frontend/src/pages/ folder
+
 import React, { useState, useEffect, useRef } from 'react';
 
-const DriverLocationApp = () => {
+const DriverTracking = () => {
   const [driverId, setDriverId] = useState('');
   const [orderId, setOrderId] = useState('');
   const [isTracking, setIsTracking] = useState(false);
@@ -12,7 +15,8 @@ const DriverLocationApp = () => {
   const lastLocationRef = useRef(null);
   const lastTimeRef = useRef(null);
 
-  const backendUrl = 'https://foreverecommerce-2.onrender.com';
+  // ✅ Use your backend URL
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://bens-repo-99lb.onrender.com';
 
   // Add log message
   const addLog = (message, type = 'info') => {
@@ -543,18 +547,16 @@ const styles = {
 };
 
 // Add pulse animation
-if (typeof document !== 'undefined') {
-  const styleSheet = document.createElement('style');
-  styleSheet.textContent = `
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-  `;
-  if (!document.querySelector('#driver-tracker-animations')) {
-    styleSheet.id = 'driver-tracker-animations';
-    document.head.appendChild(styleSheet);
+const styleSheet = document.createElement('style');
+styleSheet.textContent = `
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
   }
+`;
+if (!document.querySelector('#driver-tracker-animations')) {
+  styleSheet.id = 'driver-tracker-animations';
+  document.head.appendChild(styleSheet);
 }
 
-export default DriverLocationApp;
+export default DriverTracking;

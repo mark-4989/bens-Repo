@@ -1,9 +1,11 @@
-// Enhanced AdminOrders.jsx with customer location display and driver assignment
+// Admin/src/pages/AdminOrders.jsx
+// Enhanced with WhatsApp dispatch, location viewing, and driver tracking
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "@clerk/clerk-react";
+import LiveTracking from "../components/LiveTracking"; // Import LiveTracking
 import "./AdminOrders.css";
 
 const AdminOrders = () => {
@@ -16,14 +18,17 @@ const AdminOrders = () => {
   const [deletingOrder, setDeletingOrder] = useState(null);
   const [showDriverModal, setShowDriverModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [trackingOrderId, setTrackingOrderId] = useState(null); // For admin tracking
   const [driverInfo, setDriverInfo] = useState({
     driverId: '',
     driverName: '',
     driverPhone: '',
-    vehicle: ''
+    vehicle: '',
+    whatsappGroup: '+254712345678' // Default WhatsApp group number
   });
   
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || "https://foreverecommerce-2.onrender.com";
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "https://bens-repo-99lb.onrender.com";
+  const frontendUrl = import.meta.env.VITE_FRONTEND_URL || "https://clientside-teal.vercel.app";
 
   // Fetch orders
   const fetchOrders = async () => {
@@ -49,11 +54,7 @@ const AdminOrders = () => {
       }
     } catch (error) {
       console.error("❌ Error fetching orders:", error);
-      if (error.response?.status === 401) {
-        toast.error("Unauthorized. Please login again.");
-      } else {
-        toast.error("Failed to fetch orders");
-      }
+      toast.error("Failed to fetch orders");
     } finally {
       setLoading(false);
     }
@@ -111,8 +112,8 @@ const AdminOrders = () => {
     }
   };
 
-  // Assign driver to order
-  const assignDriver = async () => {
+  // Assign driver and dispatch to WhatsApp
+  const assignAndDispatchDriver = async () => {
     if (!driverInfo.driverId || !driverInfo.driverName) {
       toast.error("Please fill in Driver ID and Name");
       return;
@@ -121,37 +122,99 @@ const AdminOrders = () => {
     try {
       const token = await getToken({ template: "MilikiAPI" });
       
-      const response = await axios.post(
+      // Step 1: Assign driver to order
+      const assignResponse = await axios.post(
         `${backendUrl}/api/tracking/assign`,
         {
           orderId: selectedOrder._id,
-          ...driverInfo
+          driverId: driverInfo.driverId,
+          driverName: driverInfo.driverName,
+          driverPhone: driverInfo.driverPhone,
+          vehicle: driverInfo.vehicle
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (response.data.success) {
-        toast.success("Driver assigned successfully!");
-        setShowDriverModal(false);
-        setDriverInfo({ driverId: '', driverName: '', driverPhone: '', vehicle: '' });
-        fetchOrders();
-      } else {
+      if (!assignResponse.data.success) {
         toast.error("Failed to assign driver");
+        return;
       }
+
+      // Step 2: Create WhatsApp dispatch message
+      const orderDetails = `
+🚚 *NEW DELIVERY ASSIGNMENT*
+
+📦 *Order #${selectedOrder._id.slice(-8).toUpperCase()}*
+💰 Total: KSH ${selectedOrder.totalAmount?.toLocaleString()}
+🛍️ Items: ${selectedOrder.items?.length || 0} item(s)
+
+📍 *Delivery To:*
+👤 ${selectedOrder.customerName || 'Customer'}
+📞 ${selectedOrder.phone || 'N/A'}
+📍 ${selectedOrder.address?.street || ''}, ${selectedOrder.address?.city || ''}
+${selectedOrder.deliveryInfo?.latitude ? `🗺️ GPS: https://maps.google.com/?q=${selectedOrder.deliveryInfo.latitude},${selectedOrder.deliveryInfo.longitude}` : ''}
+
+👨‍✈️ *Driver Assignment:*
+🆔 ID: ${driverInfo.driverId}
+👤 Name: ${driverInfo.driverName}
+📱 Phone: ${driverInfo.driverPhone}
+🚗 Vehicle: ${driverInfo.vehicle}
+
+🔗 *DRIVER APP:*
+${frontendUrl}/driver/tracking
+
+📝 *Instructions:*
+1️⃣ Open Driver App link above
+2️⃣ Enter Driver ID: *${driverInfo.driverId}*
+3️⃣ Enter Order ID: *${selectedOrder._id}*
+4️⃣ Click "Start Tracking"
+5️⃣ Keep GPS enabled during delivery
+
+⏰ Dispatched: ${new Date().toLocaleString()}
+      `.trim();
+
+      // Step 3: Open WhatsApp with pre-filled message
+      const whatsappMessage = encodeURIComponent(orderDetails);
+      const whatsappLink = `https://wa.me/${driverInfo.whatsappGroup.replace(/\D/g, '')}?text=${whatsappMessage}`;
+      
+      // Open WhatsApp in new tab
+      window.open(whatsappLink, '_blank');
+
+      toast.success("✅ Driver assigned! WhatsApp opened with dispatch message");
+      
+      // Close modal and refresh
+      setShowDriverModal(false);
+      setDriverInfo({ 
+        driverId: '', 
+        driverName: '', 
+        driverPhone: '', 
+        vehicle: '',
+        whatsappGroup: '+254712345678'
+      });
+      fetchOrders();
+
     } catch (error) {
       console.error("Error assigning driver:", error);
       toast.error("Failed to assign driver");
     }
   };
 
-  // Open Google Maps with customer location
+  // View location on Google Maps
   const viewLocationOnMap = (order) => {
-    if (order.deliveryInfo?.latitude && order.deliveryInfo?.longitude) {
-      const url = `https://www.google.com/maps?q=${order.deliveryInfo.latitude},${order.deliveryInfo.longitude}`;
+    const lat = order.deliveryInfo?.latitude || order.address?.latitude;
+    const lng = order.deliveryInfo?.longitude || order.address?.longitude;
+    
+    if (lat && lng) {
+      const url = `https://www.google.com/maps?q=${lat},${lng}`;
       window.open(url, '_blank');
     } else {
       toast.warning("No location data available for this order");
     }
+  };
+
+  // Open admin tracking view
+  const handleTrackDriver = (orderId) => {
+    setTrackingOrderId(orderId);
   };
 
   // Toggle date folder
@@ -297,7 +360,7 @@ const AdminOrders = () => {
                           <p>📞 {order.phone || "No phone"}</p>
                           <p>📍 {order.address?.city || "No address"}, {order.address?.country || ""}</p>
                           
-                          {/* Location Button */}
+                          {/* ✅ LOCATION BUTTON */}
                           {hasLocation && (
                             <button
                               onClick={() => viewLocationOnMap(order)}
@@ -346,6 +409,27 @@ const AdminOrders = () => {
                               <p style={{ margin: '4px 0', fontSize: '11px', color: '#2e7d32' }}>
                                 🚙 {order.driver.vehicle}
                               </p>
+                              
+                              {/* ✅ TRACK DRIVER BUTTON */}
+                              {order.status === 'Cargo on Route' && (
+                                <button
+                                  onClick={() => handleTrackDriver(order._id)}
+                                  style={{
+                                    marginTop: '8px',
+                                    padding: '8px 16px',
+                                    background: '#667eea',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    fontSize: '12px',
+                                    fontWeight: '600',
+                                    width: '100%'
+                                  }}
+                                >
+                                  📡 Track Driver Live
+                                </button>
+                              )}
                             </div>
                           )}
                         </div>
@@ -436,7 +520,7 @@ const AdminOrders = () => {
                                 </select>
                               </div>
                               
-                              {/* Assign Driver Button */}
+                              {/* ✅ DISPATCH TO WHATSAPP BUTTON */}
                               {!order.driver && (
                                 <button
                                   onClick={() => {
@@ -447,16 +531,21 @@ const AdminOrders = () => {
                                     width: '100%',
                                     marginTop: '12px',
                                     padding: '12px',
-                                    background: '#667eea',
+                                    background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
                                     color: 'white',
                                     border: 'none',
                                     borderRadius: '8px',
                                     cursor: 'pointer',
                                     fontSize: '14px',
-                                    fontWeight: '700'
+                                    fontWeight: '700',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '8px'
                                   }}
                                 >
-                                  🚗 Assign Driver
+                                  <span>📱</span>
+                                  <span>Dispatch to WhatsApp</span>
                                 </button>
                               )}
                             </>
@@ -480,7 +569,7 @@ const AdminOrders = () => {
         </div>
       )}
 
-      {/* Driver Assignment Modal */}
+      {/* Driver Assignment & WhatsApp Dispatch Modal */}
       {showDriverModal && (
         <div 
           style={{
@@ -507,7 +596,10 @@ const AdminOrders = () => {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 style={{ margin: '0 0 24px 0' }}>🚗 Assign Driver</h3>
+            <h3 style={{ margin: '0 0 8px 0' }}>📱 Dispatch Order to WhatsApp</h3>
+            <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: '#666' }}>
+              Fill in driver details and dispatch to WhatsApp group
+            </p>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
@@ -525,7 +617,7 @@ const AdminOrders = () => {
                     borderRadius: '8px',
                     fontSize: '14px'
                   }}
-                  placeholder="Enter driver ID"
+                  placeholder="e.g., DRV001"
                 />
               </div>
 
@@ -550,7 +642,7 @@ const AdminOrders = () => {
 
               <div>
                 <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>
-                  Phone Number
+                  Phone Number *
                 </label>
                 <input
                   type="tel"
@@ -569,7 +661,7 @@ const AdminOrders = () => {
 
               <div>
                 <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>
-                  Vehicle
+                  Vehicle Plate *
                 </label>
                 <input
                   type="text"
@@ -582,8 +674,30 @@ const AdminOrders = () => {
                     borderRadius: '8px',
                     fontSize: '14px'
                   }}
-                  placeholder="Vehicle plate number"
+                  placeholder="e.g., KBA 123X"
                 />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>
+                  WhatsApp Group Number *
+                </label>
+                <input
+                  type="tel"
+                  value={driverInfo.whatsappGroup}
+                  onChange={(e) => setDriverInfo({...driverInfo, whatsappGroup: e.target.value})}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    fontSize: '14px'
+                  }}
+                  placeholder="+254712345678"
+                />
+                <small style={{ fontSize: '12px', color: '#666', marginTop: '4px', display: 'block' }}>
+                  Enter WhatsApp group or individual driver number
+                </small>
               </div>
 
               <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
@@ -603,11 +717,11 @@ const AdminOrders = () => {
                   Cancel
                 </button>
                 <button
-                  onClick={assignDriver}
+                  onClick={assignAndDispatchDriver}
                   style={{
                     flex: 1,
                     padding: '14px',
-                    background: '#4CAF50',
+                    background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
                     color: 'white',
                     border: 'none',
                     borderRadius: '8px',
@@ -616,12 +730,21 @@ const AdminOrders = () => {
                     fontWeight: '700'
                   }}
                 >
-                  Assign Driver
+                  📱 Dispatch to WhatsApp
                 </button>
               </div>
             </div>
           </div>
         </div>
+      )}
+
+      {/* ✅ Admin Live Tracking Modal */}
+      {trackingOrderId && (
+        <LiveTracking
+          orderId={trackingOrderId}
+          onClose={() => setTrackingOrderId(null)}
+          getToken={getToken}
+        />
       )}
     </div>
   );
