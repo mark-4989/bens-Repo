@@ -124,7 +124,13 @@ const DriverTracking = () => {
     }
 
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser');
+      alert('❌ Geolocation is not supported by your browser');
+      return;
+    }
+
+    // Check if using HTTPS (required for GPS on mobile)
+    if (window.location.protocol === 'http:' && !window.location.hostname.includes('localhost')) {
+      alert('⚠️ GPS tracking requires HTTPS. Please use https:// or contact admin.');
       return;
     }
 
@@ -138,21 +144,53 @@ const DriverTracking = () => {
         addLog('📍 Initial location obtained', 'success');
       },
       (error) => {
-        addLog(`❌ Geolocation error: ${error.message}`, 'error');
+        let errorMsg = '';
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMsg = 'Location permission denied. Please enable location access in browser settings.';
+            alert('⚠️ Location Permission Denied\n\nPlease:\n1. Click the 🔒 lock icon in address bar\n2. Allow location access\n3. Reload page and try again');
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMsg = 'Location unavailable. Please enable GPS on your device.';
+            alert('⚠️ GPS Unavailable\n\nPlease:\n1. Turn on GPS/Location Services\n2. Ensure you\'re not in airplane mode\n3. Try again');
+            break;
+          case error.TIMEOUT:
+            errorMsg = 'Location request timed out. Check GPS signal.';
+            break;
+          default:
+            errorMsg = `Unknown error: ${error.message}`;
+        }
+        addLog(`❌ ${errorMsg}`, 'error');
+        setIsTracking(false);
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
 
     // Watch position continuously
     watchIdRef.current = navigator.geolocation.watchPosition(
       updateLocationToBackend,
       (error) => {
-        addLog(`❌ Watch position error: ${error.message}`, 'error');
+        let errorMsg = '';
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMsg = 'Location permission revoked';
+            setIsTracking(false);
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMsg = 'GPS signal lost';
+            break;
+          case error.TIMEOUT:
+            errorMsg = 'GPS timeout (will retry)';
+            break;
+          default:
+            errorMsg = error.message;
+        }
+        addLog(`⚠️ ${errorMsg}`, 'error');
       },
       {
         enableHighAccuracy: true,
         maximumAge: 0,
-        timeout: 5000
+        timeout: 10000
       }
     );
   };
@@ -320,12 +358,32 @@ const DriverTracking = () => {
             <li>Enter your Driver ID (provided by admin)</li>
             <li>Enter the Order ID you're delivering</li>
             <li>Click "Start Tracking" to begin GPS tracking</li>
+            <li>**Allow location permission when browser asks**</li>
             <li>Keep this page open while delivering</li>
             <li>Your location updates automatically every few seconds</li>
             <li>Click "Stop Tracking" when delivery is complete</li>
           </ol>
+          
+          <div style={{
+            marginTop: '16px',
+            padding: '12px',
+            background: '#fff3cd',
+            border: '2px solid #ffc107',
+            borderRadius: '8px'
+          }}>
+            <p style={{ margin: '0 0 8px 0', fontWeight: '700', color: '#856404' }}>
+              ⚠️ Troubleshooting GPS Errors:
+            </p>
+            <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '12px', color: '#856404' }}>
+              <li>**Permission Denied**: Click 🔒 lock icon → Allow location</li>
+              <li>**GPS Unavailable**: Turn on Location Services in phone settings</li>
+              <li>**Timeout**: Go outdoors for better GPS signal</li>
+              <li>**HTTP Error**: Ask admin for HTTPS link</li>
+            </ul>
+          </div>
+          
           <p style={styles.note}>
-            ⚠️ Note: This app needs location permissions. Make sure GPS is enabled on your device.
+            ⚠️ GPS tracking requires location permissions and active GPS on your device.
           </p>
         </div>
       </div>

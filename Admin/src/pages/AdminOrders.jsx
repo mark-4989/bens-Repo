@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "@clerk/clerk-react";
-import LiveTracking from "../pages/LiveTracking"; // Import LiveTracking
+import LiveTracking from "../components/LiveTracking"; // Import LiveTracking
 import "./AdminOrders.css";
 
 const AdminOrders = () => {
