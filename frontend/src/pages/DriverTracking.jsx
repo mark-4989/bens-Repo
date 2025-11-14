@@ -1,348 +1,241 @@
-// frontend/src/pages/DriverTracking.jsx
-// ✅ Create this file in your frontend/src/pages/ folder
-
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const DriverTracking = () => {
   const [driverId, setDriverId] = useState('');
   const [orderId, setOrderId] = useState('');
   const [isTracking, setIsTracking] = useState(false);
   const [location, setLocation] = useState(null);
-  const [speed, setSpeed] = useState(0);
-  const [heading, setHeading] = useState(0);
+  const [error, setError] = useState(null);
   const [logs, setLogs] = useState([]);
-  const watchIdRef = useRef(null);
-  const lastLocationRef = useRef(null);
-  const lastTimeRef = useRef(null);
+  const [watchId, setWatchId] = useState(null);
 
-  // ✅ Use your backend URL
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://bens-repo-99lb.onrender.com';
+  const backendUrl = 'https://bens-repo-99lb.onrender.com';
 
-  // Add log message
   const addLog = (message, type = 'info') => {
     const timestamp = new Date().toLocaleTimeString();
-    setLogs(prev => [{timestamp, message, type}, ...prev.slice(0, 20)]);
+    setLogs(prev => [...prev, { message, type, timestamp }]);
+    console.log(`${timestamp} ${type.toUpperCase()}: ${message}`);
   };
 
-  // Calculate speed between two points
-  const calculateSpeed = (lat1, lng1, lat2, lng2, timeDiff) => {
-    const R = 6371; // Earth's radius in km
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLng = (lng2 - lng1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLng/2) * Math.sin(dLng/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    const distance = R * c; // Distance in km
-    const timeInHours = timeDiff / 3600000; // Convert ms to hours
-    return (distance / timeInHours).toFixed(2); // Speed in km/h
-  };
-
-  // Calculate heading
-  const calculateHeading = (lat1, lng1, lat2, lng2) => {
-    const dLng = (lng2 - lng1) * Math.PI / 180;
-    const y = Math.sin(dLng) * Math.cos(lat2 * Math.PI / 180);
-    const x = Math.cos(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180) -
-              Math.sin(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.cos(dLng);
-    let heading = Math.atan2(y, x) * 180 / Math.PI;
-    return (heading + 360) % 360;
-  };
-
-  // Update location to backend
-  const updateLocationToBackend = async (position) => {
-    const currentLocation = {
-      lat: position.coords.latitude,
-      lng: position.coords.longitude,
-      accuracy: position.coords.accuracy
-    };
-
-    setLocation(currentLocation);
-
-    // Calculate speed and heading if we have previous location
-    let calculatedSpeed = 0;
-    let calculatedHeading = heading;
-
-    if (lastLocationRef.current && lastTimeRef.current) {
-      const timeDiff = Date.now() - lastTimeRef.current;
-      if (timeDiff > 0) {
-        calculatedSpeed = calculateSpeed(
-          lastLocationRef.current.lat,
-          lastLocationRef.current.lng,
-          currentLocation.lat,
-          currentLocation.lng,
-          timeDiff
-        );
-        calculatedHeading = calculateHeading(
-          lastLocationRef.current.lat,
-          lastLocationRef.current.lng,
-          currentLocation.lat,
-          currentLocation.lng
-        );
-      }
+  const startTracking = () => {
+    if (!driverId || !orderId) {
+      setError('Please enter both Driver ID and Order ID');
+      addLog('Missing Driver ID or Order ID', 'error');
+      return;
     }
 
-    setSpeed(calculatedSpeed);
-    setHeading(calculatedHeading);
+    if (!navigator.geolocation) {
+      setError('❌ Geolocation is not supported by your browser');
+      addLog('Geolocation not supported', 'error');
+      return;
+    }
 
-    lastLocationRef.current = currentLocation;
-    lastTimeRef.current = Date.now();
+    addLog('Requesting location permissions...', 'info');
 
-    // Send to backend
+    // Test if we can get location
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        addLog('✅ Location permission granted', 'success');
+        startWatchingPosition();
+      },
+      (err) => {
+        let errorMessage = 'Failed to get location';
+        
+        switch(err.code) {
+          case err.PERMISSION_DENIED:
+            errorMessage = "❌ Location permission denied. Please enable location access in your browser settings.";
+            break;
+          case err.POSITION_UNAVAILABLE:
+            errorMessage = "❌ Location unavailable. Make sure GPS is enabled on your device.";
+            break;
+          case err.TIMEOUT:
+            errorMessage = "❌ Location request timed out. Please try again.";
+            break;
+          default:
+            errorMessage = `❌ Location error: ${err.message}`;
+        }
+        
+        setError(errorMessage);
+        addLog(errorMessage, 'error');
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
+  };
+
+  const startWatchingPosition = () => {
+    const id = navigator.geolocation.watchPosition(
+      (position) => {
+        const { latitude, longitude, speed, heading, accuracy } = position.coords;
+        
+        const locationData = {
+          lat: latitude,
+          lng: longitude,
+          speed: speed ? Math.round(speed * 3.6) : 0, // Convert m/s to km/h
+          heading: heading || 0,
+          accuracy: accuracy,
+          timestamp: new Date().toISOString()
+        };
+
+        setLocation(locationData);
+        setIsTracking(true);
+        setError(null);
+        
+        addLog(`📍 Location: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`, 'success');
+        
+        // Send location to backend
+        updateLocationOnServer(locationData);
+      },
+      (err) => {
+        addLog(`❌ Watch position error: ${err.message}`, 'error');
+        setError(`Location error: ${err.message}`);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 30000,
+        maximumAge: 0
+      }
+    );
+
+    setWatchId(id);
+    addLog('🚀 Tracking started', 'success');
+  };
+
+  const updateLocationOnServer = async (locationData) => {
     try {
-      const response = await fetch(`${backendUrl}/api/tracking/update`, {
+      // ✅ FIXED: Include orderId in URL path
+      const url = `${backendUrl}/api/tracking/update/${orderId}`;
+      
+      addLog(`📡 Sending location to: ${url}`, 'info');
+
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          orderId,
-          driverId,
-          currentLocation,
-          speed: parseFloat(calculatedSpeed),
-          heading: calculatedHeading,
-          timestamp: new Date().toISOString()
-        })
+          lat: locationData.lat,
+          lng: locationData.lng,
+          speed: locationData.speed,
+          heading: locationData.heading,
+        }),
       });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server error ${response.status}: ${errorText.substring(0, 100)}`);
+      }
 
       const data = await response.json();
       
       if (data.success) {
-        addLog(`✅ Location updated: ${currentLocation.lat.toFixed(6)}, ${currentLocation.lng.toFixed(6)} | Speed: ${calculatedSpeed} km/h`, 'success');
+        addLog('✅ Location updated on server', 'success');
       } else {
-        addLog(`❌ Update failed: ${data.message}`, 'error');
+        addLog(`⚠️ Server response: ${data.message}`, 'warning');
       }
-    } catch (error) {
-      addLog(`❌ Network error: ${error.message}`, 'error');
+    } catch (err) {
+      addLog(`❌ Failed to update server: ${err.message}`, 'error');
+      console.error('Update error:', err);
     }
   };
 
-  // Start tracking
-  const startTracking = () => {
-    if (!driverId || !orderId) {
-      alert('Please enter both Driver ID and Order ID');
-      return;
-    }
-
-    if (!navigator.geolocation) {
-      alert('❌ Geolocation is not supported by your browser');
-      return;
-    }
-
-    // Check if using HTTPS (required for GPS on mobile)
-    if (window.location.protocol === 'http:' && !window.location.hostname.includes('localhost')) {
-      alert('⚠️ GPS tracking requires HTTPS. Please use https:// or contact admin.');
-      return;
-    }
-
-    addLog('🚀 Starting location tracking...', 'info');
-    setIsTracking(true);
-
-    // Get initial location
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        updateLocationToBackend(position);
-        addLog('📍 Initial location obtained', 'success');
-      },
-      (error) => {
-        let errorMsg = '';
-        switch(error.code) {
-          case error.PERMISSION_DENIED:
-            errorMsg = 'Location permission denied. Please enable location access in browser settings.';
-            alert('⚠️ Location Permission Denied\n\nPlease:\n1. Click the 🔒 lock icon in address bar\n2. Allow location access\n3. Reload page and try again');
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMsg = 'Location unavailable. Please enable GPS on your device.';
-            alert('⚠️ GPS Unavailable\n\nPlease:\n1. Turn on GPS/Location Services\n2. Ensure you\'re not in airplane mode\n3. Try again');
-            break;
-          case error.TIMEOUT:
-            errorMsg = 'Location request timed out. Check GPS signal.';
-            break;
-          default:
-            errorMsg = `Unknown error: ${error.message}`;
-        }
-        addLog(`❌ ${errorMsg}`, 'error');
-        setIsTracking(false);
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-    );
-
-    // Watch position continuously
-    watchIdRef.current = navigator.geolocation.watchPosition(
-      updateLocationToBackend,
-      (error) => {
-        let errorMsg = '';
-        switch(error.code) {
-          case error.PERMISSION_DENIED:
-            errorMsg = 'Location permission revoked';
-            setIsTracking(false);
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMsg = 'GPS signal lost';
-            break;
-          case error.TIMEOUT:
-            errorMsg = 'GPS timeout (will retry)';
-            break;
-          default:
-            errorMsg = error.message;
-        }
-        addLog(`⚠️ ${errorMsg}`, 'error');
-      },
-      {
-        enableHighAccuracy: true,
-        maximumAge: 0,
-        timeout: 10000
-      }
-    );
-  };
-
-  // Stop tracking
   const stopTracking = () => {
-    if (watchIdRef.current) {
-      navigator.geolocation.clearWatch(watchIdRef.current);
-      watchIdRef.current = null;
+    if (watchId !== null) {
+      navigator.geolocation.clearWatch(watchId);
+      setWatchId(null);
     }
     setIsTracking(false);
-    addLog('⏹️ Location tracking stopped', 'info');
+    setLocation(null);
+    addLog('🛑 Tracking stopped', 'info');
   };
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (watchIdRef.current) {
-        navigator.geolocation.clearWatch(watchIdRef.current);
-      }
-    };
-  }, []);
+  const clearLogs = () => {
+    setLogs([]);
+  };
 
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h1 style={styles.title}>🚗 Driver Location Tracker</h1>
-        <p style={styles.subtitle}>Real-time GPS tracking for delivery drivers</p>
-
+        <h1 style={styles.title}>🚚 Driver Tracking App</h1>
+        
         {/* Input Section */}
         <div style={styles.inputSection}>
           <div style={styles.inputGroup}>
-            <label style={styles.label}>👤 Driver ID</label>
+            <label style={styles.label}>Driver ID</label>
             <input
               type="text"
               value={driverId}
               onChange={(e) => setDriverId(e.target.value)}
-              placeholder="Enter your driver ID"
+              placeholder="Enter your Driver ID"
               style={styles.input}
               disabled={isTracking}
             />
           </div>
 
           <div style={styles.inputGroup}>
-            <label style={styles.label}>📦 Order ID</label>
+            <label style={styles.label}>Order ID</label>
             <input
               type="text"
               value={orderId}
               onChange={(e) => setOrderId(e.target.value)}
-              placeholder="Enter order ID to track"
+              placeholder="Enter Order ID"
               style={styles.input}
               disabled={isTracking}
             />
           </div>
         </div>
 
-        {/* Control Buttons */}
+        {/* Buttons */}
         <div style={styles.buttonGroup}>
           {!isTracking ? (
-            <button
-              onClick={startTracking}
-              style={{...styles.button, ...styles.startButton}}
-              disabled={!driverId || !orderId}
-            >
+            <button onClick={startTracking} style={{...styles.button, ...styles.startButton}}>
               🚀 Start Tracking
             </button>
           ) : (
-            <button
-              onClick={stopTracking}
-              style={{...styles.button, ...styles.stopButton}}
-            >
-              ⏹️ Stop Tracking
+            <button onClick={stopTracking} style={{...styles.button, ...styles.stopButton}}>
+              🛑 Stop Tracking
             </button>
           )}
         </div>
 
         {/* Status Display */}
-        {isTracking && (
-          <div style={styles.statusCard}>
-            <div style={styles.statusHeader}>
-              <span style={styles.liveIndicator}>
-                <span style={styles.liveDot}></span>
-                LIVE
-              </span>
-            </div>
+        {error && (
+          <div style={{...styles.statusBox, ...styles.errorBox}}>
+            {error}
+          </div>
+        )}
 
-            <div style={styles.statsGrid}>
-              <div style={styles.statBox}>
-                <div style={styles.statIcon}>📍</div>
-                <div style={styles.statContent}>
-                  <div style={styles.statLabel}>Latitude</div>
-                  <div style={styles.statValue}>
-                    {location?.lat.toFixed(6) || 'N/A'}
-                  </div>
-                </div>
-              </div>
-
-              <div style={styles.statBox}>
-                <div style={styles.statIcon}>🌐</div>
-                <div style={styles.statContent}>
-                  <div style={styles.statLabel}>Longitude</div>
-                  <div style={styles.statValue}>
-                    {location?.lng.toFixed(6) || 'N/A'}
-                  </div>
-                </div>
-              </div>
-
-              <div style={styles.statBox}>
-                <div style={styles.statIcon}>⚡</div>
-                <div style={styles.statContent}>
-                  <div style={styles.statLabel}>Speed</div>
-                  <div style={styles.statValue}>{speed} km/h</div>
-                </div>
-              </div>
-
-              <div style={styles.statBox}>
-                <div style={styles.statIcon}>🧭</div>
-                <div style={styles.statContent}>
-                  <div style={styles.statLabel}>Heading</div>
-                  <div style={styles.statValue}>{heading.toFixed(0)}°</div>
-                </div>
-              </div>
-
-              <div style={styles.statBox}>
-                <div style={styles.statIcon}>🎯</div>
-                <div style={styles.statContent}>
-                  <div style={styles.statLabel}>Accuracy</div>
-                  <div style={styles.statValue}>
-                    {location?.accuracy.toFixed(0) || 'N/A'}m
-                  </div>
-                </div>
-              </div>
-            </div>
+        {isTracking && location && (
+          <div style={{...styles.statusBox, ...styles.successBox}}>
+            <h3 style={styles.statusTitle}>📍 Current Location</h3>
+            <p style={styles.statusText}>Latitude: {location.lat.toFixed(6)}</p>
+            <p style={styles.statusText}>Longitude: {location.lng.toFixed(6)}</p>
+            <p style={styles.statusText}>Speed: {location.speed} km/h</p>
+            <p style={styles.statusText}>Accuracy: {location.accuracy?.toFixed(0)}m</p>
+            <p style={styles.statusText}>Last Update: {new Date(location.timestamp).toLocaleTimeString()}</p>
           </div>
         )}
 
         {/* Activity Logs */}
         <div style={styles.logsSection}>
-          <h3 style={styles.logsTitle}>📊 Activity Logs</h3>
+          <div style={styles.logsHeader}>
+            <h3 style={styles.logsTitle}>📊 Activity Logs</h3>
+            <button onClick={clearLogs} style={styles.clearButton}>Clear</button>
+          </div>
           <div style={styles.logsContainer}>
             {logs.length === 0 ? (
-              <p style={styles.noLogs}>No activity yet. Start tracking to see logs.</p>
+              <p style={styles.noLogs}>No activity yet</p>
             ) : (
               logs.map((log, index) => (
-                <div
-                  key={index}
-                  style={{
-                    ...styles.logItem,
-                    ...(log.type === 'error' ? styles.logError : {}),
-                    ...(log.type === 'success' ? styles.logSuccess : {})
-                  }}
-                >
+                <div key={index} style={{
+                  ...styles.logItem,
+                  ...(log.type === 'error' && styles.logError),
+                  ...(log.type === 'success' && styles.logSuccess),
+                  ...(log.type === 'warning' && styles.logWarning),
+                }}>
                   <span style={styles.logTime}>{log.timestamp}</span>
                   <span style={styles.logMessage}>{log.message}</span>
                 </div>
@@ -357,34 +250,11 @@ const DriverTracking = () => {
           <ol style={styles.instructionsList}>
             <li>Enter your Driver ID (provided by admin)</li>
             <li>Enter the Order ID you're delivering</li>
-            <li>Click "Start Tracking" to begin GPS tracking</li>
-            <li>**Allow location permission when browser asks**</li>
-            <li>Keep this page open while delivering</li>
-            <li>Your location updates automatically every few seconds</li>
+            <li>Click "Start Tracking" to begin</li>
+            <li>Allow location access when prompted</li>
+            <li>Keep this page open during delivery</li>
             <li>Click "Stop Tracking" when delivery is complete</li>
           </ol>
-          
-          <div style={{
-            marginTop: '16px',
-            padding: '12px',
-            background: '#fff3cd',
-            border: '2px solid #ffc107',
-            borderRadius: '8px'
-          }}>
-            <p style={{ margin: '0 0 8px 0', fontWeight: '700', color: '#856404' }}>
-              ⚠️ Troubleshooting GPS Errors:
-            </p>
-            <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '12px', color: '#856404' }}>
-              <li>**Permission Denied**: Click 🔒 lock icon → Allow location</li>
-              <li>**GPS Unavailable**: Turn on Location Services in phone settings</li>
-              <li>**Timeout**: Go outdoors for better GPS signal</li>
-              <li>**HTTP Error**: Ask admin for HTTPS link</li>
-            </ul>
-          </div>
-          
-          <p style={styles.note}>
-            ⚠️ GPS tracking requires location permissions and active GPS on your device.
-          </p>
         </div>
       </div>
     </div>
@@ -396,225 +266,166 @@ const styles = {
     minHeight: '100vh',
     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     padding: '20px',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   },
   card: {
-    maxWidth: '800px',
+    maxWidth: '600px',
     margin: '0 auto',
-    background: 'rgba(255, 255, 255, 0.95)',
+    background: 'white',
     borderRadius: '20px',
-    padding: '32px',
-    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
+    padding: '30px',
+    boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
   },
   title: {
-    margin: '0 0 8px 0',
-    fontSize: '32px',
-    fontWeight: '700',
-    color: '#1a1a1a',
-    textAlign: 'center'
-  },
-  subtitle: {
-    margin: '0 0 32px 0',
-    fontSize: '16px',
-    color: '#666',
-    textAlign: 'center'
+    textAlign: 'center',
+    color: '#333',
+    marginBottom: '30px',
+    fontSize: '28px',
   },
   inputSection: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '16px',
-    marginBottom: '24px'
+    marginBottom: '20px',
   },
   inputGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px'
+    marginBottom: '15px',
   },
   label: {
-    fontSize: '14px',
+    display: 'block',
+    marginBottom: '8px',
+    color: '#555',
     fontWeight: '600',
-    color: '#333'
+    fontSize: '14px',
   },
   input: {
-    padding: '14px 16px',
+    width: '100%',
+    padding: '12px 16px',
     border: '2px solid #e0e0e0',
-    borderRadius: '12px',
-    fontSize: '15px',
-    outline: 'none',
-    transition: 'border-color 0.2s'
+    borderRadius: '10px',
+    fontSize: '16px',
+    transition: 'border-color 0.3s',
+    boxSizing: 'border-box',
   },
   buttonGroup: {
     display: 'flex',
-    gap: '12px',
-    marginBottom: '24px'
+    gap: '10px',
+    marginBottom: '20px',
   },
   button: {
     flex: 1,
-    padding: '16px 24px',
+    padding: '14px',
     border: 'none',
-    borderRadius: '12px',
+    borderRadius: '10px',
     fontSize: '16px',
-    fontWeight: '700',
+    fontWeight: '600',
     cursor: 'pointer',
-    transition: 'all 0.2s',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px'
+    transition: 'all 0.3s',
   },
   startButton: {
     background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
-    color: 'white'
+    color: 'white',
   },
   stopButton: {
     background: 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)',
-    color: 'white'
+    color: 'white',
   },
-  statusCard: {
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    borderRadius: '16px',
-    padding: '24px',
-    marginBottom: '24px',
-    color: 'white'
+  statusBox: {
+    padding: '20px',
+    borderRadius: '10px',
+    marginBottom: '20px',
   },
-  statusHeader: {
-    display: 'flex',
-    justifyContent: 'center',
-    marginBottom: '20px'
+  errorBox: {
+    background: '#ffebee',
+    border: '2px solid #ef5350',
+    color: '#c62828',
   },
-  liveIndicator: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    background: 'rgba(255, 255, 255, 0.2)',
-    padding: '8px 16px',
-    borderRadius: '20px',
+  successBox: {
+    background: '#e8f5e9',
+    border: '2px solid #66bb6a',
+    color: '#2e7d32',
+  },
+  statusTitle: {
+    margin: '0 0 10px 0',
+    fontSize: '18px',
+  },
+  statusText: {
+    margin: '5px 0',
     fontSize: '14px',
-    fontWeight: '700'
-  },
-  liveDot: {
-    width: '10px',
-    height: '10px',
-    background: '#ff4444',
-    borderRadius: '50%',
-    animation: 'pulse 2s infinite'
-  },
-  statsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-    gap: '12px'
-  },
-  statBox: {
-    background: 'rgba(255, 255, 255, 0.15)',
-    backdropFilter: 'blur(10px)',
-    borderRadius: '12px',
-    padding: '16px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px'
-  },
-  statIcon: {
-    fontSize: '32px'
-  },
-  statContent: {
-    flex: 1
-  },
-  statLabel: {
-    fontSize: '11px',
-    opacity: 0.9,
-    marginBottom: '4px',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px'
-  },
-  statValue: {
-    fontSize: '16px',
-    fontWeight: '700'
   },
   logsSection: {
-    marginBottom: '24px'
+    marginTop: '20px',
+  },
+  logsHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '10px',
   },
   logsTitle: {
-    margin: '0 0 12px 0',
+    margin: 0,
     fontSize: '18px',
-    fontWeight: '700',
-    color: '#1a1a1a'
+    color: '#333',
+  },
+  clearButton: {
+    padding: '6px 12px',
+    background: '#f5f5f5',
+    border: '1px solid #ddd',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontSize: '12px',
   },
   logsContainer: {
-    background: '#f5f5f5',
-    borderRadius: '12px',
-    padding: '16px',
-    maxHeight: '300px',
-    overflowY: 'auto'
+    maxHeight: '200px',
+    overflowY: 'auto',
+    background: '#f9f9f9',
+    borderRadius: '10px',
+    padding: '10px',
   },
   noLogs: {
     textAlign: 'center',
     color: '#999',
-    fontSize: '14px',
-    fontStyle: 'italic'
+    padding: '20px',
   },
   logItem: {
-    padding: '10px 12px',
-    marginBottom: '8px',
+    padding: '8px 12px',
+    marginBottom: '6px',
+    borderRadius: '6px',
     background: 'white',
-    borderRadius: '8px',
     fontSize: '13px',
-    display: 'flex',
-    gap: '12px',
-    alignItems: 'flex-start',
-    borderLeft: '3px solid #667eea'
   },
   logError: {
-    borderLeftColor: '#f44336',
-    background: '#ffebee'
+    borderLeft: '3px solid #f44336',
   },
   logSuccess: {
-    borderLeftColor: '#4CAF50',
-    background: '#e8f5e9'
+    borderLeft: '3px solid #4CAF50',
+  },
+  logWarning: {
+    borderLeft: '3px solid #ff9800',
   },
   logTime: {
-    fontSize: '11px',
     color: '#666',
-    fontFamily: 'monospace',
-    whiteSpace: 'nowrap'
+    marginRight: '10px',
+    fontSize: '12px',
   },
   logMessage: {
-    flex: 1,
-    color: '#333'
+    color: '#333',
   },
   instructions: {
-    background: '#fff3cd',
-    border: '2px solid #ffc107',
-    borderRadius: '12px',
-    padding: '20px'
+    marginTop: '30px',
+    padding: '20px',
+    background: '#f5f5f5',
+    borderRadius: '10px',
   },
   instructionsTitle: {
-    margin: '0 0 12px 0',
+    margin: '0 0 15px 0',
+    color: '#333',
     fontSize: '16px',
-    fontWeight: '700',
-    color: '#856404'
   },
   instructionsList: {
-    margin: '0 0 12px 0',
-    paddingLeft: '24px',
-    color: '#856404'
-  },
-  note: {
     margin: 0,
-    fontSize: '13px',
-    color: '#856404',
-    fontStyle: 'italic'
-  }
+    paddingLeft: '20px',
+    color: '#666',
+    fontSize: '14px',
+    lineHeight: '1.8',
+  },
 };
-
-// Add pulse animation
-const styleSheet = document.createElement('style');
-styleSheet.textContent = `
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-`;
-if (!document.querySelector('#driver-tracker-animations')) {
-  styleSheet.id = 'driver-tracker-animations';
-  document.head.appendChild(styleSheet);
-}
 
 export default DriverTracking;
