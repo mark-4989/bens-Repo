@@ -6,7 +6,8 @@ import connectCloudinary from "./config/cloudinary.js";
 import userRouter from "./routes/UserRoute.js";
 import productRouter from "./routes/ProductRoute.js";
 import orderRouter from "./routes/OrderRoute.js";
-import trackingRouter from "./routes/TrackingRoutes.js"; // ✅ Already imported!
+import trackingRouter from "./routes/TrackingRoutes.js";
+import dispatchRouter from "./routes/DispatchRoutes.js"; // ✅ ADD THIS LINE
 
 // App Config
 const app = express();
@@ -58,7 +59,8 @@ app.use((req, res, next) => {
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter);
 app.use("/api/orders", orderRouter);
-app.use("/api/tracking", trackingRouter); // ✅ Already connected! Just need to create the file
+app.use("/api/tracking", trackingRouter);
+app.use("/api/dispatch", dispatchRouter); // ✅ ADD THIS LINE
 
 // Health check endpoint
 app.get("/", (req, res) => {
@@ -66,7 +68,14 @@ app.get("/", (req, res) => {
     success: true,
     message: "API Working - Forever Ecommerce Backend",
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || "development"
+    environment: process.env.NODE_ENV || "development",
+    routes: {
+      users: "/api/user",
+      products: "/api/product", 
+      orders: "/api/orders",
+      tracking: "/api/tracking",
+      dispatch: "/api/dispatch" // ✅ Show available routes
+    }
   });
 });
 
@@ -96,9 +105,15 @@ app.listen(port, () => {
   console.log("🚀 Forever Ecommerce Backend Server");
   console.log("╚═══════════════════════════════════════╝");
   console.log(`📡 Server started on PORT: ${port}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
+  console.log(`🌐 Environment: ${process.env.NODE_ENV || "development"}`);
   console.log(`🔗 URL: ${process.env.NODE_ENV === "production" ? "https://bens-repo-99lb.onrender.com" : `http://localhost:${port}`}`);
-  console.log("╚═══════════════════════════════════════╝");
+  console.log("\n✅ Available Routes:");
+  console.log("   - /api/user");
+  console.log("   - /api/product");
+  console.log("   - /api/orders");
+  console.log("   - /api/tracking");
+  console.log("   - /api/dispatch ← NEW!");
+  console.log("╚═══════════════════════════════════════╝\n");
 });
 
 export default app;
