@@ -62,29 +62,46 @@ const AdminOrders = () => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
+      console.log(`🔄 Updating order ${orderId} status to:`, newStatus);
+      
       const token = await getToken({ template: "MilikiAPI" });
-      const response = await fetch(
-        `${backendUrl}/api/orders/${orderId}/status`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ status: newStatus }),
-        }
-      );
+      
+      if (!token) {
+        toast.error("❌ Authentication failed. Please log in again.");
+        return;
+      }
+
+      const url = `${backendUrl}/api/orders/${orderId}/status`;
+      console.log("📡 Calling:", url);
+
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      console.log("📥 Response status:", response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("❌ Response error:", errorText);
+        throw new Error(`Server returned ${response.status}: ${errorText.substring(0, 100)}`);
+      }
 
       const data = await response.json();
+      
       if (data.success) {
         toast.success(`✅ Order status updated to "${newStatus}"`);
         fetchOrders(); // Refresh orders
       } else {
-        toast.error("❌ Failed to update status: " + data.message);
+        toast.error("❌ Failed to update status: " + (data.message || "Unknown error"));
       }
     } catch (error) {
-      console.error("Failed to update status:", error);
-      toast.error("❌ Error updating status. Please try again.");
+      console.error("❌ Failed to update status:", error);
+      toast.error("❌ Error: " + error.message);
     }
   };
 
