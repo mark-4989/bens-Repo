@@ -1,16 +1,19 @@
-// backend/routes/tracking.js
-const express = require("express");
-const router = express.Router();
-const { clerkClient, requireAuth } = require("@clerk/clerk-sdk-node");
-const Order = require("../models/Order");
+// backend/routes/TrackingRoutes.js
+import express from "express";
+import { verifyClerkToken } from "../middleware/verifyClerkToken.js";
+import Order from "../models/OrderModel.js";
+
+const trackingRouter = express.Router();
 
 // In-memory storage for active deliveries (replace with Redis in production)
 const activeDeliveries = new Map();
 
 // 🚀 GET tracking data for an order
-router.get("/:orderId", requireAuth(), async (req, res) => {
+trackingRouter.get("/:orderId", verifyClerkToken, async (req, res) => {
   try {
     const { orderId } = req.params;
+
+    console.log("🔍 Fetching tracking for order:", orderId);
 
     // Fetch the order
     const order = await Order.findById(orderId);
@@ -24,9 +27,10 @@ router.get("/:orderId", requireAuth(), async (req, res) => {
 
     // Check if order is in transit
     if (order.status !== "Cargo on Route") {
+      console.log(`⚠️ Order ${orderId} status: ${order.status}`);
       return res.status(400).json({
         success: false,
-        message: `Order is not currently in transit. Current status: ${order.status}`,
+        message: `Tracking is not available. Order is currently "${order.status}". Live tracking will be available once the order is "Cargo on Route".`,
         status: order.status,
       });
     }
@@ -35,11 +39,14 @@ router.get("/:orderId", requireAuth(), async (req, res) => {
     const trackingData = activeDeliveries.get(orderId);
 
     if (!trackingData) {
+      console.log(`⚠️ No tracking data found for order ${orderId}`);
       return res.status(404).json({
         success: false,
         message: "Tracking data not available. Driver hasn't started tracking yet.",
       });
     }
+
+    console.log("✅ Tracking data found:", trackingData);
 
     // Return tracking data
     res.json({
@@ -47,7 +54,7 @@ router.get("/:orderId", requireAuth(), async (req, res) => {
       tracking: trackingData,
     });
   } catch (error) {
-    console.error("Tracking fetch error:", error);
+    console.error("❌ Tracking fetch error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch tracking data",
@@ -57,10 +64,12 @@ router.get("/:orderId", requireAuth(), async (req, res) => {
 });
 
 // 🚀 UPDATE driver location (called by driver's device)
-router.post("/update/:orderId", requireAuth(), async (req, res) => {
+trackingRouter.post("/update/:orderId", async (req, res) => {
   try {
     const { orderId } = req.params;
     const { lat, lng, speed, heading } = req.body;
+
+    console.log("📍 Location update for order:", orderId, { lat, lng, speed });
 
     // Validate input
     if (!lat || !lng) {
@@ -84,6 +93,7 @@ router.post("/update/:orderId", requireAuth(), async (req, res) => {
     let trackingData = activeDeliveries.get(orderId);
 
     if (!trackingData) {
+      console.log("🆕 Creating new tracking session for order:", orderId);
       // Initialize tracking data
       trackingData = {
         orderId: orderId,
@@ -97,8 +107,8 @@ router.post("/update/:orderId", requireAuth(), async (req, res) => {
           lng: parseFloat(lng),
         },
         destination: {
-          lat: order.deliveryLocation?.lat || -1.2921, // Use order's delivery location
-          lng: order.deliveryLocation?.lng || 36.8219,
+          lat: order.address?.latitude || -1.2921, // Use order's delivery location
+          lng: order.address?.longitude || 36.8219,
         },
         speed: speed || 0,
         heading: heading || 0,
@@ -126,13 +136,15 @@ router.post("/update/:orderId", requireAuth(), async (req, res) => {
     // Store updated tracking data
     activeDeliveries.set(orderId, trackingData);
 
+    console.log("✅ Location updated successfully");
+
     res.json({
       success: true,
       message: "Location updated successfully",
       tracking: trackingData,
     });
   } catch (error) {
-    console.error("Tracking update error:", error);
+    console.error("❌ Tracking update error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to update location",
@@ -142,10 +154,12 @@ router.post("/update/:orderId", requireAuth(), async (req, res) => {
 });
 
 // 🚀 START tracking for an order (called when driver accepts delivery)
-router.post("/start/:orderId", requireAuth(), async (req, res) => {
+trackingRouter.post("/start/:orderId", async (req, res) => {
   try {
     const { orderId } = req.params;
     const { driverName, driverPhone, vehicle, destinationLat, destinationLng } = req.body;
+
+    console.log("🚀 Starting tracking for order:", orderId);
 
     const order = await Order.findById(orderId);
 
@@ -169,8 +183,8 @@ router.post("/start/:orderId", requireAuth(), async (req, res) => {
         lng: 36.8219,
       },
       destination: {
-        lat: destinationLat || order.deliveryLocation?.lat || -1.2921,
-        lng: destinationLng || order.deliveryLocation?.lng || 36.8219,
+        lat: destinationLat || order.address?.latitude || -1.2921,
+        lng: destinationLng || order.address?.longitude || 36.8219,
       },
       speed: 0,
       heading: 0,
@@ -180,13 +194,15 @@ router.post("/start/:orderId", requireAuth(), async (req, res) => {
 
     activeDeliveries.set(orderId, trackingData);
 
+    console.log("✅ Tracking started successfully");
+
     res.json({
       success: true,
       message: "Tracking started successfully",
       tracking: trackingData,
     });
   } catch (error) {
-    console.error("Start tracking error:", error);
+    console.error("❌ Start tracking error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to start tracking",
@@ -196,9 +212,11 @@ router.post("/start/:orderId", requireAuth(), async (req, res) => {
 });
 
 // 🚀 STOP tracking (called when delivery is completed)
-router.post("/stop/:orderId", requireAuth(), async (req, res) => {
+trackingRouter.post("/stop/:orderId", async (req, res) => {
   try {
     const { orderId } = req.params;
+
+    console.log("🛑 Stopping tracking for order:", orderId);
 
     activeDeliveries.delete(orderId);
 
@@ -207,7 +225,7 @@ router.post("/stop/:orderId", requireAuth(), async (req, res) => {
       message: "Tracking stopped successfully",
     });
   } catch (error) {
-    console.error("Stop tracking error:", error);
+    console.error("❌ Stop tracking error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to stop tracking",
@@ -247,8 +265,10 @@ function calculateETA(distanceKm, speedKmh) {
 }
 
 // 🔍 ADMIN: Get all active deliveries
-router.get("/admin/active", requireAuth(), async (req, res) => {
+trackingRouter.get("/admin/active", verifyClerkToken, async (req, res) => {
   try {
+    console.log("📊 Fetching all active deliveries");
+
     const activeTrackingData = Array.from(activeDeliveries.entries()).map(
       ([orderId, data]) => ({
         orderId,
@@ -262,7 +282,7 @@ router.get("/admin/active", requireAuth(), async (req, res) => {
       deliveries: activeTrackingData,
     });
   } catch (error) {
-    console.error("Get active deliveries error:", error);
+    console.error("❌ Get active deliveries error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch active deliveries",
@@ -270,4 +290,4 @@ router.get("/admin/active", requireAuth(), async (req, res) => {
   }
 });
 
-module.exports = router;
+export default trackingRouter;
