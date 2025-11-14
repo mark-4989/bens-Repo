@@ -10,30 +10,46 @@ import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import ProtectedAdminPanel from "./ProtectedAdminPanel";
 import AdminLogin from "./pages/AdminLogin";
 import { ToastContainer } from 'react-toastify';
-
+import 'react-toastify/dist/ReactToastify.css'; // ✅ ADD THIS LINE
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL
 console.log("Backend URL:", backendUrl);
 
-
 const App = () => {
   return (
-    <div>
+    <div className="bg-gray-50 min-h-screen">
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        style={{ zIndex: 9999 }} // ✅ Ensure toasts appear above everything
+      />
+      
       <SignedIn>
-        <ToastContainer position="top-right" autoClose={3000} />
         <Navbar />
         <hr />
-        <Sidebar />
-
-        <Routes>
-          <Route path="/" element={<Navigate to="/list" />} />
-          <Route path="/add" element={<Add />} />
-          <Route path="/list" element={<List />} />
-          <Route path="/orders" element={<AdminOrders />} />
-          <Route path="/admin" element={<ProtectedAdminPanel />} />
-          <Route path="/login" element={<AdminLogin />} />
-        </Routes>
+        <div className="flex">
+          <Sidebar />
+          <div className="flex-1 p-6">
+            <Routes>
+              <Route path="/" element={<Navigate to="/list" />} />
+              <Route path="/add" element={<Add />} />
+              <Route path="/list" element={<List />} />
+              <Route path="/orders" element={<AdminOrders />} />
+              <Route path="/admin" element={<ProtectedAdminPanel />} />
+              <Route path="/login" element={<AdminLogin />} />
+            </Routes>
+          </div>
+        </div>
       </SignedIn>
+      
       <SignedOut>
         <Routes>
           <Route path="*" element={<AdminLogin />} />
