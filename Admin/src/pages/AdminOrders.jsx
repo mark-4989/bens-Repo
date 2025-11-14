@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@clerk/clerk-react";
 import "./AdminOrders.css";
-import LiveTracking from "./LiveTracking";
+import LiveTracking from "../components/LiveTracking";
 
 const AdminOrders = () => {
   const { getToken } = useAuth();
