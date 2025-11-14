@@ -9,8 +9,7 @@ import { Route, Routes } from "react-router-dom";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import ProtectedAdminPanel from "./ProtectedAdminPanel";
 import AdminLogin from "./pages/AdminLogin";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; // ✅ ADD THIS LINE
+import { ToastContainer, toast } from 'react-toastify';
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL
 console.log("Backend URL:", backendUrl);
@@ -18,6 +17,7 @@ console.log("Backend URL:", backendUrl);
 const App = () => {
   return (
     <div className="bg-gray-50 min-h-screen">
+      {/* ✅ Toast Container - Must be at root level */}
       <ToastContainer 
         position="top-right"
         autoClose={3000}
@@ -28,8 +28,8 @@ const App = () => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="light"
-        style={{ zIndex: 9999 }} // ✅ Ensure toasts appear above everything
+        theme="colored"
+        limit={3}
       />
       
       <SignedIn>

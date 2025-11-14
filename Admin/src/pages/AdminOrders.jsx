@@ -39,6 +39,7 @@ const AdminOrders = () => {
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
         setOrders(sortedOrders);
+        toast.success(`✅ Loaded ${data.orders.length} orders successfully!`);
 
         // Auto-expand today's orders
         const today = new Date().toLocaleDateString("en-US", {
@@ -49,11 +50,12 @@ const AdminOrders = () => {
         setExpandedDates(new Set([today]));
       } else {
         console.error("Failed to fetch orders:", data.message);
+        toast.error("❌ Failed to fetch orders");
       }
       setLoading(false);
     } catch (error) {
       console.error("Failed to fetch orders:", error);
-      alert("Failed to load orders. Please refresh the page.");
+      toast.error("❌ Failed to load orders. Please refresh the page.");
       setLoading(false);
     }
   };
@@ -75,13 +77,14 @@ const AdminOrders = () => {
 
       const data = await response.json();
       if (data.success) {
+        toast.success(`✅ Order status updated to "${newStatus}"`);
         fetchOrders(); // Refresh orders
       } else {
-        alert("Failed to update status: " + data.message);
+        toast.error("❌ Failed to update status: " + data.message);
       }
     } catch (error) {
       console.error("Failed to update status:", error);
-      alert("Error updating status");
+      toast.error("❌ Error updating status. Please try again.");
     }
   };
 
@@ -97,14 +100,14 @@ const AdminOrders = () => {
 
       const data = await response.json();
       if (data.success) {
-        alert("Order deleted successfully");
+        toast.success("🗑️ Order deleted successfully");
         fetchOrders();
       } else {
-        alert("Failed to delete order: " + data.message);
+        toast.error("❌ Failed to delete order: " + data.message);
       }
     } catch (error) {
       console.error("Failed to delete order:", error);
-      alert("Error deleting order");
+      toast.error("❌ Error deleting order. Please try again.");
     }
   };
 
