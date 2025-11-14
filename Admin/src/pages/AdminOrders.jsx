@@ -22,7 +22,7 @@ const AdminOrders = () => {
     try {
       setLoading(true);
       const token = await getToken({ template: "MilikiAPI" });
-      const response = await fetch(`${backendUrl}/api/orders/admin/all`, {
+      const response = await fetch(`${backendUrl}/api/orders/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -98,35 +98,54 @@ const AdminOrders = () => {
     }
   };
 
-  // 🚀 DISPATCH TO WHATSAPP (Opens WhatsApp with pre-filled message)
-  const dispatchToWhatsApp = (order) => {
-    // Format order details for WhatsApp message
-    const itemsList = order.items
-      .map(
-        (item) =>
-          `• ${item.name} (${item.size}) x${item.quantity} - KSH ${item.price}`
-      )
-      .join("%0A"); // URL-encoded newline
+  // 🚀 DISPATCH TO WHATSAPP (Using backend route)
+  const dispatchToWhatsApp = async (order) => {
+    try {
+      const token = await getToken({ template: "MilikiAPI" });
+      
+      // Prompt admin for driver details
+      const driverId = prompt("Enter Driver ID:");
+      if (!driverId) return;
+      
+      const driverName = prompt("Enter Driver Name:");
+      if (!driverName) return;
+      
+      const driverPhone = prompt("Enter Driver Phone (e.g., +254712345678):");
+      if (!driverPhone) return;
 
-    const message = `🚚 *NEW ORDER DISPATCH*%0A%0A` +
-      `📦 *Order ID:* ${order._id.slice(-8).toUpperCase()}%0A` +
-      `👤 *Customer:* ${order.customer.name}%0A` +
-      `📞 *Phone:* ${order.customer.phone}%0A` +
-      `📍 *Location:* ${order.customer.address}%0A%0A` +
-      `🛍️ *Items:*%0A${itemsList}%0A%0A` +
-      `💰 *Total:* KSH ${order.totalAmount}%0A` +
-      `💳 *Payment:* ${order.paymentMethod} (${order.paymentStatus})%0A%0A` +
-      `⏰ *Ordered:* ${new Date(order.createdAt).toLocaleString()}%0A%0A` +
-      `🎯 *Status:* Ready for dispatch`;
+      // Call backend dispatch endpoint
+      const response = await fetch(`${backendUrl}/api/dispatch/whatsapp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          orderId: order._id,
+          driverId,
+          driverName,
+          driverPhone,
+          groupNumber: "", // Leave empty to open WhatsApp without specific number
+        }),
+      });
 
-    // WhatsApp Web link (works on desktop and mobile)
-    const whatsappLink = `https://wa.me/?text=${message}`;
-    
-    // Open WhatsApp in new tab
-    window.open(whatsappLink, '_blank');
-    
-    // Optional: Update order status to "Cargo Packed"
-    updateOrderStatus(order._id, "Cargo Packed");
+      const data = await response.json();
+
+      if (data.success) {
+        // Open WhatsApp with the generated link
+        window.open(data.whatsappLink, '_blank');
+        
+        // Update order status
+        await updateOrderStatus(order._id, "Cargo Packed");
+        
+        alert("✅ Order dispatched! WhatsApp opened with driver details.");
+      } else {
+        alert("❌ Failed to dispatch: " + data.message);
+      }
+    } catch (error) {
+      console.error("Dispatch error:", error);
+      alert("❌ Error dispatching order");
+    }
   };
 
   const toggleDateFolder = (date) => {
