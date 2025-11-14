@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@clerk/clerk-react";
 import "./AdminOrders.css";
-import LiveTracking from "../components/LiveTracking";
+import LiveTracking from "./LiveTracking";
 
 const AdminOrders = () => {
   const { getToken } = useAuth();
@@ -25,9 +25,15 @@ const AdminOrders = () => {
       const response = await fetch(`${backendUrl}/api/orders/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
 
       if (data.success) {
+        console.log("✅ Orders fetched:", data.orders.length);
         const sortedOrders = data.orders.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
@@ -40,10 +46,13 @@ const AdminOrders = () => {
           day: "numeric",
         });
         setExpandedDates(new Set([today]));
+      } else {
+        console.error("Failed to fetch orders:", data.message);
       }
       setLoading(false);
     } catch (error) {
       console.error("Failed to fetch orders:", error);
+      alert("Failed to load orders. Please refresh the page.");
       setLoading(false);
     }
   };
@@ -308,38 +317,43 @@ const AdminOrders = () => {
 
                       {/* Customer Info */}
                       <div className="customer-info">
-                        <h4>👤 {order.customer.name}</h4>
-                        <p>📞 {order.customer.phone}</p>
-                        <p>📧 {order.customer.email}</p>
-                        <p>📍 {order.customer.address || "No address"}</p>
+                        <h4>👤 {order.customerName || order.customer?.name || "N/A"}</h4>
+                        <p>📞 {order.phone || order.customer?.phone || "N/A"}</p>
+                        <p>📧 {order.email || order.customer?.email || "N/A"}</p>
+                        <p>📍 {order.address?.street || order.customer?.address || "No address"}</p>
                       </div>
 
                       {/* Order Items */}
                       <div className="order-items">
                         <h5>🛍️ Items:</h5>
-                        {order.items.slice(0, 2).map((item, idx) => (
-                          <div key={idx} className="order-item">
-                            <img
-                              src={item.image}
-                              alt={item.name}
-                              onError={(e) => {
-                                e.target.src =
-                                  "https://via.placeholder.com/60?text=No+Image";
-                              }}
-                            />
-                            <div className="item-details">
-                              <p className="item-name">{item.name}</p>
-                              <p className="item-meta">
-                                Qty: {item.quantity} | Size: {item.size}
+                        {order.items && order.items.length > 0 ? (
+                          <>
+                            {order.items.slice(0, 2).map((item, idx) => (
+                              <div key={idx} className="order-item">
+                                <img
+                                  src={item.image || "https://via.placeholder.com/60?text=No+Image"}
+                                  alt={item.name || "Product"}
+                                  onError={(e) => {
+                                    e.target.src = "https://via.placeholder.com/60?text=No+Image";
+                                  }}
+                                />
+                                <div className="item-details">
+                                  <p className="item-name">{item.name || "Unknown Item"}</p>
+                                  <p className="item-meta">
+                                    Qty: {item.quantity || 1} | Size: {item.size || "N/A"}
+                                  </p>
+                                  <p className="item-price">KSH {item.price || 0}</p>
+                                </div>
+                              </div>
+                            ))}
+                            {order.items.length > 2 && (
+                              <p className="more-items-text">
+                                +{order.items.length - 2} more items
                               </p>
-                              <p className="item-price">KSH {item.price}</p>
-                            </div>
-                          </div>
-                        ))}
-                        {order.items.length > 2 && (
-                          <p className="more-items-text">
-                            +{order.items.length - 2} more items
-                          </p>
+                            )}
+                          </>
+                        ) : (
+                          <p className="more-items-text">No items</p>
                         )}
                       </div>
 
