@@ -7,21 +7,23 @@ import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 import WineBarIcon from '@mui/icons-material/WineBar';
 import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
 import DinnerDiningIcon from '@mui/icons-material/DinnerDining';
-import HomeIcon from '@mui/icons-material/Home';
-import CheckroomIcon from '@mui/icons-material/Checkroom';
-import LocalDrinkIcon from '@mui/icons-material/LocalDrink';
-import PetsIcon from '@mui/icons-material/Pets';
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const [hoveredCategory, setHoveredCategory] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // NEW: Mobile sidebar state
 
-  // ⚠️ CRITICAL: These category IDs MUST match your backend exactly
-  // Backend uses: 'fresh-foods', 'baby-kids', 'electronics', 'liquor-store', 'food-cupboard'
-  
+  // Toggle sidebar on mobile/tablet
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  // Categories data
   const categories = [
     {
-      id: 'fresh-foods',  // ← Matches backend exactly
+      id: 'fresh-foods',
       name: 'Fresh Food',
       icon: <RestaurantIcon/>,
       route: '/category/fresh-foods',
@@ -79,7 +81,7 @@ const Sidebar = () => {
       ]
     },
     {
-      id: 'baby-kids',  // ← Matches backend exactly
+      id: 'baby-kids',
       name: 'Baby & Kids',
       icon: <ChildCareIcon/>,
       route: '/category/baby-kids',
@@ -133,7 +135,7 @@ const Sidebar = () => {
       ]
     },
     {
-      id: 'electronics',  // ← Matches backend exactly
+      id: 'electronics',
       name: 'Electronics',
       icon: <ElectricBoltIcon/>,
       route: '/category/electronics',
@@ -186,7 +188,7 @@ const Sidebar = () => {
       ]
     },
     {
-      id: 'liquor-store',  // ← Matches backend exactly
+      id: 'liquor-store',
       name: 'Naivas Liquor',
       icon: <WineBarIcon/>,
       route: '/category/liquor-store',
@@ -241,7 +243,7 @@ const Sidebar = () => {
       ]
     },
     {
-      id: 'food-cupboard',  // ← Matches backend exactly
+      id: 'food-cupboard',
       name: 'Food Cupboard',
       icon: <DinnerDiningIcon/>,
       route: '/category/food-cupboard',
@@ -294,7 +296,7 @@ const Sidebar = () => {
       ]
     },
     {
-      id: 'promos',  // ← For promotional products
+      id: 'promos',
       name: 'Promotions',
       icon: <CardGiftcardIcon/>,
       route: '/category/promos',
@@ -323,84 +325,100 @@ const Sidebar = () => {
   const handleCategoryClick = (route) => {
     navigate(route);
     setHoveredCategory(null);
+    setIsSidebarOpen(false); // Close sidebar on mobile after navigation
   };
 
   const handleSubcategoryClick = (route) => {
     navigate(route);
     setHoveredCategory(null);
+    setIsSidebarOpen(false); // Close sidebar on mobile after navigation
   };
 
   return (
-    <div className="sidebar-container">
-      <div className="sidebar">
-        <div className="sidebar-header">
-          <span className="sidebar-icon">🛍️</span>
-          <h2 className="sidebar-title">Categories</h2>
-        </div>
+    <>
+      {/* Hamburger Toggle Button (Mobile/Tablet Only) */}
+      <button className="sidebar-toggle" onClick={toggleSidebar}>
+        {isSidebarOpen ? <CloseIcon /> : <MenuIcon />}
+      </button>
 
-        <div className="category-list">
-          {categories.map((category) => (
-            <div
-              key={category.id}
-              className="category-item"
-              onMouseEnter={() => handleMouseEnter(category.id)}
-              onMouseLeave={handleMouseLeave}
-            >
-              <button 
-                className="category-button"
-                onClick={() => handleCategoryClick(category.route)}
+      {/* Overlay for mobile (darkens background when sidebar is open) */}
+      <div 
+        className={`sidebar-overlay ${isSidebarOpen ? 'active' : ''}`}
+        onClick={toggleSidebar}
+      />
+
+      {/* Sidebar Container */}
+      <div className={`sidebar-container ${isSidebarOpen ? 'active' : ''}`}>
+        <div className="sidebar">
+          <div className="sidebar-header">
+            <span className="sidebar-icon">🛍️</span>
+            <h2 className="sidebar-title">Categories</h2>
+          </div>
+
+          <div className="category-list">
+            {categories.map((category) => (
+              <div
+                key={category.id}
+                className="category-item"
+                onMouseEnter={() => handleMouseEnter(category.id)}
+                onMouseLeave={handleMouseLeave}
               >
-                <div className="category-content">
-                  <span className="category-icon">{category.icon}</span>
-                  <span className="category-name">{category.name}</span>
-                </div>
-                <span className="category-arrow">›</span>
-              </button>
-
-              {hoveredCategory === category.id && (
-                <div 
-                  className="mega-menu"
-                  onMouseEnter={() => handleMouseEnter(category.id)}
-                  onMouseLeave={handleMouseLeave}
+                <button 
+                  className="category-button"
+                  onClick={() => handleCategoryClick(category.route)}
                 >
-                  <h3 className="mega-menu-title">{category.name}</h3>
-                  
-                  <div className="mega-menu-grid">
-                    {category.subcategories.map((sub, idx) => (
-                      <div key={idx} className="subcategory">
-                        <h4 
-                          className="subcategory-title"
-                          onClick={() => handleSubcategoryClick(sub.route)}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          {sub.title}
-                        </h4>
-                        <ul className="subcategory-list">
-                          {sub.items.map((item, itemIdx) => (
-                            <li key={itemIdx} className="subcategory-item">
-                              <a 
-                                href="#" 
-                                className="subcategory-link"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  handleSubcategoryClick(item.route);
-                                }}
-                              >
-                                {item.name}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
+                  <div className="category-content">
+                    <span className="category-icon">{category.icon}</span>
+                    <span className="category-name">{category.name}</span>
                   </div>
-                </div>
-              )}
-            </div>
-          ))}
+                  <span className="category-arrow">›</span>
+                </button>
+
+                {hoveredCategory === category.id && (
+                  <div 
+                    className="mega-menu"
+                    onMouseEnter={() => handleMouseEnter(category.id)}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <h3 className="mega-menu-title">{category.name}</h3>
+                    
+                    <div className="mega-menu-grid">
+                      {category.subcategories.map((sub, idx) => (
+                        <div key={idx} className="subcategory">
+                          <h4 
+                            className="subcategory-title"
+                            onClick={() => handleSubcategoryClick(sub.route)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            {sub.title}
+                          </h4>
+                          <ul className="subcategory-list">
+                            {sub.items.map((item, itemIdx) => (
+                              <li key={itemIdx} className="subcategory-item">
+                                <a 
+                                  href="#" 
+                                  className="subcategory-link"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handleSubcategoryClick(item.route);
+                                  }}
+                                >
+                                  {item.name}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

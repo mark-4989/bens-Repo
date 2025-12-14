@@ -16,6 +16,7 @@ import SearchBar from "./components/SearchBar";
 import Sidebar from "./components/Sidebar";
 import { ToastContainer } from "react-toastify";
 import CategoryPage from "./pages/CategoryPage";
+import "./styles/global.css";
 
 const App = () => {
   return (

@@ -1,74 +1,105 @@
 .bestseller-section {
-  margin: 60px 0;
-  padding: 0 20px;
+  margin: 40px 20px;
+  padding: 32px 24px;
+  
+  /* FLOATING EFFECT - Same as Collections */
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
 }
 
 .bestseller-header {
   text-align: center;
-  padding: 20px 0 32px;
+  padding: 12px 0 20px;
 }
 
 .bestseller-description {
   width: 80%;
-  max-width: 700px;
-  margin: 20px auto 0;
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.8;
+  max-width: 600px;
+  margin: 12px auto 0;
+  font-size: 14px;
+  color: #6c757d;
+  line-height: 1.6;
   text-align: center;
-  
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
-  padding: 16px 32px;
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 8px 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
 }
 
 .bestseller-loading {
   text-align: center;
-  padding: 48px 32px;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 18px;
-  
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  margin: 40px auto;
-  max-width: 500px;
+  padding: 32px 24px;
+  color: #6c757d;
+  font-size: 15px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  margin: 30px auto;
+  max-width: 400px;
 }
 
+/* COMPACT GRID - Fits 5 products per row */
 .bestseller-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 32px;
-  margin-top: 40px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 28px;
   justify-items: center;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* For larger screens - force 5 columns */
+@media (min-width: 1200px) {
+  .bestseller-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 18px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .bestseller-section {
+    margin: 30px 15px;
+    padding: 28px 20px;
+  }
+  
+  .bestseller-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
 }
 
 @media (max-width: 768px) {
   .bestseller-section {
-    margin: 40px 0;
-    padding: 0 15px;
+    margin: 24px 12px;
+    padding: 24px 16px;
   }
 
   .bestseller-description {
     width: 95%;
-    font-size: 14px;
-    padding: 12px 20px;
+    font-size: 13px;
+    padding: 8px 16px;
   }
 
   .bestseller-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    margin-top: 30px;
+    gap: 12px;
+    margin-top: 20px;
   }
 }
 
-@media (min-width: 1025px) {
+@media (max-width: 480px) {
+  .bestseller-section {
+    margin: 20px 10px;
+    padding: 20px 12px;
+  }
+  
   .bestseller-grid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 36px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 }

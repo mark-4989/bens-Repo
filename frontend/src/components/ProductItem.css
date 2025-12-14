@@ -1,244 +1,318 @@
 /* ====================================
-   LIQUID GLASSMORPHISM PRODUCT CARD
+   EXACT PRODUCT CARD - 268px x 432px
    ==================================== */
 
-.card-container {
+.product-card {
   position: relative;
+  background: var(--primary-white);
+  width: 200px;
+  height: 370px;
   display: flex;
   flex-direction: column;
-  width: 180px;
-  height: 250px;
-  padding: 0;
-  margin: 10px;
-  border-radius: 24px;
-  overflow: hidden;
-  
-  /* Liquid Glass Effect */
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  
-  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
   cursor: pointer;
+  transition: all 0.3s ease;
+  border: #2a2a2a solid 1px;
+  border-radius: 12px;
 }
 
-/* Hover Effect - Enhanced Glass with Glow */
-.card-container:hover {
-  transform: translateY(-8px) scale(1.02);
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 
-    0 20px 60px rgba(102, 126, 234, 0.4),
-    0 0 80px rgba(102, 126, 234, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+.product-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
-/* Shimmer Effect on Hover */
-.card-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    transparent
-  );
-  transition: left 0.7s;
-  z-index: 1;
-}
-
-.card-container:hover::before {
-  left: 100%;
-}
-
-/* Ambient Glow Edge */
-.card-container::after {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: 24px;
-  padding: 2px;
-  background: linear-gradient(
-    135deg,
-    rgba(102, 126, 234, 0),
-    rgba(118, 75, 162, 0),
-    rgba(102, 126, 234, 0)
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.5s;
-  pointer-events: none;
-}
-
-.card-container:hover::after {
-  opacity: 1;
-  background: linear-gradient(
-    135deg,
-    rgba(102, 126, 234, 0.6),
-    rgba(118, 75, 162, 0.6),
-    rgba(102, 126, 234, 0.6)
-  );
-}
-
-/* Image Container with Glass Overlay */
-.image-container {
+/* Product Image Container - 200px x 200px (square) */
+.product-image-container {
   position: relative;
-  width: 100%;
-  height: 260px;
+  width: 195px;
+  height: 200px;
+  background: #F8F9FA;
+  border-radius: 12px 12px 0 0;
   overflow: hidden;
-  border-radius: 20px 20px 0 0;
+  flex-shrink: 0;
 }
 
-.image-container::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(0, 0, 0, 0.3) 100%
-  );
-  opacity: 0;
-  transition: opacity 0.4s;
-}
-
-.card-container:hover .image-container::after {
-  opacity: 1;
-}
-
-.image-container img {
+.product-image-container img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+  object-fit: contain;
+  padding: 10px;
+  transition: transform 0.4s ease;
 }
 
-.card-container:hover .image-container img {
+.product-card:hover .product-image-container img {
+  transform: scale(1.05);
+}
+
+/* Wishlist Button */
+.wishlist-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.wishlist-btn:hover {
   transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* Details Container - Frosted Glass Bottom */
-.details-container {
-  position: relative;
-  padding: 20px 16px;
+.wishlist-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: #000000;
+  stroke-width: 2;
+  fill: none;
+  transition: all 0.3s ease;
+}
+
+.wishlist-btn:hover svg {
+  stroke: #ff0000;
+}
+
+.wishlist-btn.active svg {
+  fill: #ff0000;
+  stroke: #ff0000;
+}
+
+/* Product Info Section - 150px height (350 - 200 = 150) */
+.product-info {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 8px;
-  height: 100px;
-  
-  /* Inner Glass Layer */
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  
-  transition: all 0.4s ease;
+  padding: 12px 8px 0 8px;
+  height: 150px;
+  justify-content: space-between;
 }
 
-.card-container:hover .details-container {
-  background: rgba(255, 255, 255, 0.05);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Product Name - Bright White */
+/* Product Name */
 .product-name {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 500;
-  color: #ffffff;
-  font-family: 'Outfit', sans-serif;
-  line-height: 1.4;
-  margin: 0;
-  
-  /* Text Shadow for Glass Effect */
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  
-  /* Truncate */
+  color: #000000;
+  line-height: 1.3;
+  margin: 0 0 4px 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  
-  transition: color 0.3s;
+  min-height: 34px;
 }
 
-.card-container:hover .product-name {
-  color: #fff;
-  text-shadow: 0 2px 12px rgba(255, 255, 255, 0.3);
+/* Product Model/Description */
+.product-model {
+  font-size: 13px;
+  color: var(--text-gray);
+  margin: 0 0 8px 0;
+  line-height: 1.2;
 }
 
-/* Product Price - Vibrant Glow */
+/* Product Price */
 .product-price {
-  font-size: 18px;
+  font-size: 8px;
   font-weight: 600;
-  color: #00ff88;
-  margin: 0;
-  
-  /* Neon Glow Effect */
-  text-shadow: 
-    0 0 10px rgba(0, 255, 136, 0.5),
-    0 0 20px rgba(0, 255, 136, 0.3);
-  
-  transition: all 0.3s;
+  color: #000000;
+  margin: 0 0 10px 0;
 }
 
-.card-container:hover .product-price {
-  color: #00ffaa;
-  text-shadow: 
-    0 0 15px rgba(0, 255, 170, 0.8),
-    0 0 30px rgba(0, 255, 170, 0.4);
-  transform: scale(1.05);
+/* Buy Now Button */
+.buy-now-btn {
+  width: 180px;
+  background: var(--primary-black);
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: capitalize;
+  height: 32px;
+}
+
+.buy-now-btn:hover {
+  background: #2a2a2a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.buy-now-btn:active {
+  transform: translateY(0);
 }
 
 /* Link Reset */
-a {
+.product-card a {
   text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-  .card-container {
-    width: 170px;
-    height: 300px;
-    border-radius: 20px;
-    margin: 10px;
+/* ====================================
+   PRODUCT GRID LAYOUT
+   ==================================== */
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 200px);
+  gap: 20px;
+  padding: 4vw;
+  justify-content: start;
+  width: 100%;
+}
+
+/* ====================================
+   PAGE LAYOUT WITH SIDEBAR
+   ==================================== */
+
+.collection-page {
+  display: flex;
+  min-height: 100vh;
+  background: var(--primary-white);
+}
+
+/* Sidebar - 18vw */
+.filter-sidebar {
+  width: 18vw;
+  min-width: 240px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  border-right: 1px solid var(--medium-gray);
+  padding: 32px 24px;
+  overflow-y: auto;
+  background: var(--primary-white);
+}
+
+/* Products Area */
+.products-area {
+  flex: 1;
+  width: calc(100% - 18vw);
+}
+
+/* ====================================
+   RESPONSIVE ADJUSTMENTS
+   ==================================== */
+
+/* For screens that can fit 8-9 cards */
+@media (min-width: 1920px) {
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, 200px);
+    gap: 24px;
+    padding: 4vw 6vw;
+  }
+}
+
+/* For screens that fit 6-7 cards */
+@media (max-width: 1680px) {
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, 200px);
+    gap: 20px;
+  }
+}
+
+/* For screens that fit 5-6 cards */
+@media (max-width: 1440px) {
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, 200px);
+    gap: 20px;
+    padding: 3vw;
   }
   
-  .image-container {
-    height: 200px;
+  .filter-sidebar {
+    width: 10vw;
+  }
+}
+
+/* For screens that fit 4-5 cards */
+@media (max-width: 1200px) {
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, 200px);
+    gap: 20px;
+    padding: 2vw;
   }
   
-  .details-container {
-    padding: 16px 12px;
-    height: 100px;
+  .filter-sidebar {
+    width: 180px;
+  }
+}
+
+/* Tablet - 3-4 cards */
+@media (max-width: 1024px) {
+  .collection-page {
+    flex-direction: column;
+  }
+  
+  .filter-sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid var(--medium-gray);
+  }
+  
+  .products-area {
+    width: 100%;
+  }
+  
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, 200px);
+    gap: 20px;
+    padding: 24px;
+    justify-content: center;
+  }
+}
+
+/* Mobile - 1 card or flexible */
+@media (max-width: 640px) {
+  .products-grid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    padding: 16px;
+  }
+  
+  .product-card {
+    width: 100%;
+    height: auto;
+    min-height: 320px;
+  }
+  
+  .product-image-container {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+  
+  .product-info {
+    height: auto;
+    padding: 12px 8px;
   }
   
   .product-name {
-    font-size: 13px;
+    font-size: 14px;
+    min-height: 36px;
   }
   
   .product-price {
-    font-size: 16px;
-  }
-}
-
-@media (min-width: 1440px) {
-  .card-container {
-    width: 240px;
-    height: 380px;
+    font-size: 18px;
+    margin: 0 0 10px 0;
   }
   
-  .image-container {
-    height: 280px;
+  .buy-now-btn {
+    padding: 10px 20px;
+    font-size: 13px;
+    height: 40px;
   }
 }

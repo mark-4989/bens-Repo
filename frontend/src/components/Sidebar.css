@@ -1,4 +1,4 @@
-/* Sidebar.css - iPhone 11 Liquid Glass Morphism - FIXED */
+/* Sidebar.css - iPhone 11 Liquid Glass Morphism - MOBILE RESPONSIVE */
 
 /* Reset and Main Container */
 .sidebar-container {
@@ -13,7 +13,7 @@
 }
 
 .sidebar {
-  width: 20vw;
+  width: 10vw;
   height: 100vh;
   background: transparent;
   
@@ -66,7 +66,7 @@
 .category-list {
   padding: 12px 0;
   margin: 0;
-   width: 18vw;
+   width: 8vw;
 }
 
 .category-item {
@@ -79,14 +79,14 @@
 
 /* Glass Morphism Category Buttons */
 .category-button {
-  width: 18vw;
+  width: 8vw;
   height: 7vh;
   padding: 14px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  /* 🧽 Clean transparent background */
+  /* Clean transparent background */
   background: transparent;
   border: none;
 
@@ -122,7 +122,7 @@
   gap: 12px;
   margin: 0;
   padding: 0;
-  width: 18vw;
+  width: 4vw;
 }
 
 .category-icon {
@@ -145,7 +145,8 @@
   font-weight: 500;
   color: #1f2937;
   transition: all 0.3s ease;
-  margin: 0;
+  margin-left: 1vw;
+  width: 8vw;
   padding: 0;
   line-height: 1.4;
   white-space: nowrap;
@@ -172,7 +173,7 @@
 /* Mega Menu - Enhanced Glass Morphism */
 .mega-menu {
   position: fixed;
-  left: 272px;
+  left: 8vw;
   top: 80px;
   width: 650px;
   min-height: 400px;
@@ -326,24 +327,6 @@
 }
 
 /* Dark Theme Support */
-/* .dark-theme .sidebar {
-  background: linear-gradient(
-    135deg,
-    rgba(31, 41, 55, 0.8) 0%,
-    rgba(17, 24, 39, 0.9) 100%
-  );
-  border-right: 1px solid rgba(75, 85, 99, 0.5);
-}
-
-.dark-theme .sidebar-header {
-  background: linear-gradient(
-    135deg,
-    rgba(17, 24, 39, 0.4) 0%,
-    rgba(17, 24, 39, 0.2) 100%
-  );
-  border-bottom: 1px solid rgba(75, 85, 99, 0.5);
-} */
-
 .dark-theme .category-button {
   background: linear-gradient(
     135deg,
@@ -388,21 +371,153 @@
   color: #10b981;
 }
 
-/* Responsive adjustments */
-@media (max-width: 1200px) {
-  .mega-menu {
-    width: 550px;
-  }
+/* ============================================
+   MOBILE/TABLET RESPONSIVE STYLES 
+   (Desktop appearance stays unchanged)
+   ============================================ */
+
+/* Hamburger Toggle Button - HIDDEN ON DESKTOP */
+.sidebar-toggle {
+  display: none; /* Hidden by default on desktop */
+  position: fixed;
+  top: 8vh;
+  left: 20px;
+  z-index: 10001;
+  background: linear-gradient(135deg, #14b8a6, #10b981);
+  border: none;
+  border-radius: 12px;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  color: white;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+  transition: all 0.3s ease;
+  align-items: center;
+  justify-content: center;
 }
 
+.sidebar-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(20, 184, 166, 0.4);
+}
+
+.sidebar-toggle svg {
+  font-size: 28px;
+}
+
+/* Overlay - HIDDEN ON DESKTOP */
+.sidebar-overlay {
+  display: none; /* Hidden by default */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  display: block;
+  opacity: 1;
+}
+
+/* ============================================
+   TABLET RESPONSIVE (1024px and below)
+   ============================================ */
 @media (max-width: 1024px) {
-  .sidebar {
-    width: 250px;
+  /* Show hamburger button */
+  .sidebar-toggle {
+    display: flex;
   }
 
+  /* Hide sidebar by default, slide in when active */
+  .sidebar-container {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    width: 280px;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.98) 0%,
+      rgba(255, 255, 255, 0.95) 100%
+    );
+    backdrop-filter: blur(20px);
+  }
+
+  .sidebar-container.active {
+    left: 0;
+  }
+
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .sidebar-header {
+    padding: 20px;
+  }
+
+  .sidebar-icon {
+    font-size: 24px;
+    height: auto;
+    width: auto;
+  }
+
+  .sidebar-title {
+    font-size: 22px;
+  }
+
+  .category-list {
+    width: 100%;
+    padding: 12px 8px;
+  }
+
+  .category-item {
+    width: 100%;
+  }
+
+  .category-button {
+    width: 100%;
+    height: auto;
+    padding: 16px 20px;
+    margin: 4px 0;
+  }
+
+  .category-content {
+    width: auto;
+    gap: 16px;
+  }
+
+  .category-icon {
+    font-size: 20px;
+    height: auto;
+    width: auto;
+  }
+
+  .category-name {
+    font-size: 16px;
+    width: auto;
+    margin-left: 0;
+    white-space: normal;
+  }
+
+  /* Mega Menu - Full Width on Tablet */
   .mega-menu {
-    left: 262px;
-    width: 500px;
+    position: fixed;
+    left: 280px;
+    top: 0;
+    width: calc(100vw - 280px);
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    padding: 24px;
   }
 
   .mega-menu-grid {
@@ -410,13 +525,100 @@
   }
 }
 
+/* ============================================
+   MOBILE RESPONSIVE (768px and below)
+   ============================================ */
 @media (max-width: 768px) {
-  .sidebar {
-    width: 220px;
+  .sidebar-toggle {
+    top: 10px;
+    left: 10px;
+    width: 45px;
+    height: 45px;
+  }
+
+  .sidebar-toggle svg {
+    font-size: 24px;
+  }
+
+  .sidebar-container {
+    width: 85vw;
+    max-width: 320px;
+  }
+
+  .sidebar-header {
+    padding: 16px;
+  }
+
+  .sidebar-title {
+    font-size: 20px;
+  }
+
+  .category-button {
+    padding: 14px 16px;
+  }
+
+  .category-name {
+    font-size: 15px;
+  }
+
+  /* Mega Menu - Full Screen on Mobile */
+  .mega-menu {
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    padding: 20px;
+  }
+
+  .mega-menu-title {
+    font-size: 18px;
+  }
+
+  .subcategory-title {
+    font-size: 14px;
+  }
+
+  .subcategory-link {
+    font-size: 13px;
+  }
+}
+
+/* ============================================
+   SMALL MOBILE (480px and below)
+   ============================================ */
+@media (max-width: 480px) {
+  .sidebar-container {
+    width: 90vw;
+  }
+
+  .sidebar-toggle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .sidebar-toggle svg {
+    font-size: 22px;
+  }
+
+  .category-button {
+    padding: 12px 14px;
+  }
+
+  .category-name {
+    font-size: 14px;
   }
 
   .mega-menu {
-    left: 232px;
-    width: 400px;
+    padding: 16px;
+  }
+
+  .mega-menu-title {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+
+  .subcategory {
+    margin-bottom: 16px;
   }
 }

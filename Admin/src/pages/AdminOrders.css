@@ -1,110 +1,127 @@
-/* Admin Orders Container */
+/* ====================================
+   ADMIN ORDERS - MINIMALIST WHITE THEME
+   
+   FILE: admin/src/pages/AdminOrders.css
+   INSTRUCTIONS: Replace entire file content
+   ==================================== */
+
+/* ====================================
+   CONTAINER
+   ==================================== */
+
 .admin-orders-container {
-  padding: 32px;
+  padding: 40px;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #ffffff;
 }
 
-/* Header */
+/* ====================================
+   HEADER
+   ==================================== */
+
 .admin-orders-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 32px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 16px;
-  padding: 24px 32px;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+  padding-bottom: 20px;
+  border-bottom: 2px solid #000000;
 }
 
 .admin-orders-header h2 {
   margin: 0;
   font-size: 32px;
-  font-weight: 700;
-  color: #000000; /* Black text */
-  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  color: #000000;
+  letter-spacing: -0.5px;
 }
 
 .refresh-btn {
   padding: 12px 24px;
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  border-radius: 12px;
-  color: #000000; /* Black text */
+  background: #000000;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .refresh-btn:hover {
-  background: rgba(255, 255, 255, 0.35);
-  transform: translateY(-2px);
+  background: #1a1a1a;
+  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Filters */
+/* ====================================
+   FILTERS
+   ==================================== */
+
 .admin-filters {
   display: flex;
-  gap: 20px;
+  gap: 16px;
   flex-wrap: wrap;
   align-items: center;
   margin-bottom: 32px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 16px;
-  padding: 20px 32px;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .filter-group {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .filter-group label {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
-  color: #000000; /* Black text */
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .filter-group select {
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  padding: 10px 16px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
   border-radius: 8px;
-  color: #000000; /* Black text */
+  color: #1a1a1a;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   outline: none;
-  min-width: 150px;
+  min-width: 160px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .filter-group select:focus {
-  border-color: rgba(255, 255, 255, 0.6);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+  border-color: #000000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
 }
 
 .orders-count {
   margin-left: auto;
   font-size: 14px;
-  font-weight: 700;
-  color: #000000; /* Black text */
-  background: rgba(255, 255, 255, 0.25);
-  padding: 8px 16px;
-  border-radius: 20px;
+  font-weight: 600;
+  color: #000000;
+  background: #ffffff;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
 }
 
-/* Loading Spinner */
+/* ====================================
+   LOADING SPINNER
+   ==================================== */
+
 .loading-spinner {
   display: flex;
   flex-direction: column;
@@ -114,13 +131,13 @@
 }
 
 .spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-top: 4px solid #ffffff;
+  width: 48px;
+  height: 48px;
+  border: 4px solid #f3f4f6;
+  border-top: 4px solid #000000;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 @keyframes spin {
@@ -129,228 +146,255 @@
 }
 
 .loading-spinner p {
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 600;
+  color: #6b7280;
+  font-size: 15px;
+  font-weight: 500;
 }
 
-/* No Orders */
+/* ====================================
+   NO ORDERS
+   ==================================== */
+
 .no-orders {
   text-align: center;
   padding: 80px 20px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 20px;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .no-orders-icon {
-  font-size: 80px;
-  margin-bottom: 20px;
-  opacity: 0.6;
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
 }
 
 .no-orders h3 {
-  font-size: 28px;
-  color: #000000; /* Black text */
-  margin: 0 0 12px 0;
-  font-weight: 700;
+  font-size: 24px;
+  color: #000000;
+  margin: 0 0 8px 0;
+  font-weight: 600;
 }
 
 .no-orders p {
-  font-size: 16px;
-  color: #1a1a1a; /* Dark gray */
+  font-size: 15px;
+  color: #6b7280;
   margin: 0;
 }
 
-/* Date Folders Container */
+/* ====================================
+   DATE FOLDERS
+   ==================================== */
+
 .date-folders-container {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
-/* Date Folder */
 .date-folder {
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 16px;
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .date-folder:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.3);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
-/* Date Folder Header */
+/* ====================================
+   DATE FOLDER HEADER
+   ==================================== */
+
 .date-folder-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 32px;
+  padding: 20px 28px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+  background: #ffffff;
+  border-bottom: 1px solid transparent;
 }
 
 .date-folder-header:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: #f9fafb;
 }
 
 .date-folder-header.expanded {
-  background: rgba(255, 255, 255, 0.15);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .date-folder-info {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
 }
 
 .folder-icon {
-  font-size: 32px;
+  font-size: 28px;
 }
 
 .date-title {
   margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: #000000; /* Black text */
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
 }
 
 .order-count-badge {
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
-  color: #000000; /* Black text */
+  background: #f3f4f6;
+  color: #000000;
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: 6px;
   font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
+  font-weight: 600;
+  border: 1px solid #e5e7eb;
 }
 
 .expand-arrow {
-  font-size: 20px;
-  color: #000000; /* Black text */
-  transition: transform 0.3s ease;
+  font-size: 18px;
+  color: #6b7280;
+  transition: transform 0.2s ease;
 }
 
 .date-folder-header.expanded .expand-arrow {
   transform: rotate(90deg);
 }
 
-/* Orders Grid */
+/* ====================================
+   ORDERS GRID
+   ==================================== */
+
 .orders-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
   gap: 20px;
   padding: 24px;
+  background: #ffffff;
 }
 
-/* Order Card */
+/* ====================================
+   ORDER CARD
+   ==================================== */
+
 .order-card {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  border-radius: 16px;
-  padding: 20px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.15);
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.2s ease;
 }
 
 .order-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px 0 rgba(31, 38, 135, 0.25);
-  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #d1d5db;
 }
 
 .order-card.cancelled {
-  border-color: rgba(255, 107, 107, 0.6);
-  background: rgba(255, 107, 107, 0.15);
+  border-color: #fca5a5;
+  background: #fef2f2;
 }
 
-/* Order Card Header */
+/* ====================================
+   ORDER CARD HEADER
+   ==================================== */
+
 .order-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .order-id {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  color: #000000; /* Black text */
-  background: rgba(255, 255, 255, 0.3);
+  color: #000000;
+  background: #ffffff;
   padding: 6px 12px;
-  border-radius: 8px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
 }
 
 .order-time {
   font-size: 12px;
-  font-weight: 600;
-  color: #1a1a1a;
+  font-weight: 500;
+  color: #6b7280;
 }
 
-/* Customer Info */
+/* ====================================
+   CUSTOMER INFO
+   ==================================== */
+
 .customer-info {
   margin-bottom: 16px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.15);
+  padding: 16px;
+  background: #ffffff;
   border-radius: 8px;
+  border: 1px solid #e5e7eb;
 }
 
 .customer-info h4 {
-  margin: 0 0 8px 0;
-  font-size: 16px;
-  font-weight: 700;
-  color: #000000; /* Black text */
+  margin: 0 0 10px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #000000;
 }
 
 .customer-info p {
-  margin: 4px 0;
+  margin: 6px 0;
   font-size: 13px;
-  color: #1a1a1a;
-  font-weight: 500;
+  color: #4b5563;
+  font-weight: 400;
 }
 
-/* Order Items */
+/* ====================================
+   ORDER ITEMS
+   ==================================== */
+
 .order-items {
   margin-bottom: 16px;
 }
 
 .order-items h5 {
   margin: 0 0 12px 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: #000000; /* Black text */
+  font-size: 13px;
+  font-weight: 600;
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .order-item {
   display: flex;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.15);
+  background: #ffffff;
   border-radius: 8px;
+  border: 1px solid #e5e7eb;
 }
 
 .order-item img {
-  width: 60px;
-  height: 60px;
+  width: 56px;
+  height: 56px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
 }
 
 .item-details {
@@ -360,93 +404,109 @@
 .item-name {
   margin: 0 0 4px 0;
   font-size: 13px;
-  font-weight: 700;
-  color: #000000; /* Black text */
+  font-weight: 600;
+  color: #000000;
 }
 
 .item-meta {
   margin: 0 0 4px 0;
   font-size: 11px;
-  color: #333333;
+  color: #6b7280;
 }
 
 .item-price {
   margin: 0;
   font-size: 13px;
-  font-weight: 700;
-  color: #000000; /* Black text */
+  font-weight: 600;
+  color: #000000;
 }
 
 .more-items-text {
   font-size: 12px;
-  color: #333333;
+  color: #6b7280;
   font-style: italic;
   margin: 8px 0 0 0;
 }
 
-/* Order Total */
+/* ====================================
+   ORDER TOTAL
+   ==================================== */
+
 .order-total {
-  margin-bottom: 12px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.25);
+  margin-bottom: 16px;
+  padding: 14px;
+  background: #ffffff;
   border-radius: 8px;
   text-align: center;
+  border: 1px solid #e5e7eb;
 }
 
 .order-total strong {
   font-size: 16px;
-  color: #000000; /* Black text */
+  color: #000000;
+  font-weight: 700;
 }
 
-/* Payment Info */
+/* ====================================
+   PAYMENT INFO
+   ==================================== */
+
 .payment-info {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.15);
+  padding: 12px;
+  background: #ffffff;
   border-radius: 8px;
+  border: 1px solid #e5e7eb;
 }
 
 .payment-method {
   font-size: 12px;
-  font-weight: 700;
-  color: #000000; /* Black text */
+  font-weight: 600;
+  color: #000000;
 }
 
 .payment-badge {
-  padding: 4px 12px;
-  border-radius: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
 }
 
 .payment-badge.paid {
-  background: rgba(40, 167, 69, 0.8);
-  color: #ffffff;
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #86efac;
 }
 
 .payment-badge.pending {
-  background: rgba(255, 193, 7, 0.8);
-  color: #000000;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
 }
 
 .payment-badge.failed {
-  background: rgba(220, 53, 69, 0.8);
-  color: #ffffff;
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
 }
 
-/* Visual Stepper */
+/* ====================================
+   VISUAL STEPPER
+   ==================================== */
+
 .visual-stepper {
   display: flex;
   justify-content: space-between;
   margin: 16px 0;
-  padding: 16px 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  padding: 16px 12px;
+  background: #ffffff;
+  border-radius: 8px;
   position: relative;
+  border: 1px solid #e5e7eb;
 }
 
 .visual-stepper::before {
@@ -455,8 +515,8 @@
   top: 50%;
   left: 15%;
   right: 15%;
-  height: 3px;
-  background: rgba(255, 255, 255, 0.3);
+  height: 2px;
+  background: #e5e7eb;
   transform: translateY(-50%);
   z-index: 0;
 }
@@ -469,7 +529,7 @@
   position: relative;
   z-index: 1;
   opacity: 0.4;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .step.active {
@@ -477,40 +537,47 @@
 }
 
 .step-icon {
-  font-size: 24px;
-  background: rgba(255, 255, 255, 0.3);
-  padding: 8px;
+  font-size: 22px;
+  background: #f3f4f6;
+  padding: 10px;
   border-radius: 50%;
-  transition: all 0.3s ease;
+  border: 2px solid #e5e7eb;
+  transition: all 0.2s ease;
 }
 
 .step.active .step-icon {
-  background: rgba(255, 255, 255, 0.5);
-  transform: scale(1.1);
+  background: #000000;
+  border-color: #000000;
+  filter: grayscale(0) brightness(2);
 }
 
 .step-label {
   font-size: 10px;
-  font-weight: 700;
-  color: #000000; /* Black text */
+  font-weight: 600;
+  color: #1a1a1a;
   text-align: center;
 }
 
-/* Cancelled Badge */
+/* ====================================
+   CANCELLED BADGE
+   ==================================== */
+
 .cancelled-badge {
   text-align: center;
-  padding: 16px;
-  background: rgba(220, 53, 69, 0.2);
-  border: 2px solid rgba(220, 53, 69, 0.5);
-  border-radius: 12px;
-  font-size: 16px;
+  padding: 14px;
+  background: #fef2f2;
+  border: 2px solid #fca5a5;
+  border-radius: 8px;
+  font-size: 14px;
   font-weight: 700;
-  color: #ffffff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  color: #dc2626;
   margin: 16px 0;
 }
 
-/* Status Actions */
+/* ====================================
+   STATUS ACTIONS
+   ==================================== */
+
 .status-actions {
   margin-top: 16px;
 }
@@ -523,78 +590,133 @@
 
 .status-section label {
   font-size: 12px;
-  font-weight: 700;
-  color: #000000; /* Black text */
+  font-weight: 600;
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .status-select {
   padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  background: #ffffff;
+  border: 1px solid #d1d5db;
   border-radius: 8px;
-  color: #000000; /* Black text */
+  color: #1a1a1a;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   outline: none;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .status-select:focus {
-  border-color: rgba(255, 255, 255, 0.6);
+  border-color: #000000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
 }
 
-/* Delete Button */
+/* ====================================
+   DISPATCH & TRACK BUTTONS
+   ==================================== */
+
+.dispatch-btn,
+.track-btn {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dispatch-btn {
+  background: #000000;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dispatch-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: #1a1a1a;
+}
+
+.track-btn {
+  background: #f3f4f6;
+  color: #000000;
+  border: 1px solid #d1d5db;
+}
+
+.track-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: #e5e7eb;
+}
+
+/* ====================================
+   DELETE BUTTON
+   ==================================== */
+
 .delete-order-btn {
   width: 100%;
   padding: 12px 20px;
-  background: rgba(220, 53, 69, 0.9);
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(220, 53, 69, 1);
-  border-radius: 12px;
-  color: #ffffff;
-  font-size: 14px;
-  font-weight: 700;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .delete-order-btn:hover {
-  background: rgba(200, 35, 51, 1);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+  background: #fee2e2;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.15);
 }
 
 .delete-order-btn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
   transform: none;
 }
 
-/* Responsive */
+/* ====================================
+   RESPONSIVE
+   ==================================== */
+
 @media (max-width: 1024px) {
   .orders-grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   }
 }
 
 @media (max-width: 768px) {
   .admin-orders-container {
-    padding: 16px;
+    padding: 20px;
   }
 
   .admin-orders-header {
     flex-direction: column;
     gap: 16px;
-    padding: 20px;
+    align-items: flex-start;
+  }
+
+  .refresh-btn {
+    width: 100%;
   }
 
   .admin-filters {
     flex-direction: column;
     align-items: stretch;
-    padding: 16px;
+    padding: 20px;
   }
 
   .filter-group {
@@ -609,6 +731,7 @@
   .orders-count {
     margin-left: 0;
     text-align: center;
+    width: 100%;
   }
 
   .date-folder-header {
@@ -622,19 +745,27 @@
   .orders-grid {
     grid-template-columns: 1fr;
     gap: 16px;
-    padding: 16px;
+    padding: 20px;
   }
 
   .visual-stepper {
-    padding: 12px 4px;
+    padding: 12px 8px;
   }
 
   .step-icon {
-    font-size: 20px;
-    padding: 6px;
+    font-size: 18px;
+    padding: 8px;
   }
 
   .step-label {
     font-size: 9px;
   }
+}
+
+/* ====================================
+   CLEAN UP
+   ==================================== */
+
+* {
+  text-shadow: none !important;
 }

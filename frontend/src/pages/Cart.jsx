@@ -1,46 +1,38 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { ShopContext } from '../context/ShopContext'
-import Title from '../components/Title'
-import { assets } from '../assets/frontend_assets/assets'
-import CartTotal from '../components/CartTotal'
-import './Cart.css'
+import React, { useContext, useEffect, useState } from 'react';
+import { ShopContext } from '../context/ShopContext';
+import './Cart.css';
 
 const Cart = () => {
-  const { products, currency, cartItems, updateQuantity, navigate, loading } = useContext(ShopContext)
-  const [cartData, setCartdata] = useState([])
-  const [isProcessing, setIsProcessing] = useState(true)
+  const { products, currency, cartItems, updateQuantity, navigate, loading, getCartAmount, delivery_fee } = useContext(ShopContext);
+  const [cartData, setCartData] = useState([]);
+  const [isProcessing, setIsProcessing] = useState(true);
+  const [promoCode, setPromoCode] = useState('');
+  const [bonusCard, setBonusCard] = useState('');
 
   useEffect(() => {
-    // Wait for products to load
     if (!products || products.length === 0) {
-      console.log("⏳ Waiting for products to load...");
-      setIsProcessing(true)
+      setIsProcessing(true);
       return;
     }
 
     try {
-      const tempData = []
+      const tempData = [];
       
-      // Only process if cartItems exists
       if (cartItems && typeof cartItems === 'object') {
         for (const itemId in cartItems) {
           if (cartItems[itemId] && typeof cartItems[itemId] === 'object') {
             for (const size in cartItems[itemId]) {
-              const quantity = cartItems[itemId][size]
+              const quantity = cartItems[itemId][size];
               
-              // Check if quantity is valid and greater than 0
               if (quantity && quantity > 0) {
-                // Verify product exists before adding
-                const productExists = products.find(p => p._id === itemId)
+                const productExists = products.find(p => p._id === itemId);
                 
                 if (productExists && productExists.price !== undefined) {
                   tempData.push({
                     _id: itemId,
                     size: size,
                     quantity: quantity
-                  })
-                } else {
-                  console.warn(`⚠️ Product ${itemId} not found or missing price, skipping`);
+                  });
                 }
               }
             }
@@ -48,38 +40,34 @@ const Cart = () => {
         }
       }
       
-      console.log("🛒 Cart data processed:", tempData);
-      setCartdata(tempData)
-      setIsProcessing(false)
+      setCartData(tempData);
+      setIsProcessing(false);
     } catch (error) {
-      console.error("❌ Error processing cart:", error)
-      setCartdata([])
-      setIsProcessing(false)
+      console.error('Error processing cart:', error);
+      setCartData([]);
+      setIsProcessing(false);
     }
-  }, [cartItems, products])
+  }, [cartItems, products]);
 
-  // Show loading state
+  const subtotal = getCartAmount ? getCartAmount() : 0;
+  const estimatedTax = Math.round(subtotal * 0.021); // 2.1% tax
+  const shippingFee = delivery_fee || 29;
+  const total = subtotal + estimatedTax + shippingFee;
+
   if (loading || isProcessing) {
     return (
       <div className='cart-container'>
-        <div className="title-container">
-          <Title text1={'YOUR'} text2={'CART'} />
-        </div>
         <div className="loading-state">
           <div className="spinner"></div>
           <p>Loading your cart...</p>
         </div>
       </div>
-    )
+    );
   }
 
-  // Show empty cart message
   if (!cartData || cartData.length === 0) {
     return (
       <div className='cart-container'>
-        <div className="title-container">
-          <Title text1={'YOUR'} text2={'CART'} />
-        </div>
         <div className="empty-cart">
           <div className="empty-cart-icon">🛒</div>
           <h2>Your cart is empty</h2>
@@ -92,160 +80,150 @@ const Cart = () => {
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <div className='cart-container'>
-      <div className="title-container">
-        <Title text1={'YOUR'} text2={'CART'} />
-      </div>
+      <h1 className="cart-page-title">Shopping Cart</h1>
 
-      <div className="cart-items-wrapper">
-        {cartData.map((item, index) => {
-          // Find product with safety check
-          const productData = products.find((product) => product._id === item._id)
+      <div className="cart-main-layout">
+        {/* Left Side - Cart Items */}
+        <div className="cart-items-section">
+          {cartData.map((item, index) => {
+            const productData = products.find((product) => product._id === item._id);
 
-          // Skip if product not found
-          if (!productData) {
-            console.warn(`⚠️ Product ${item._id} not found in products list`);
-            return null;
-          }
+            if (!productData) return null;
 
-          // Additional safety checks with fallbacks
-          const productImage = (productData.image && Array.isArray(productData.image) && productData.image.length > 0) 
-            ? productData.image[0] 
-            : '/placeholder.png'
-          
-          const productName = productData.name || 'Unknown Product'
-          const productPrice = productData.price !== undefined ? productData.price : 0
+            const productImage = (productData.image && Array.isArray(productData.image) && productData.image.length > 0) 
+              ? productData.image[0] 
+              : '/placeholder.png';
+            
+            const productName = productData.name || 'Unknown Product';
+            const productPrice = productData.price !== undefined ? productData.price : 0;
 
-          // Skip if price is still invalid
-          if (productPrice === 0) {
-            console.warn(`⚠️ Product ${productName} has no valid price`);
-            return null;
-          }
+            if (productPrice === 0) return null;
 
-          return (
-            <div key={`${item._id}-${item.size}-${index}`} className="cart-item-holder">
-              <div className="cart-box">
+            return (
+              <div key={`${item._id}-${item.size}-${index}`} className="cart-item">
                 <img 
-                  className='cart-item-img' 
+                  className='cart-item-image' 
                   src={productImage}
                   alt={productName}
                   onError={(e) => {
-                    e.target.onerror = null; // Prevent infinite loop
-                    e.target.src = '/placeholder.png'
+                    e.target.onerror = null;
+                    e.target.src = '/placeholder.png';
                   }}
                 />
-                <div className="mini-cart-text-holder">
-                  <p className="cart-item-name">{productName}</p>
-                  <div className="cart-price-size">
-                    <p className='cart-price'>
-                      {currency}{productPrice.toLocaleString()}
-                    </p>
-                    <p className='cart-size-badge'>Size: {item.size}</p>
-                  </div>
+                
+                <div className="cart-item-info">
+                  <h3 className="cart-item-name">{productName}</h3>
+                  <p className="cart-item-id">#{item._id.slice(-8).toUpperCase()}</p>
                 </div>
-              </div>
-              
-              <div className="cart-quantity-control">
+                
+                <div className="cart-item-quantity">
+                  <button 
+                    className="qty-btn"
+                    onClick={() => updateQuantity(item._id, item.size, Math.max(1, item.quantity - 1))}
+                  >
+                    −
+                  </button>
+                  <input 
+                    className='qty-input' 
+                    type="number" 
+                    min={1} 
+                    value={item.quantity}
+                    readOnly
+                  />
+                  <button 
+                    className="qty-btn"
+                    onClick={() => updateQuantity(item._id, item.size, item.quantity + 1)}
+                  >
+                    +
+                  </button>
+                </div>
+
+                <p className="cart-item-price">
+                  {currency}{productPrice.toLocaleString()}
+                </p>
+
                 <button 
-                  className="qty-btn"
                   onClick={() => {
-                    try {
-                      updateQuantity(item._id, item.size, Math.max(1, item.quantity - 1))
-                    } catch (error) {
-                      console.error('Error updating quantity:', error)
-                    }
-                  }}
-                  aria-label="Decrease quantity"
-                >
-                  −
-                </button>
-                <input 
-                  onChange={(e) => {
-                    try {
-                      const value = Number(e.target.value);
-                      if (value > 0) {
-                        updateQuantity(item._id, item.size, value);
-                      }
-                    } catch (error) {
-                      console.error('Error updating quantity:', error)
+                    if (window.confirm('Remove this item from cart?')) {
+                      updateQuantity(item._id, item.size, 0);
                     }
                   }} 
-                  className='cart-input' 
-                  type="number" 
-                  min={1} 
-                  value={item.quantity}
-                  readOnly
-                />
-                <button 
-                  className="qty-btn"
-                  onClick={() => {
-                    try {
-                      updateQuantity(item._id, item.size, item.quantity + 1)
-                    } catch (error) {
-                      console.error('Error updating quantity:', error)
-                    }
-                  }}
-                  aria-label="Increase quantity"
+                  className='cart-item-remove'
+                  aria-label="Remove item"
                 >
-                  +
+                  ✕
                 </button>
               </div>
+            );
+          })}
+        </div>
 
-              <div className="cart-item-total">
-                <p className="item-total-label">Total</p>
-                <p className="item-total-price">
-                  {currency}{(productPrice * item.quantity).toLocaleString()}
-                </p>
-              </div>
-
-              <button 
-                onClick={() => {
-                  try {
-                    if (window.confirm('Remove this item from cart?')) {
-                      updateQuantity(item._id, item.size, 0)
-                    }
-                  } catch (error) {
-                    console.error('Error removing item:', error)
-                  }
-                }} 
-                className='cart-remove-btn'
-                aria-label="Remove item"
-                title="Remove from cart"
-              >
-                <img 
-                  src={assets.bin_icon} 
-                  alt="Remove"
-                />
-              </button>
+        {/* Right Side - Order Summary */}
+        <div className="order-summary">
+          <h2 className="order-summary-title">Order Summary</h2>
+          
+          {/* Promo Code */}
+          <div className="promo-section">
+            <label className="promo-label">Discount code / Promo code</label>
+            <div className="promo-input-group">
+              <input 
+                type="text" 
+                className="promo-input" 
+                placeholder="Code"
+                value={promoCode}
+                onChange={(e) => setPromoCode(e.target.value)}
+              />
+              <button className="apply-btn">Apply</button>
             </div>
-          )
-        })}
-      </div>
+          </div>
 
-      <div className="cart-bottom-section">
-        <div className="cart-total-section">
-          <CartTotal />
+          {/* Bonus Card */}
+          <div className="bonus-card-section">
+            <label className="bonus-card-label">Your bonus card number</label>
+            <input 
+              type="text" 
+              className="bonus-card-input" 
+              placeholder="Enter Card Number"
+              value={bonusCard}
+              onChange={(e) => setBonusCard(e.target.value)}
+            />
+          </div>
+
+          {/* Price Breakdown */}
+          <div className="price-breakdown">
+            <div className="price-row">
+              <p className="price-label">Subtotal</p>
+              <p className="price-value">{currency}{subtotal.toLocaleString()}</p>
+            </div>
+            <div className="price-row">
+              <p className="price-label">Estimated Tax</p>
+              <p className="price-value">{currency}{estimatedTax}</p>
+            </div>
+            <div className="price-row">
+              <p className="price-label">Estimated shipping & Handling</p>
+              <p className="price-value">{currency}{shippingFee}</p>
+            </div>
+            <div className="price-row total">
+              <p className="price-label">Total</p>
+              <p className="price-value">{currency}{total.toLocaleString()}</p>
+            </div>
+          </div>
+
           <button 
-            onClick={() => {
-              try {
-                navigate('/place-order')
-              } catch (error) {
-                console.error('Navigation error:', error)
-              }
-            }} 
+            onClick={() => navigate('/place-order')} 
             className="checkout-btn"
           >
-            <span>PROCEED TO CHECKOUT</span>
-            <span className="checkout-arrow">→</span>
+            Checkout
           </button>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Cart
+export default Cart;

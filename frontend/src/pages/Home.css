@@ -1,51 +1,54 @@
 /* ====================================
-   HOME PAGE LAYOUT - LIQUID GLASS ENHANCED
+   HOME PAGE LAYOUT - EXACT MEASUREMENTS
    ==================================== */
 
 .home-container {
   display: flex;
-  gap: 24px;
-  width: 89vw;
-  margin-left: 20vw;
-  margin: 0 auto;
-  padding: 0 20px;
+  width: 100%;
   min-height: 100vh;
+  background: #F8F9FA;
   position: relative;
-  overflow: visible;
 }
 
+/* Sidebar - 10vw */
+.home-sidebar {
+  width: 10vw;
+  min-width: 180px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  background: var(--primary-white);
+  border-right: 1px solid var(--medium-gray);
+  padding: 32px 24px;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+/* Main Content Area */
 .home-content {
   flex: 1;
-  width: 89vw;
-  padding: 20px 0;
-  overflow: visible;
-  position: relative;
-  z-index: 1;
-  margin-left: 20vw;
+  margin-left: 10vw;
+  width: calc(100% - 10vw);
+  padding: 4vw;
+  background: #F8F9FA;
 }
 
-/* Smooth Spacing Between Sections */
-.home-content > * {
+/* Section Spacing */
+.home-section {
   margin-bottom: 80px;
-  animation: fadeInUp 0.8s ease-out backwards;
+  animation: fadeIn 0.6s ease-out backwards;
 }
 
-.home-content > *:nth-child(1) { animation-delay: 0.1s; }
-.home-content > *:nth-child(2) { animation-delay: 0.2s; }
-.home-content > *:nth-child(3) { animation-delay: 0.3s; }
-.home-content > *:nth-child(4) { animation-delay: 0.4s; }
-.home-content > *:nth-child(5) { animation-delay: 0.5s; }
-.home-content > *:nth-child(6) { animation-delay: 0.6s; }
-.home-content > *:nth-child(7) { animation-delay: 0.7s; }
+.home-section:nth-child(1) { animation-delay: 0.1s; }
+.home-section:nth-child(2) { animation-delay: 0.2s; }
+.home-section:nth-child(3) { animation-delay: 0.3s; }
+.home-section:nth-child(4) { animation-delay: 0.4s; }
 
-.home-content > *:last-child {
-  margin-bottom: 60px;
-}
-
-@keyframes fadeInUp {
+@keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -53,97 +56,136 @@
   }
 }
 
+/* Section Title */
+.section-title {
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--primary-black);
+  margin-bottom: 32px;
+  text-align: left;
+}
+
+/* Product Grid - 20px gap, auto-fill with 268px cards */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 268px);
+  gap: 20px;
+  width: 100%;
+  justify-content: start;
+}
+
 /* ====================================
-   RESPONSIVE LAYOUT
+   RESPONSIVE BREAKPOINTS
    ==================================== */
 
+@media (max-width: 1680px) {
+  .home-content {
+    padding: 3vw;
+  }
+}
+
 @media (max-width: 1440px) {
-  .home-container {
-    max-width: 100%;
-    gap: 20px;
+  .home-content {
+    padding: 2.5vw;
   }
   
-  .home-content > * {
-    margin-bottom: 70px;
+  .section-title {
+    font-size: 28px;
+    margin-bottom: 28px;
   }
 }
 
 @media (max-width: 1024px) {
-  .home-container {
-    gap: 20px;
-    padding: 0 16px;
+  .home-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+  }
+  
+  .home-sidebar.active {
+    transform: translateX(0);
   }
   
   .home-content {
-    padding: 16px 0;
+    margin-left: 0;
+    width: 100%;
+    padding: 24px;
   }
   
-  .home-content > * {
-    margin-bottom: 60px;
+  .products-grid {
+    justify-content: center;
   }
 }
 
 @media (max-width: 768px) {
-  .home-container {
-    flex-direction: column;
-    gap: 0;
-    padding: 0 12px;
-  }
-  
   .home-content {
-    padding: 12px 0;
-    width: 100%;
+    padding: 20px 16px;
   }
   
-  .home-content > * {
-    margin-bottom: 50px;
+  .section-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .home-section {
+    margin-bottom: 60px;
+  }
+  
+  .products-grid {
+    gap: 16px;
   }
 }
 
-/* ====================================
-   MOBILE SIDEBAR TOGGLE - GLASS STYLE
-   ==================================== */
+@media (max-width: 640px) {
+  .home-content {
+    padding: 16px 12px;
+  }
+  
+  .section-title {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+  
+  .home-section {
+    margin-bottom: 40px;
+  }
+  
+  .products-grid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+  }
+}
 
+/* Mobile Sidebar Toggle Button */
 .mobile-sidebar-toggle {
   display: none;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .mobile-sidebar-toggle {
     display: flex;
     position: fixed;
-    bottom: 20px;
-    left: 20px;
+    bottom: 24px;
+    left: 24px;
     z-index: 999;
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    
-    /* Enhanced Glass Effect */
-    background: rgba(102, 126, 234, 0.15);
-    backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    
-    box-shadow: 
-      0 8px 32px rgba(102, 126, 234, 0.4),
-      0 0 0 1px rgba(255, 255, 255, 0.1) inset,
-      0 0 60px rgba(118, 75, 162, 0.3);
-    
+    background: var(--primary-black);
+    color: var(--primary-white);
+    border: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     cursor: pointer;
     align-items: center;
     justify-content: center;
-    color: white;
     font-size: 24px;
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    transition: all 0.3s ease;
   }
 
   .mobile-sidebar-toggle:hover {
-    transform: scale(1.1) translateY(-2px);
-    background: rgba(102, 126, 234, 0.25);
-    box-shadow: 
-      0 12px 40px rgba(102, 126, 234, 0.5),
-      0 0 0 1px rgba(255, 255, 255, 0.2) inset,
-      0 0 80px rgba(118, 75, 162, 0.4);
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
   }
 
   .mobile-sidebar-toggle:active {
@@ -151,29 +193,21 @@
   }
 }
 
-/* Overlay for mobile sidebar - Enhanced */
+/* Sidebar Overlay */
 .sidebar-overlay {
   display: none;
-}
-
-.sidebar-overlay.active {
-  display: block;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.5);
   z-index: 999;
-  animation: fadeIn 0.3s ease;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.sidebar-overlay.active {
+  display: block;
+  opacity: 1;
 }

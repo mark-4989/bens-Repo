@@ -1,0 +1,343 @@
+/* ====================================
+   PROMOTIONAL BANNER - SUPER DARK
+   ==================================== */
+
+.promo-banner {
+  width: 100%;
+  min-height: 300px;
+  background: #1a1a1a; /* Super dark background */
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  margin: 60px 0;
+  padding: 60px 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+}
+
+/* Subtle geometric patterns */
+.promo-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(45deg, rgba(255, 255, 255, 0.02) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255, 255, 255, 0.02) 25%, transparent 25%);
+  background-size: 60px 60px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.promo-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+  gap: 60px;
+}
+
+/* Left Section - 50% OFF */
+.promo-left {
+  flex: 0 0 auto;
+}
+
+.promo-discount {
+  font-size: 96px;
+  font-weight: 900;
+  line-height: 0.85;
+  margin: 0;
+  color: #ffd700;
+  text-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
+  letter-spacing: -2px;
+}
+
+/* Center Section - Fruits & Title */
+.promo-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.promo-fruit-arc {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  height: 150px;
+  margin-bottom: 20px;
+}
+
+.fruit-item {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+  animation: fruitFloat 3s ease-in-out infinite;
+}
+
+.watermelon-left {
+  top: 0;
+  left: 10%;
+  width: 100px;
+  height: 100px;
+}
+
+.strawberry {
+  top: 20px;
+  left: 30%;
+  animation-delay: 0.5s;
+}
+
+.mint {
+  top: 10px;
+  right: 30%;
+  width: 60px;
+  height: 60px;
+  animation-delay: 1s;
+}
+
+.watermelon-right {
+  top: 0;
+  right: 10%;
+  width: 100px;
+  height: 100px;
+  animation-delay: 1.5s;
+}
+
+@keyframes fruitFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-15px) rotate(5deg);
+  }
+}
+
+.promo-title {
+  font-size: 56px;
+  font-weight: 400;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.promo-title-bold {
+  display: block;
+  font-weight: 900;
+  font-size: 64px;
+}
+
+/* Right Section - Validity */
+.promo-right {
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+.promo-validity {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.promo-date {
+  display: block;
+  font-size: 24px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-top: 4px;
+}
+
+/* CTA Button */
+.promo-cta-btn {
+  background: #dc3545;
+  color: #ffffff;
+  padding: 16px 50px;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: capitalize;
+  box-shadow: 0 8px 24px rgba(220, 53, 69, 0.4);
+}
+
+.promo-cta-btn:hover {
+  background: #c82333;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(220, 53, 69, 0.5);
+}
+
+.promo-cta-btn:active {
+  transform: translateY(-2px);
+}
+
+/* ====================================
+   RESPONSIVE DESIGN
+   ==================================== */
+
+@media (max-width: 1440px) {
+  .promo-banner {
+    min-height: 350px;
+    padding: 50px 60px;
+  }
+  
+  .promo-discount {
+    font-size: 80px;
+  }
+  
+  .promo-title {
+    font-size: 48px;
+  }
+  
+  .promo-title-bold {
+    font-size: 56px;
+  }
+  
+  .promo-fruit-arc {
+    height: 120px;
+  }
+  
+  .fruit-item {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .watermelon-left,
+  .watermelon-right {
+    width: 85px;
+    height: 85px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .promo-banner {
+    padding: 40px;
+  }
+  
+  .promo-content {
+    flex-direction: column;
+    gap: 40px;
+  }
+  
+  .promo-left,
+  .promo-right {
+    text-align: center;
+  }
+  
+  .promo-discount {
+    font-size: 72px;
+  }
+  
+  .promo-title {
+    font-size: 40px;
+  }
+  
+  .promo-title-bold {
+    font-size: 48px;
+  }
+}
+
+@media (max-width: 768px) {
+  .promo-banner {
+    min-height: 300px;
+    padding: 32px 24px;
+    border-radius: 12px;
+    margin: 40px 0;
+  }
+  
+  .promo-content {
+    gap: 32px;
+  }
+  
+  .promo-discount {
+    font-size: 60px;
+  }
+  
+  .promo-title {
+    font-size: 32px;
+  }
+  
+  .promo-title-bold {
+    font-size: 40px;
+  }
+  
+  .promo-fruit-arc {
+    height: 100px;
+  }
+  
+  .fruit-item {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .watermelon-left,
+  .watermelon-right {
+    width: 65px;
+    height: 65px;
+  }
+  
+  .promo-validity {
+    font-size: 16px;
+  }
+  
+  .promo-date {
+    font-size: 20px;
+  }
+  
+  .promo-cta-btn {
+    padding: 14px 40px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .promo-banner {
+    padding: 24px 20px;
+  }
+  
+  .promo-discount {
+    font-size: 48px;
+  }
+  
+  .promo-title {
+    font-size: 24px;
+  }
+  
+  .promo-title-bold {
+    font-size: 32px;
+  }
+  
+  .promo-fruit-arc {
+    height: 80px;
+    margin-bottom: 16px;
+  }
+  
+  .fruit-item {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .watermelon-left,
+  .watermelon-right {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .promo-cta-btn {
+    padding: 12px 32px;
+    font-size: 14px;
+  }
+}

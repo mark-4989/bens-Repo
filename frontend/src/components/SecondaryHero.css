@@ -1,0 +1,303 @@
+/* ====================================
+   SECONDARY HERO - FULL WIDTH FIXED
+   ==================================== */
+
+.secondary-hero {
+  width: 100%; /* Account for 10vw sidebar */
+  margin-left: 1px; /* Align with sidebar */
+  margin-right: 0;
+  min-height: 350px;
+  background: #1a1a1a;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  margin-top: 40px;
+  margin-bottom: 40px;
+  padding: 48px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.secondary-hero-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 60px;
+}
+
+/* Text Section */
+.secondary-hero-text {
+  flex: 1;
+  z-index: 2;
+  max-width: 500px;
+}
+
+.secondary-hero-title {
+  font-size: 44px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+  margin: 0 0 12px 0;
+  letter-spacing: -1.5px;
+  text-transform: capitalize;
+}
+
+.secondary-hero-highlight {
+  display: block;
+  font-size: 52px;
+  font-weight: 900;
+  margin-top: 6px;
+}
+
+.secondary-hero-subtitle {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 16px 0 32px 0;
+  font-weight: 400;
+}
+
+/* Feature Grid - More Compact */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  max-width: 380px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.feature-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(220, 53, 69, 0.15);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  border-radius: 6px;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* Image Section */
+.secondary-hero-image {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+  max-width: 500px;
+}
+
+.groceries-image {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.5));
+}
+
+/* CTA Button */
+.secondary-hero-btn {
+  position: absolute;
+  bottom: 48px;
+  left: 60px;
+  background: #000000;
+  color: #ffffff;
+  padding: 14px 48px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: capitalize;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+}
+
+.secondary-hero-btn:hover {
+  background: #2a2a2a;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+}
+
+.secondary-hero-btn:active {
+  transform: translateY(-1px);
+}
+
+/* ====================================
+   RESPONSIVE DESIGN
+   ==================================== */
+
+@media (max-width: 1440px) {
+  .secondary-hero {
+    min-height: 340px;
+    padding: 44px;
+  }
+  
+  .secondary-hero-title {
+    font-size: 42px;
+  }
+  
+  .secondary-hero-highlight {
+    font-size: 50px;
+  }
+  
+  .secondary-hero-subtitle {
+    font-size: 17px;
+  }
+  
+  .groceries-image {
+    max-width: 380px;
+  }
+  
+  .secondary-hero-btn {
+    bottom: 44px;
+    left: 50px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .secondary-hero {
+    width: calc(100% - 20px);
+    margin-left: 10px;
+    margin-right: 10px;
+    min-height: 320px;
+    padding: 36px;
+    flex-direction: column;
+  }
+  
+  .secondary-hero-content {
+    flex-direction: column;
+    gap: 32px;
+    text-align: center;
+  }
+  
+  .secondary-hero-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 100%;
+  }
+  
+  .secondary-hero-title {
+    font-size: 38px;
+  }
+  
+  .secondary-hero-highlight {
+    font-size: 46px;
+  }
+  
+  .secondary-hero-subtitle {
+    font-size: 16px;
+    margin-bottom: 28px;
+  }
+  
+  .feature-grid {
+    max-width: 100%;
+  }
+  
+  .secondary-hero-image {
+    justify-content: center;
+    max-width: 100%;
+  }
+  
+  .secondary-hero-btn {
+    position: static;
+    margin-top: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .secondary-hero {
+    min-height: 300px;
+    padding: 32px 24px;
+    border-radius: 10px;
+    margin: 32px 10px;
+  }
+  
+  .secondary-hero-content {
+    gap: 28px;
+  }
+  
+  .secondary-hero-title {
+    font-size: 34px;
+  }
+  
+  .secondary-hero-highlight {
+    font-size: 42px;
+  }
+  
+  .secondary-hero-subtitle {
+    font-size: 15px;
+    margin-bottom: 24px;
+  }
+  
+  .feature-grid {
+    gap: 14px;
+  }
+  
+  .feature-item {
+    font-size: 13px;
+  }
+  
+  .feature-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+  
+  .groceries-image {
+    max-width: 320px;
+  }
+  
+  .secondary-hero-btn {
+    padding: 13px 40px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .secondary-hero {
+    min-height: 280px;
+    padding: 28px 20px;
+  }
+  
+  .secondary-hero-title {
+    font-size: 28px;
+  }
+  
+  .secondary-hero-highlight {
+    font-size: 36px;
+  }
+  
+  .secondary-hero-subtitle {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  
+  .feature-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .groceries-image {
+    max-width: 260px;
+  }
+  
+  .secondary-hero-btn {
+    padding: 12px 36px;
+    font-size: 13px;
+  }
+}

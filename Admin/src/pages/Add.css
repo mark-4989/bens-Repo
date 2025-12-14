@@ -1,136 +1,120 @@
 /* ====================================
-   BEAUTIFUL NAVY STYLE - MATCHING DISPLAY SECTIONS
+   MINIMALIST WHITE ADMIN DASHBOARD
+   Clean, Modern, Professional Design
+   
+   INSTRUCTIONS:
+   1. Copy this ENTIRE file content
+   2. Navigate to: admin/src/pages/Add.css
+   3. Replace ALL existing content with this code
+   4. Save the file
+   5. Refresh your browser (Ctrl+Shift+R)
    ==================================== */
 
-/* Page Background - Deep Navy */
+/* ====================================
+   GLOBAL STYLES
+   ==================================== */
+
 body,
 .add-page-wrapper {
-  background: linear-gradient(
-    135deg,
-    #1a1d2e 0%,
-    #252841 25%,
-    #1a1d2e 50%,
-    #252841 75%,
-    #1a1d2e 100%
-  ) !important;
-  background-size: 400% 400% !important;
-  animation: gradientShift 15s ease infinite !important;
+  background: #ffffff !important;
   min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #1a1a1a;
 }
 
+/* Remove all animations for cleaner look */
 @keyframes gradientShift {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
 }
 
-/* Form Container - Deep Navy Card */
+/* ====================================
+   FORM CONTAINER - CLEAN WHITE CARD
+   ==================================== */
+
 .form-container {
-  max-width: 1000px;
-  margin: 30px auto;
-  padding: 48px;
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 60px;
   
-  /* Beautiful Navy Glass */
-  background: rgba(30, 34, 54, 0.95);
-  backdrop-filter: blur(30px) saturate(180%);
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
-  
-  border-radius: 24px;
-  border: 1px solid rgba(102, 126, 234, 0.3);
-  box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(102, 126, 234, 0.2) inset,
-    0 0 100px rgba(102, 126, 234, 0.1);
-}
-
-/* Title - Vibrant & Glowing */
-.form-container h2 {
-  font-size: 36px;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0 0 40px 0;
-  text-align: center;
-  
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  
-  text-shadow: 
-    0 0 40px rgba(102, 126, 234, 0.6),
-    0 0 80px rgba(118, 75, 162, 0.4);
-  
-  letter-spacing: 2px;
-  position: relative;
-}
-
-.form-container h2::after {
-  content: '';
-  position: absolute;
-  bottom: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100px;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, #667eea, #764ba2, transparent);
-  border-radius: 2px;
-  box-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
-}
-
-/* Section Labels - Bright White */
-.form-container > p {
-  font-size: 19px;
-  font-weight: 600;
-  color: #ffffff;
-  margin: 36px 0 20px 0;
-  
-  text-shadow: 
-    0 2px 10px rgba(0, 0, 0, 0.8),
-    0 0 20px rgba(102, 126, 234, 0.3);
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 /* ====================================
-   IMAGE UPLOAD - VIBRANT CARDS
+   TITLE - MINIMAL & ELEGANT
+   ==================================== */
+
+.form-container h2 {
+  font-size: 32px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 48px 0;
+  text-align: left;
+  letter-spacing: -0.5px;
+  position: relative;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #000000;
+}
+
+.form-container h2::after {
+  display: none;
+}
+
+/* ====================================
+   SECTION LABELS
+   ==================================== */
+
+.form-container > p {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+  margin: 40px 0 16px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-shadow: none;
+}
+
+/* ====================================
+   IMAGE UPLOAD - CLEAN GRID
    ==================================== */
 
 .label-container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  gap: 16px;
   margin-bottom: 48px;
 }
 
 .label-container label {
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-  border-radius: 16px;
+  transition: all 0.2s ease;
+  border-radius: 12px;
   overflow: hidden;
   
-  /* Beautiful Navy Background */
-  background: rgba(47, 53, 80, 0.6);
-  backdrop-filter: blur(15px);
-  border: 2px dashed rgba(102, 126, 234, 0.4);
+  background: #fafafa;
+  border: 2px dashed #d1d5db;
   
-  box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(102, 126, 234, 0.1) inset;
+  box-shadow: none;
 }
 
 .label-container label:hover {
-  transform: translateY(-6px) scale(1.03);
-  border-color: rgba(102, 126, 234, 0.8);
-  background: rgba(102, 126, 234, 0.15);
+  transform: translateY(-2px);
+  border-color: #000000;
+  background: #f5f5f5;
   box-shadow: 
-    0 12px 36px rgba(102, 126, 234, 0.4),
-    0 0 60px rgba(118, 75, 162, 0.3),
-    0 0 0 1px rgba(102, 126, 234, 0.3) inset;
+    0 2px 6px rgba(0, 0, 0, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .upload-img {
   width: 100%;
   height: 160px;
   object-fit: cover;
-  border-radius: 14px;
-  transition: all 0.3s ease;
+  border-radius: 10px;
+  transition: all 0.2s ease;
 }
 
 /* ====================================
@@ -140,58 +124,51 @@ body,
 .add-form-fields {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-}
-
-/* Form Sections - Beautiful Navy Cards */
-.form-section {
-  /* Matching Display Sections Style */
-  background: rgba(47, 53, 80, 0.7);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  
-  padding: 32px;
-  border-radius: 20px;
-  border: 1px solid rgba(102, 126, 234, 0.3);
-  
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(102, 126, 234, 0.15) inset,
-    0 0 60px rgba(102, 126, 234, 0.1);
-  
-  transition: all 0.4s ease;
-}
-
-.form-section:hover {
-  border-color: rgba(102, 126, 234, 0.5);
-  background: rgba(47, 53, 80, 0.85);
-  box-shadow: 
-    0 12px 40px rgba(102, 126, 234, 0.3),
-    0 0 0 1px rgba(102, 126, 234, 0.2) inset,
-    0 0 80px rgba(102, 126, 234, 0.15);
-  transform: translateY(-2px);
-}
-
-/* Section Headers - Vibrant with Icons */
-.form-section h3 {
-  font-size: 22px;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0 0 24px 0;
-  padding-bottom: 18px;
-  border-bottom: 2px solid rgba(102, 126, 234, 0.4);
-  
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  
-  text-shadow: 
-    0 2px 10px rgba(0, 0, 0, 0.8),
-    0 0 20px rgba(102, 126, 234, 0.5);
+  gap: 24px;
 }
 
 /* ====================================
-   INPUT FIELDS - BEAUTIFUL NAVY STYLE
+   FORM SECTIONS - MINIMAL WHITE CARDS
+   ==================================== */
+
+.form-section {
+  background: #fafafa;
+  padding: 32px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: none;
+  transition: all 0.2s ease;
+}
+
+.form-section:hover {
+  border-color: #d1d5db;
+  background: #f5f5f5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transform: none;
+}
+
+/* ====================================
+   SECTION HEADERS
+   ==================================== */
+
+.form-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 24px 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  
+  text-shadow: none;
+  letter-spacing: -0.3px;
+}
+
+/* ====================================
+   INPUT FIELDS - CLEAN MINIMAL STYLE
    ==================================== */
 
 .add-form-fields input[type="text"],
@@ -199,25 +176,21 @@ body,
 .add-form-fields textarea,
 .add-form-fields select {
   width: 100%;
-  padding: 16px 20px;
-  margin-bottom: 18px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
   
-  /* Beautiful Input Style */
-  background: rgba(30, 34, 54, 0.8);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(102, 126, 234, 0.3);
-  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
   
-  font-size: 16px;
-  font-weight: 500;
-  color: #ffffff;
-  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: #1a1a1a;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   
-  box-shadow: 
-    inset 0 2px 10px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   outline: none;
 }
 
@@ -225,256 +198,217 @@ body,
 .add-form-fields input[type="number"]:focus,
 .add-form-fields textarea:focus,
 .add-form-fields select:focus {
-  background: rgba(30, 34, 54, 0.95);
-  border: 1px solid rgba(102, 126, 234, 0.7);
-  box-shadow: 
-    inset 0 2px 10px rgba(0, 0, 0, 0.5),
-    0 0 0 4px rgba(102, 126, 234, 0.25),
-    0 8px 32px rgba(102, 126, 234, 0.4),
-    0 0 60px rgba(118, 75, 162, 0.3);
-  transform: translateY(-2px);
+  background: #ffffff;
+  border: 1px solid #000000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+  transform: none;
 }
 
-/* Placeholder - Soft Purple Tint */
+/* Placeholder */
 .add-form-fields input::placeholder,
 .add-form-fields textarea::placeholder {
-  color: rgba(185, 195, 230, 0.5);
-  font-style: italic;
+  color: #9ca3af;
+  font-style: normal;
 }
 
 /* Textarea */
 .add-form-fields textarea {
   resize: vertical;
-  min-height: 130px;
-  font-family: 'Outfit', sans-serif;
-  line-height: 1.7;
+  min-height: 120px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.6;
 }
 
 /* Select Dropdown */
 .add-form-fields select {
   cursor: pointer;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 12 12'%3E%3Cpath fill='%23000000' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 18px center;
-  padding-right: 50px;
+  background-position: right 14px center;
+  padding-right: 40px;
 }
 
 .add-form-fields select:disabled {
-  background-color: rgba(30, 34, 54, 0.5);
+  background-color: #f9fafb;
   cursor: not-allowed;
-  opacity: 0.5;
-  border-color: rgba(102, 126, 234, 0.15);
+  opacity: 0.6;
+  border-color: #e5e7eb;
 }
 
 .add-form-fields select option {
-  background: #1e2236;
-  color: #ffffff;
+  background: #ffffff;
+  color: #1a1a1a;
   padding: 12px;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 /* ====================================
-   CHECKBOX FIELDS - MATCHING STYLE
+   CHECKBOX FIELDS - MINIMAL STYLE
    ==================================== */
 
 .checkbox-field {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin: 14px 0;
+  gap: 12px;
+  margin: 12px 0;
   cursor: pointer;
   
-  font-size: 16px;
-  font-weight: 500;
-  color: #e8ebf7;
+  font-size: 15px;
+  font-weight: 400;
+  color: #1a1a1a;
   
-  padding: 14px 18px;
-  background: rgba(30, 34, 54, 0.6);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(102, 126, 234, 0.2);
-  border-radius: 14px;
+  padding: 12px 16px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .checkbox-field:hover {
-  background: rgba(102, 126, 234, 0.12);
-  border-color: rgba(102, 126, 234, 0.4);
-  transform: translateX(6px);
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+  background: #fafafa;
+  border-color: #d1d5db;
+  transform: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .checkbox-field input[type="checkbox"] {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   margin: 0;
   cursor: pointer;
-  accent-color: #667eea;
+  accent-color: #000000;
 }
 
 /* ====================================
-   SUBMIT BUTTON - VIBRANT & GLOWING
+   SUBMIT BUTTON - BOLD BLACK
    ==================================== */
 
 .submit-btn {
   width: 100%;
-  padding: 20px 44px;
+  padding: 16px 32px;
   
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 18px;
+  background: #000000;
+  color: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 8px;
   
-  font-size: 19px;
-  font-weight: 700;
-  font-family: 'Outfit', sans-serif;
-  letter-spacing: 1px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: 0.3px;
   
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: all 0.2s ease;
   
-  box-shadow: 
-    0 10px 32px rgba(102, 126, 234, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.15) inset,
-    0 20px 60px rgba(118, 75, 162, 0.4),
-    0 0 80px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   
   margin-top: 32px;
   position: relative;
   overflow: hidden;
 }
 
-/* Button Shimmer Effect */
+/* Remove shimmer effect */
 .submit-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.4),
-    transparent
-  );
-  transition: left 0.6s;
-}
-
-.submit-btn:hover::before {
-  left: 100%;
+  display: none;
 }
 
 .submit-btn:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 
-    0 16px 48px rgba(102, 126, 234, 0.6),
-    0 0 0 1px rgba(255, 255, 255, 0.25) inset,
-    0 24px 80px rgba(118, 75, 162, 0.5),
-    0 0 120px rgba(102, 126, 234, 0.4);
-  background: linear-gradient(135deg, #7689f0 0%, #8659b8 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: #1a1a1a;
 }
 
 .submit-btn:active {
-  transform: translateY(-2px) scale(0.98);
+  transform: translateY(0);
 }
 
 /* ====================================
-   FEATURED SECTION - EXACT MATCH!
+   FEATURED SECTION
    ==================================== */
 
 .featured-section {
-  /* Matching Display Sections Exactly */
-  background: rgba(47, 53, 80, 0.8);
-  border: 2px solid rgba(102, 126, 234, 0.5);
-  box-shadow: 
-    0 12px 40px rgba(102, 126, 234, 0.3),
-    0 0 0 1px rgba(102, 126, 234, 0.2) inset,
-    0 0 100px rgba(102, 126, 234, 0.15);
+  background: #fafafa;
+  border: 1px solid #d1d5db;
+  box-shadow: none;
 }
 
 .section-help-text {
-  font-size: 15px;
-  color: rgba(185, 195, 230, 0.7);
-  font-style: italic;
-  margin: -8px 0 24px 0;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  font-size: 14px;
+  color: #6b7280;
+  font-style: normal;
+  margin: -8px 0 20px 0;
+  text-shadow: none;
 }
 
-/* Featured Checkboxes - EXACTLY Like Display Sections */
+/* Featured Checkboxes */
 .checkbox-field.featured {
-  /* Matching the beautiful cards */
-  background: rgba(59, 66, 99, 0.7);
-  border: 2px solid rgba(102, 126, 234, 0.25);
-  padding: 24px;
-  margin: 18px 0;
-  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  padding: 20px;
+  margin: 16px 0;
+  border-radius: 10px;
   
   box-shadow: 
-    0 6px 24px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(102, 126, 234, 0.1) inset;
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.04);
   
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .checkbox-field.featured:hover {
-  border-color: rgba(102, 126, 234, 0.6);
-  background: rgba(102, 126, 234, 0.15);
-  transform: translateX(10px);
+  border-color: #000000;
+  background: #fafafa;
+  transform: none;
   box-shadow: 
-    0 10px 36px rgba(102, 126, 234, 0.4),
-    0 0 60px rgba(118, 75, 162, 0.3),
-    0 0 0 1px rgba(102, 126, 234, 0.3) inset;
+    0 2px 4px rgba(0, 0, 0, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .checkbox-label-content {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 16px;
   width: 100%;
 }
 
 .checkbox-icon {
-  font-size: 40px;
-  min-width: 52px;
+  font-size: 36px;
+  min-width: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 0 12px rgba(102, 126, 234, 0.6));
+  filter: none;
 }
 
 .checkbox-label-content > span:last-child {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .checkbox-label-content strong {
-  font-size: 18px;
-  font-weight: 700;
-  color: #ffffff;
-  text-shadow: 
-    0 2px 10px rgba(0, 0, 0, 0.8),
-    0 0 20px rgba(102, 126, 234, 0.4);
+  font-size: 16px;
+  font-weight: 600;
+  color: #000000;
+  text-shadow: none;
 }
 
 .checkbox-label-content small {
-  font-size: 14px;
-  color: rgba(185, 195, 230, 0.7);
+  font-size: 13px;
+  color: #6b7280;
   font-weight: 400;
 }
 
 .checkbox-field.featured input[type="checkbox"] {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
 }
 
 .checkbox-field.featured input:checked ~ .checkbox-label-content strong {
-  color: #667eea;
-  text-shadow: 
-    0 0 20px rgba(102, 126, 234, 1),
-    0 0 40px rgba(102, 126, 234, 0.6);
+  color: #000000;
+  text-shadow: none;
 }
 
 /* ====================================
@@ -482,29 +416,29 @@ body,
    ==================================== */
 
 .form-message {
-  padding: 18px 24px;
-  border-radius: 14px;
+  padding: 16px 20px;
+  border-radius: 8px;
   margin-bottom: 24px;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 500;
   text-align: center;
   
-  backdrop-filter: blur(15px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  backdrop-filter: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .form-message.success {
-  background: rgba(16, 185, 129, 0.2);
-  color: #10b981;
-  border: 2px solid rgba(16, 185, 129, 0.6);
-  text-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #86efac;
+  text-shadow: none;
 }
 
 .form-message.error {
-  background: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
-  border: 2px solid rgba(239, 68, 68, 0.6);
-  text-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  text-shadow: none;
 }
 
 /* ====================================
@@ -514,22 +448,23 @@ body,
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px;
+  gap: 16px;
 }
 
 /* ====================================
-   SUGGESTION TEXT - PURPLE HIGHLIGHT
+   SUGGESTION TEXT
    ==================================== */
 
 .form-section p[style*="color"] {
-  font-size: 14px !important;
-  color: rgba(185, 195, 230, 0.9) !important;
-  margin-top: 10px !important;
-  padding: 12px 16px;
-  background: rgba(102, 126, 234, 0.15);
-  border-radius: 10px;
-  border-left: 4px solid rgba(102, 126, 234, 0.7);
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+  font-size: 13px !important;
+  color: #6b7280 !important;
+  margin-top: 8px !important;
+  padding: 10px 14px;
+  background: #f9fafb;
+  border-radius: 6px;
+  border-left: 3px solid #d1d5db;
+  box-shadow: none;
+  font-style: normal;
 }
 
 /* ====================================
@@ -538,44 +473,44 @@ body,
 
 @media (max-width: 768px) {
   .form-container {
-    padding: 28px;
+    padding: 32px 24px;
     margin: 20px;
-    border-radius: 20px;
+    border-radius: 12px;
   }
 
   .form-container h2 {
-    font-size: 28px;
+    font-size: 24px;
     margin-bottom: 32px;
   }
 
   .label-container {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: 12px;
   }
 
   .upload-img {
-    height: 140px;
+    height: 120px;
   }
 
   .form-section {
-    padding: 24px;
+    padding: 24px 20px;
   }
 
   .form-section h3 {
-    font-size: 19px;
+    font-size: 16px;
   }
 
   .add-form-fields input[type="text"],
   .add-form-fields input[type="number"],
   .add-form-fields textarea,
   .add-form-fields select {
-    padding: 14px 18px;
-    font-size: 15px;
+    padding: 12px 14px;
+    font-size: 14px;
   }
 
   .submit-btn {
-    padding: 18px 36px;
-    font-size: 17px;
+    padding: 14px 24px;
+    font-size: 15px;
   }
 
   .form-grid {
@@ -583,12 +518,12 @@ body,
   }
   
   .checkbox-label-content strong {
-    font-size: 16px;
+    font-size: 15px;
   }
   
   .checkbox-icon {
-    font-size: 36px;
-    min-width: 44px;
+    font-size: 32px;
+    min-width: 40px;
   }
 }
 
@@ -598,23 +533,71 @@ body,
   }
 
   .form-container {
-    padding: 24px;
+    padding: 24px 20px;
     margin: 16px;
   }
 
   .form-container h2 {
-    font-size: 26px;
+    font-size: 22px;
   }
 
   .add-form-fields {
-    gap: 24px;
+    gap: 20px;
   }
 
   .form-section {
-    padding: 20px;
+    padding: 20px 16px;
   }
   
   .checkbox-field.featured {
-    padding: 20px;
+    padding: 16px;
   }
+}
+
+/* ====================================
+   ADDITIONAL CLEAN TOUCHES
+   ==================================== */
+
+/* Remove all text shadows globally */
+* {
+  text-shadow: none !important;
+}
+
+/* Ensure all backgrounds are clean */
+.form-section,
+.checkbox-field,
+.checkbox-field.featured {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Clean focus states */
+input:focus,
+textarea:focus,
+select:focus,
+button:focus {
+  outline: none;
+}
+
+/* Smooth transitions everywhere */
+* {
+  transition: all 0.2s ease;
+}
+
+/* Clean scrollbar (webkit browsers) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f9fafb;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }
