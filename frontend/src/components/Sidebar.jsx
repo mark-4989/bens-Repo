@@ -13,14 +13,12 @@ import CloseIcon from '@mui/icons-material/Close';
 const Sidebar = () => {
   const navigate = useNavigate();
   const [hoveredCategory, setHoveredCategory] = useState(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // NEW: Mobile sidebar state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Toggle sidebar on mobile/tablet
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  // Categories data
   const categories = [
     {
       id: 'fresh-foods',
@@ -325,13 +323,13 @@ const Sidebar = () => {
   const handleCategoryClick = (route) => {
     navigate(route);
     setHoveredCategory(null);
-    setIsSidebarOpen(false); // Close sidebar on mobile after navigation
+    setIsSidebarOpen(false);
   };
 
   const handleSubcategoryClick = (route) => {
     navigate(route);
     setHoveredCategory(null);
-    setIsSidebarOpen(false); // Close sidebar on mobile after navigation
+    setIsSidebarOpen(false);
   };
 
   return (
@@ -341,11 +339,7 @@ const Sidebar = () => {
         {isSidebarOpen ? <CloseIcon /> : <MenuIcon />}
       </button>
 
-      {/* Overlay for mobile (darkens background when sidebar is open) */}
-      <div 
-        className={`sidebar-overlay ${isSidebarOpen ? 'active' : ''}`}
-        onClick={toggleSidebar}
-      />
+      {/* NO OVERLAY - Removed completely */}
 
       {/* Sidebar Container */}
       <div className={`sidebar-container ${isSidebarOpen ? 'active' : ''}`}>
