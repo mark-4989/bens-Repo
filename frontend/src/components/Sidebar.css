@@ -66,7 +66,7 @@
 .category-list {
   padding: 12px 0;
   margin: 0;
-   width: 8vw;
+  width: 8vw;
 }
 
 .category-item {
@@ -126,7 +126,6 @@
 }
 
 .category-icon {
-  
   transition: transform 0.3s ease;
   margin: 0;
   color: #fff;
@@ -378,7 +377,7 @@
 
 /* Hamburger Toggle Button - HIDDEN ON DESKTOP */
 .sidebar-toggle {
-  display: none; /* Hidden by default on desktop */
+  display: none;
   position: fixed;
   top: 8vh;
   left: 20px;
@@ -407,21 +406,23 @@
 
 /* Overlay - HIDDEN ON DESKTOP */
 .sidebar-overlay {
-  display: none; /* Hidden by default */
+  display: none;
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 998;
+  z-index: 997; /* Changed from 998 to sit BELOW sidebar */
   opacity: 0;
   transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
 .sidebar-overlay.active {
   display: block;
   opacity: 1;
+  pointer-events: auto;
 }
 
 /* ============================================
@@ -440,7 +441,7 @@
     top: 0;
     width: 280px;
     height: 100vh;
-    z-index: 1000;
+    z-index: 999; /* Changed from 1000 to sit ABOVE overlay */
     transition: left 0.3s ease;
     background: linear-gradient(
       135deg,
@@ -541,8 +542,9 @@
   }
 
   .sidebar-container {
-    width: 85vw;
-    max-width: 320px;
+    width: 75vw;
+    max-width: 280px;
+    z-index: 999; /* Ensure it's above overlay */
   }
 
   .sidebar-header {
@@ -589,7 +591,8 @@
    ============================================ */
 @media (max-width: 480px) {
   .sidebar-container {
-    width: 90vw;
+    width: 80vw;
+    max-width: 280px;
   }
 
   .sidebar-toggle {

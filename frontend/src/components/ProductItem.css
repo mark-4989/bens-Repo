@@ -275,44 +275,119 @@
   }
 }
 
-/* Mobile - 1 card or flexible */
-@media (max-width: 640px) {
+/* Mobile - Smaller, more compact cards */
+@media (max-width: 768px) {
   .products-grid {
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 16px;
-    padding: 16px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 12px;
   }
   
   .product-card {
     width: 100%;
-    height: auto;
-    min-height: 320px;
+    height: 280px;
+    min-height: unset;
   }
   
   .product-image-container {
     width: 100%;
-    height: auto;
-    aspect-ratio: 1;
+    height: 150px;
+  }
+  
+  .product-image-container img {
+    padding: 8px;
+  }
+  
+  .wishlist-btn {
+    width: 28px;
+    height: 28px;
+    top: 8px;
+    right: 8px;
+  }
+  
+  .wishlist-btn svg {
+    width: 14px;
+    height: 14px;
   }
   
   .product-info {
-    height: auto;
-    padding: 12px 8px;
+    height: 130px;
+    padding: 8px 6px;
   }
   
   .product-name {
-    font-size: 14px;
-    min-height: 36px;
+    font-size: 11px;
+    min-height: 28px;
+    margin: 0 0 4px 0;
   }
   
   .product-price {
-    font-size: 18px;
-    margin: 0 0 10px 0;
+    font-size: 14px;
+    margin: 0 0 8px 0;
   }
   
   .buy-now-btn {
-    padding: 10px 20px;
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 11px;
+    height: 32px;
+  }
+}
+
+/* Small Mobile - Even more compact */
+@media (max-width: 480px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 10px;
+  }
+  
+  .product-card {
+    height: 260px;
+    border-radius: 10px;
+  }
+  
+  .product-image-container {
+    height: 140px;
+    border-radius: 10px 10px 0 0;
+  }
+  
+  .product-image-container img {
+    padding: 6px;
+  }
+  
+  .wishlist-btn {
+    width: 26px;
+    height: 26px;
+    top: 6px;
+    right: 6px;
+  }
+  
+  .wishlist-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .product-info {
+    height: 120px;
+    padding: 6px 5px;
+  }
+  
+  .product-name {
+    font-size: 10px;
+    min-height: 26px;
+    -webkit-line-clamp: 2;
+  }
+  
+  .product-price {
     font-size: 13px;
-    height: 40px;
+    margin: 0 0 6px 0;
+  }
+  
+  .buy-now-btn {
+    padding: 7px 10px;
+    font-size: 10px;
+    height: 30px;
+    border-radius: 5px;
   }
 }
