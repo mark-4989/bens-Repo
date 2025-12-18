@@ -413,17 +413,17 @@
   width: 100vw;
   height: 100vh;
   background: transparent;
-  z-index: -997; /* Changed from 998 to sit BELOW sidebar */
+  z-index: -9; /* Changed from 998 to sit BELOW sidebar */
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition:  0.3s ease;
   pointer-events: none;
 }
 
-.sidebar-overlay.active {
+/* .sidebar-overlay.active {
   display: block;
   opacity: 0;
   pointer-events: auto;
-}
+} */
 
 /* ============================================
    TABLET RESPONSIVE (1024px and below)
@@ -546,6 +546,9 @@
     max-width: 280px;
     z-index: 999; /* Ensure it's above overlay */
   }
+  .sidebar-overlay{
+    display: none;
+  }
 
   .sidebar-header {
     padding: 16px;
@@ -602,6 +605,10 @@
 
   .sidebar-toggle svg {
     font-size: 22px;
+  }
+
+  .sidebar-overlay{
+    display: none;
   }
 
   .category-button {
