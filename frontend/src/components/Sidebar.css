@@ -1,4 +1,4 @@
-/* Sidebar.css - Modern Mobile Design */
+/* Sidebar.css - iPhone 11 Liquid Glass Morphism - MOBILE RESPONSIVE */
 
 /* Reset and Main Container */
 .sidebar-container {
@@ -16,7 +16,9 @@
   width: 10vw;
   height: 100vh;
   background: transparent;
+  
   border-right: 1px solid rgba(255, 255, 255, 0.4);
+  
   overflow-y: auto;
   overflow-x: visible;
   margin: 0;
@@ -83,8 +85,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  /* Clean transparent background */
   background: transparent;
   border: none;
+
   border-radius: 12px;
   margin: 6px 12px;
   cursor: pointer;
@@ -92,9 +97,12 @@
   text-align: left;
   font-family: 'Outfit', sans-serif;
   box-sizing: border-box;
+
+  /* Remove the blur/glass look */
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
+
 
 .category-button:hover {
   background: linear-gradient(
@@ -121,6 +129,7 @@
   transition: transform 0.3s ease;
   margin: 0;
   color: #fff;
+  
   height: 10px;
   width: 10px;
   font-size: 14px;
@@ -232,12 +241,6 @@
   padding: 0;
   letter-spacing: 0.3px;
   line-height: 1.3;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.subcategory-title:hover {
-  color: #10b981;
 }
 
 .subcategory-list {
@@ -322,11 +325,57 @@
   background: rgba(20, 184, 166, 0.8);
 }
 
+/* Dark Theme Support */
+.dark-theme .category-button {
+  background: linear-gradient(
+    135deg,
+    rgba(75, 85, 99, 0.2) 0%,
+    rgba(55, 65, 81, 0.1) 100%
+  );
+  border: 1px solid rgba(75, 85, 99, 0.3);
+}
+
+.dark-theme .category-button:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(75, 85, 99, 0.4) 0%,
+    rgba(55, 65, 81, 0.3) 100%
+  );
+  border: 1px solid rgba(75, 85, 99, 0.5);
+}
+
+.dark-theme .category-name {
+  color: #f9fafb;
+}
+
+.dark-theme .mega-menu {
+  background: linear-gradient(
+    135deg,
+    rgba(31, 41, 55, 0.95) 0%,
+    rgba(17, 24, 39, 0.98) 100%
+  );
+  border: 1px solid rgba(75, 85, 99, 0.5);
+}
+
+.dark-theme .mega-menu-title {
+  color: #f9fafb;
+  border-bottom: 2px solid rgba(20, 184, 166, 0.4);
+}
+
+.dark-theme .subcategory-link {
+  color: #d1d5db;
+}
+
+.dark-theme .subcategory-link:hover {
+  color: #10b981;
+}
+
 /* ============================================
    MOBILE/TABLET RESPONSIVE STYLES 
+   (Desktop appearance stays unchanged)
    ============================================ */
 
-/* Hamburger Toggle Button */
+/* Hamburger Toggle Button - HIDDEN ON DESKTOP */
 .sidebar-toggle {
   display: none;
   position: fixed;
@@ -355,45 +404,32 @@
   font-size: 28px;
 }
 
-/* Overlay for Mobile */
-.sidebar-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 998;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-
-.sidebar-overlay.active {
-  display: block;
-  opacity: 1;
-  pointer-events: auto;
-}
+/* Overlay - REMOVED COMPLETELY - No longer needed */
 
 /* ============================================
    TABLET RESPONSIVE (1024px and below)
    ============================================ */
 @media (max-width: 1024px) {
+  /* Show hamburger button */
   .sidebar-toggle {
     display: flex;
   }
 
+  /* Hide sidebar by default, slide in when active */
   .sidebar-container {
     position: fixed;
     left: -100%;
     top: 0;
-    width: 320px;
+    width: 280px;
     height: 100vh;
-    z-index: 999;
+    z-index: 999; /* Changed from 1000 to sit ABOVE overlay */
     transition: left 0.3s ease;
-    background: #1a1f2e;
-    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.98) 0%,
+      rgba(255, 255, 255, 0.95) 100%
+    );
+    backdrop-filter: blur(20px);
   }
 
   .sidebar-container.active {
@@ -403,31 +439,26 @@
   .sidebar {
     width: 100%;
     border-right: none;
-    background: #1a1f2e;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
   }
 
   .sidebar-header {
-    padding: 24px 20px;
-    background: #1a1f2e;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px;
   }
 
   .sidebar-icon {
-    font-size: 28px;
+    font-size: 24px;
     height: auto;
     width: auto;
   }
 
   .sidebar-title {
-    font-size: 24px;
-    background: linear-gradient(135deg, #14b8a6, #10b981);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-size: 22px;
   }
 
   .category-list {
     width: 100%;
-    padding: 16px 0;
+    padding: 12px 8px;
   }
 
   .category-item {
@@ -439,15 +470,6 @@
     height: auto;
     padding: 16px 20px;
     margin: 4px 0;
-    background: transparent;
-    border-radius: 0;
-  }
-
-  .category-button:hover {
-    background: rgba(20, 184, 166, 0.1);
-    transform: none;
-    border: none;
-    box-shadow: none;
   }
 
   .category-content {
@@ -456,10 +478,9 @@
   }
 
   .category-icon {
-    font-size: 22px;
+    font-size: 20px;
     height: auto;
     width: auto;
-    color: #14b8a6;
   }
 
   .category-name {
@@ -467,51 +488,22 @@
     width: auto;
     margin-left: 0;
     white-space: normal;
-    color: #ffffff;
-    font-weight: 500;
   }
 
-  .category-arrow {
-    color: #14b8a6;
-  }
-
-  /* Mobile Mega Menu */
+  /* Mega Menu - Full Width on Tablet */
   .mega-menu {
     position: fixed;
-    left: 0;
+    left: 280px;
     top: 0;
-    width: 100vw;
+    width: calc(100vw - 280px);
     height: 100vh;
     max-height: 100vh;
     border-radius: 0;
-    padding: 24px 20px;
-    background: #1a1f2e;
-    z-index: 10000;
-  }
-
-  .mega-menu-title {
-    color: #ffffff;
-    border-bottom: 2px solid rgba(20, 184, 166, 0.3);
-    font-size: 20px;
+    padding: 24px;
   }
 
   .mega-menu-grid {
     grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .subcategory-title {
-    color: #14b8a6;
-    font-size: 16px;
-  }
-
-  .subcategory-link {
-    color: #d1d5db;
-    font-size: 15px;
-  }
-
-  .subcategory-link:hover {
-    color: #10b981;
   }
 }
 
@@ -531,16 +523,17 @@
   }
 
   .sidebar-container {
-    width: 85vw;
-    max-width: 320px;
+    width: 75vw;
+    max-width: 280px;
+    z-index: 999; /* Ensure it's above overlay */
   }
 
   .sidebar-header {
-    padding: 20px 16px;
+    padding: 16px;
   }
 
   .sidebar-title {
-    font-size: 22px;
+    font-size: 20px;
   }
 
   .category-button {
@@ -551,78 +544,18 @@
     font-size: 15px;
   }
 
+  /* Mega Menu - Full Screen on Mobile */
   .mega-menu {
-    padding: 20px 16px;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    padding: 20px;
   }
 
   .mega-menu-title {
     font-size: 18px;
-  }
-
-  .subcategory-title {
-    font-size: 15px;
-  }
-
-  .subcategory-link {
-    font-size: 14px;
-  }
-}
-
-/* ============================================
-   SMALL MOBILE (480px and below)
-   ============================================ */
-@media (max-width: 480px) {
-  .sidebar-container {
-    width: 90vw;
-    max-width: 300px;
-  }
-
-  .sidebar-toggle {
-    width: 42px;
-    height: 42px;
-    top: 12px;
-    left: 12px;
-  }
-
-  .sidebar-toggle svg {
-    font-size: 22px;
-  }
-
-  .sidebar-header {
-    padding: 18px 14px;
-  }
-
-  .sidebar-icon {
-    font-size: 24px;
-  }
-
-  .sidebar-title {
-    font-size: 20px;
-  }
-
-  .category-button {
-    padding: 12px 14px;
-  }
-
-  .category-icon {
-    font-size: 20px;
-  }
-
-  .category-name {
-    font-size: 14px;
-  }
-
-  .mega-menu {
-    padding: 16px 14px;
-  }
-
-  .mega-menu-title {
-    font-size: 17px;
-    margin-bottom: 16px;
-  }
-
-  .subcategory {
-    margin-bottom: 16px;
   }
 
   .subcategory-title {
@@ -631,5 +564,45 @@
 
   .subcategory-link {
     font-size: 13px;
+  }
+}
+
+/* ============================================
+   SMALL MOBILE (480px and below)
+   ============================================ */
+@media (max-width: 480px) {
+  .sidebar-container {
+    width: 80vw;
+    max-width: 280px;
+  }
+
+  .sidebar-toggle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .sidebar-toggle svg {
+    font-size: 22px;
+  }
+
+  .category-button {
+    padding: 12px 14px;
+  }
+
+  .category-name {
+    font-size: 14px;
+  }
+
+  .mega-menu {
+    padding: 16px;
+  }
+
+  .mega-menu-title {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+
+  .subcategory {
+    margin-bottom: 16px;
   }
 }
