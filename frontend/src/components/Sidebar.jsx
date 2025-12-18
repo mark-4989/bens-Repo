@@ -339,7 +339,11 @@ const Sidebar = () => {
         {isSidebarOpen ? <CloseIcon /> : <MenuIcon />}
       </button>
 
-      {/* NO OVERLAY - Removed completely */}
+      {/* Dark Overlay for Mobile */}
+      <div 
+        className={`sidebar-overlay ${isSidebarOpen ? 'active' : ''}`}
+        onClick={toggleSidebar}
+      />
 
       {/* Sidebar Container */}
       <div className={`sidebar-container ${isSidebarOpen ? 'active' : ''}`}>
