@@ -1,10 +1,10 @@
-/* CategoryPage.css */
+/* CategoryPage.css - Updated for Unified Sidebar */
 
 .category-page-container {
-  margin-left: 8vw; /* Match your sidebar width */
   padding: 2rem;
   min-height: 100vh;
   background-color: #f9fafb;
+  /* No margin-left needed - handled by main-content-unified */
 }
 
 /* Breadcrumb */
@@ -20,15 +20,16 @@
 
 .breadcrumb span {
   transition: color 0.2s;
+  cursor: pointer;
 }
 
 .breadcrumb span:hover:not(.active) {
-  color: #10b981;
+  color: #000000;
 }
 
 .breadcrumb span.active {
   color: #1f2937;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* Main Content Layout */
@@ -47,6 +48,7 @@
   height: fit-content;
   position: sticky;
   top: 2rem;
+  border: 1px solid #e5e7eb;
 }
 
 .filter-header {
@@ -61,22 +63,26 @@
   font-weight: 700;
   color: #1f2937;
   margin: 0;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .toggle-filter-btn {
   display: none;
-  background: #10b981;
+  background: #000000;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 8px;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
 }
 
 .toggle-filter-btn:hover {
-  background: #059669;
+  background: #1a1a1a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Filter Sections */
@@ -92,9 +98,10 @@
 
 .filter-section h4 {
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #1f2937;
   margin-bottom: 1rem;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .sort-select {
@@ -105,12 +112,14 @@
   font-size: 0.95rem;
   cursor: pointer;
   background: white;
-  transition: border-color 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
 }
 
 .sort-select:focus {
   outline: none;
-  border-color: #10b981;
+  border-color: #000000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Price Inputs */
@@ -126,16 +135,20 @@
   border: 1px solid #e5e7eb;
   border-radius: 6px;
   font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .price-inputs input:focus {
   outline: none;
-  border-color: #10b981;
+  border-color: #000000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
 .price-inputs span {
   color: #6b7280;
   font-size: 0.9rem;
+  font-weight: 600;
 }
 
 /* Brand Checkboxes */
@@ -153,36 +166,38 @@
   color: #4b5563;
   cursor: pointer;
   transition: color 0.2s;
+  font-weight: 500;
 }
 
 .checkbox-label:hover {
-  color: #10b981;
+  color: #000000;
 }
 
 .checkbox-label input[type="checkbox"] {
   width: 18px;
   height: 18px;
   cursor: pointer;
-  accent-color: #10b981;
+  accent-color: #000000;
 }
 
 .clear-filters-btn {
   width: 100%;
   padding: 0.75rem;
   background: #f3f4f6;
-  border: none;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
   color: #6b7280;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   margin-top: 1rem;
 }
 
 .clear-filters-btn:hover {
   background: #e5e7eb;
   color: #1f2937;
+  border-color: #d1d5db;
 }
 
 /* Products Section */
@@ -201,6 +216,7 @@
   color: #6b7280;
   font-size: 0.95rem;
   margin-top: 0.5rem;
+  font-weight: 500;
 }
 
 /* Products Grid */
@@ -217,35 +233,38 @@
   padding: 4rem 2rem;
   background: white;
   border-radius: 12px;
+  border: 1px solid #e5e7eb;
 }
 
 .no-products p {
   font-size: 1.1rem;
   color: #6b7280;
   margin-bottom: 1.5rem;
+  font-weight: 500;
 }
 
 .no-products button {
   padding: 0.75rem 2rem;
-  background: #10b981;
+  background: #000000;
   color: white;
   border: none;
   border-radius: 8px;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .no-products button:hover {
-  background: #059669;
+  background: #1a1a1a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Mobile Styles */
 @media (max-width: 1024px) {
   .category-page-container {
-    margin-left: 0;
-    padding: 1rem;
+    padding: 1.5rem;
   }
 
   .category-content {
@@ -262,10 +281,12 @@
     z-index: 1000;
     transition: left 0.3s ease;
     overflow-y: auto;
+    border-radius: 0;
   }
 
   .filters-panel.active {
     left: 0;
+    box-shadow: 4px 0 30px rgba(0, 0, 0, 0.2);
   }
 
   .toggle-filter-btn {
@@ -283,6 +304,10 @@
 }
 
 @media (max-width: 768px) {
+  .category-page-container {
+    padding: 1rem;
+  }
+
   .products-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -302,6 +327,7 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
     z-index: -1;
   }
 }

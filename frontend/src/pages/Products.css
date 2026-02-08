@@ -129,8 +129,8 @@
     font-family: 'Outfit', sans-serif;
 }
 
-/* Size Selection */
-.product-size-section {
+/* Quantity Selection */
+.product-quantity-section {
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -140,7 +140,7 @@
     border-bottom: 1px solid #e9ecef;
 }
 
-.product-size-section p {
+.product-quantity-section p {
     margin: 0;
     font-size: 14px;
     font-weight: 600;
@@ -149,37 +149,53 @@
     letter-spacing: 0.5px;
 }
 
-.size-select {
+.quantity-selector {
     display: flex;
-    flex-direction: row;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.size-select button {
-    min-width: 60px;
-    height: 48px;
+    align-items: center;
+    gap: 0;
+    width: fit-content;
     border: 2px solid #e9ecef;
     border-radius: 8px;
+    overflow: hidden;
+}
+
+.quantity-btn {
+    width: 48px;
+    height: 48px;
+    border: none;
     background: #ffffff;
-    color: #495057;
-    font-size: 14px;
+    color: #212529;
+    font-size: 20px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
     font-family: 'Outfit', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.size-select button:hover {
-    border-color: #212529;
+.quantity-btn:hover {
     background: #f8f9fa;
 }
 
-.size-select button.active,
-.size-select button:active {
-    border-color: #212529;
-    background: #212529;
-    color: #ffffff;
+.quantity-btn:active {
+    background: #e9ecef;
+}
+
+.quantity-display {
+    min-width: 60px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: #212529;
+    border-left: 2px solid #e9ecef;
+    border-right: 2px solid #e9ecef;
+    background: #ffffff;
+    font-family: 'Outfit', sans-serif;
 }
 
 /* Add to Cart Button */
@@ -396,10 +412,16 @@
         font-size: 24px;
     }
 
-    .size-select button {
+    .quantity-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+    }
+
+    .quantity-display {
         min-width: 50px;
         height: 44px;
-        font-size: 13px;
+        font-size: 15px;
     }
 
     #add-to-cart-btn {

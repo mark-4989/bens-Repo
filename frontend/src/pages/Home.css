@@ -1,36 +1,11 @@
 /* ====================================
-   HOME PAGE LAYOUT - EXACT MEASUREMENTS
+   HOME PAGE LAYOUT - Updated for Unified Sidebar
    ==================================== */
 
-.home-container {
-  display: flex;
+.home-page {
   width: 100%;
   min-height: 100vh;
-  background: #F8F9FA;
-  position: relative;
-}
-
-/* Sidebar - 10vw */
-.home-sidebar {
-  width: 10vw;
-  min-width: 180px;
-  position: fixed;
-  left: 0;
-  top: 0;
-  height: 100vh;
-  background: var(--primary-white);
-  border-right: 1px solid var(--medium-gray);
-  padding: 32px 24px;
-  overflow-y: auto;
-  z-index: 100;
-}
-
-/* Main Content Area */
-.home-content {
-  flex: 1;
-  margin-left: 10vw;
-  width: calc(100% - 10vw);
-  padding: 4vw;
+  padding: 40px;
   background: #F8F9FA;
 }
 
@@ -59,19 +34,19 @@
 /* Section Title */
 .section-title {
   font-size: 32px;
-  font-weight: 600;
-  color: var(--primary-black);
+  font-weight: 700;
+  color: #1f2937;
   margin-bottom: 32px;
   text-align: left;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* Product Grid - 20px gap, auto-fill with 268px cards */
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 268px);
+  grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
   gap: 20px;
   width: 100%;
-  justify-content: start;
 }
 
 /* ====================================
@@ -79,14 +54,14 @@
    ==================================== */
 
 @media (max-width: 1680px) {
-  .home-content {
-    padding: 3vw;
+  .home-page {
+    padding: 32px;
   }
 }
 
 @media (max-width: 1440px) {
-  .home-content {
-    padding: 2.5vw;
+  .home-page {
+    padding: 28px;
   }
   
   .section-title {
@@ -96,30 +71,13 @@
 }
 
 @media (max-width: 1024px) {
-  .home-sidebar {
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-  }
-  
-  .home-sidebar.active {
-    transform: translateX(0);
-  }
-  
-  .home-content {
-    margin-left: 0;
-    width: 100%;
+  .home-page {
     padding: 24px;
-  }
-  
-  .products-grid {
-    justify-content: center;
   }
 }
 
 @media (max-width: 768px) {
-  .home-content {
+  .home-page {
     padding: 20px 16px;
   }
   
@@ -134,11 +92,12 @@
   
   .products-grid {
     gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
 }
 
 @media (max-width: 640px) {
-  .home-content {
+  .home-page {
     padding: 16px 12px;
   }
   
@@ -152,62 +111,7 @@
   }
   
   .products-grid {
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 12px;
   }
-}
-
-/* Mobile Sidebar Toggle Button */
-.mobile-sidebar-toggle {
-  display: none;
-}
-
-@media (max-width: 1024px) {
-  .mobile-sidebar-toggle {
-    display: flex;
-    position: fixed;
-    bottom: 24px;
-    left: 24px;
-    z-index: 999;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: var(--primary-black);
-    color: var(--primary-white);
-    border: none;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    transition: all 0.3s ease;
-  }
-
-  .mobile-sidebar-toggle:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-  }
-
-  .mobile-sidebar-toggle:active {
-    transform: scale(0.95);
-  }
-}
-
-/* Sidebar Overlay */
-.sidebar-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.sidebar-overlay.active {
-  display: block;
-  opacity: 1;
 }

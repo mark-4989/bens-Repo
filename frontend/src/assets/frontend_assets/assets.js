@@ -51,7 +51,7 @@ import p_img47 from './p_img47.png'
 import p_img48 from './p_img48.png'
 import p_img49 from './p_img49.png'
 import p_img50 from './p_img50.png'
-
+import p_img51 from './p_img51.png'
 import p_img52 from './p_img52.png'
 
 
@@ -700,7 +700,7 @@ export const products = [
         name: "Women Zip-Front Relaxed Fit Jacket",
         description: "A lightweight, usually knitted, pullover shirt, close-fitting and with a round neckline and short sleeves, worn as an undershirt or outer garment.",
         price: 320,
-        image: [p_img25],
+        image: [p_img51],
         category: "Women",
         subCategory: "Winterwear",
         sizes: ["S", "M", "L", "XL"],

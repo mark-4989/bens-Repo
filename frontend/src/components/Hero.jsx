@@ -16,7 +16,7 @@ const Hero = () => {
         
         <div className="hero-image">
           <img 
-            src="/images/hero-fruits.png" 
+            src="/images/hero banner.jpg" 
             alt="Fresh fruits and vegetables" 
             className="hero-product-image"
           />

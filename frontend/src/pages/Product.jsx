@@ -10,7 +10,7 @@ const Product = () => {
   const { products, currency, addToCart } = useContext(ShopContext);
   const [productData, setProductdata] = useState(false);
   const [image, setImage] = useState("");
-  const [size, setSize] = useState("");
+  const [quantity, setQuantity] = useState(1);
 
   const fetchProductData = async () => {
     products.map((item) => {
@@ -66,17 +66,25 @@ const Product = () => {
             {productData.price}
           </p>
           <p className="product-description">{productData.description}</p>
-          <div className="product-size-section">
-            <p>Select size</p>
-            <div className="size-select">
-              {productData.sizes.map((item, index) => (
-                <button onClick={() => setSize(item)} key={index}>
-                  {item}
-                </button>
-              ))}
+          <div className="product-quantity-section">
+            <p>Quantity</p>
+            <div className="quantity-selector">
+              <button 
+                onClick={() => setQuantity(prev => Math.max(1, prev - 1))} 
+                className="quantity-btn"
+              >
+                -
+              </button>
+              <span className="quantity-display">{quantity}</span>
+              <button 
+                onClick={() => setQuantity(prev => prev + 1)} 
+                className="quantity-btn"
+              >
+                +
+              </button>
             </div>
           </div>
-          <button onClick={()=>addToCart(productData._id,size)} id="add-to-cart-btn">ADD TO CART</button>
+          <button onClick={()=>addToCart(productData._id,quantity)} id="add-to-cart-btn">ADD TO CART</button>
           <hr />
           <div className="terms">
             <p>100% original product</p>

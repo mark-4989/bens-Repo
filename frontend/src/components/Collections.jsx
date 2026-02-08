@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext';
 import Title from '../components/Title';
 import ProductItem from '../components/ProductItem';
-import Sidebar from '../components/Sidebar';
+import './Collection.css';
 
 const Collection = () => {
   const { products, search, showSearch } = useContext(ShopContext);
@@ -96,96 +96,54 @@ const Collection = () => {
   }, [sortType]);
 
   return (
-    <div className="home-container">
-      <Sidebar />
-      
-      <div className="home-content">
-        <div style={{ 
-          padding: '20px',
-          background: 'rgba(255, 255, 255, 0.25)',
-          backdropFilter: 'blur(20px)',
-          borderRadius: '24px',
-          border: '1px solid rgba(255, 255, 255, 0.4)',
-          boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)',
-          minHeight: '80vh'
-        }}>
-          {/* Title & Sort */}
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center',
-            marginBottom: '30px',
-            flexWrap: 'wrap',
-            gap: '20px'
-          }}>
-            <Title text1={'ALL'} text2={'COLLECTIONS'} />
-            
-            {/* Sort */}
-            <select 
-              onChange={(e) => setSortType(e.target.value)} 
-              style={{
-                padding: '10px 20px',
-                border: '2px solid rgba(255, 255, 255, 0.3)',
-                background: 'rgba(255, 255, 255, 0.2)',
-                backdropFilter: 'blur(10px)',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#2d3748',
-                cursor: 'pointer',
-                outline: 'none'
-              }}
-            >
-              <option value="relevant">Sort by: Relevant</option>
-              <option value="low-high">Sort by: Low to High</option>
-              <option value="high-low">Sort by: High to Low</option>
-            </select>
-          </div>
-
-          {/* Products Count */}
-          <p style={{ 
-            marginBottom: '20px', 
-            fontSize: '16px', 
-            fontWeight: '600',
-            color: '#2d3748'
-          }}>
-            Showing {filterProducts.length} products
-          </p>
-
-          {/* Products Grid */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-            gap: '24px',
-            marginTop: '20px'
-          }}>
-            {filterProducts.map((item, index) => (
-              <ProductItem
-                key={index}
-                id={item._id}
-                image={item.image}
-                name={item.name}
-                price={item.price}
-              />
-            ))}
-          </div>
-
-          {/* No Products Message */}
-          {filterProducts.length === 0 && (
-            <div style={{
-              textAlign: 'center',
-              padding: '60px 20px',
-              color: '#4a5568'
-            }}>
-              <div style={{ fontSize: '64px', marginBottom: '20px' }}>📦</div>
-              <h3 style={{ fontSize: '24px', marginBottom: '10px', color: '#2d3748' }}>
-                No products found
-              </h3>
-              <p>Try adjusting your filters or browse all categories</p>
-            </div>
-          )}
-        </div>
+    <div className="collection-container">
+      {/* Header */}
+      <div className="collection-header">
+        <Title text1={'ALL'} text2={'COLLECTIONS'} />
+        <p className="collection-description">
+          Showing {filterProducts.length} products
+        </p>
       </div>
+
+      {/* Controls */}
+      <div className="collection-controls">
+        <select 
+          onChange={(e) => setSortType(e.target.value)} 
+          className="sort-select"
+          value={sortType}
+        >
+          <option value="relevant">Sort by: Relevant</option>
+          <option value="low-high">Sort by: Low to High</option>
+          <option value="high-low">Sort by: High to Low</option>
+        </select>
+      </div>
+
+      {/* Products Grid */}
+      {filterProducts.length > 0 ? (
+        <div className="products-grid">
+          {filterProducts.map((item, index) => (
+            <ProductItem
+              key={index}
+              id={item._id}
+              image={item.image}
+              name={item.name}
+              price={item.price}
+              onPromo={item.onPromo}
+              discount={item.discount}
+              originalPrice={item.originalPrice}
+              bestseller={item.bestseller}
+              rating={item.rating}
+              reviewCount={item.reviewCount}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="no-products">
+          <div className="no-products-icon">📦</div>
+          <h3>No products found</h3>
+          <p>Try adjusting your filters or browse all categories</p>
+        </div>
+      )}
     </div>
   );
 };
