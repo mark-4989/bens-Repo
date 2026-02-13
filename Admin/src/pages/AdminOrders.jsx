@@ -3,9 +3,10 @@ import { useAuth } from "@clerk/clerk-react";
 import { toast } from "react-toastify";
 import "./AdminOrders.css";
 
-const MAPBOX_TOKEN = "pk.eyJ1IjoiY2hlZmRyZWR6IiwiYSI6ImNtaDRwY2JhZzFvYXFmMXNiOTVmYnQ5aHkifQ.wdXtoBRNl0xYhiPAZxDRjA";
-const BACKEND_URL = "https://bens-repo-99lb.onrender.com";
-const WS_URL = "wss://bens-repo-99lb.onrender.com";
+// Get tokens and URLs from environment variables
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://bens-repo-99lb.onrender.com";
+const WS_URL = import.meta.env.VITE_WS_URL || "wss://bens-repo-99lb.onrender.com";
 
 // ─────────────────────────────────────────────────────────────────
 // LIVE TRACKING MODAL
