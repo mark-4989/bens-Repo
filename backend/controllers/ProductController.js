@@ -15,6 +15,7 @@ const addProduct = async (req, res) => {
       category,
       subCategory,
       detailedCategory,
+      productType, // ✅ ENHANCED: 3rd level categorization
       sizes,
       bestseller,
       // ✅ NEW FIELDS
@@ -101,6 +102,7 @@ const addProduct = async (req, res) => {
       category,
       subCategory,
       detailedCategory: detailedCategory || "",
+      productType: productType || "", // ✅ ENHANCED: 3rd level categorization
       sizes: parsedSizes,
       bestseller: bestseller === "true" || bestseller === true,
       date: Date.now(),
@@ -156,6 +158,7 @@ const updateProduct = async (req, res) => {
       category,
       subCategory,
       detailedCategory,
+      productType, // ✅ ENHANCED: 3rd level categorization
       sizes,
       bestseller,
       // ✅ NEW FIELDS
@@ -247,6 +250,7 @@ const updateProduct = async (req, res) => {
       category: category || existingProduct.category,
       subCategory: subCategory || existingProduct.subCategory,
       detailedCategory: detailedCategory !== undefined ? detailedCategory : existingProduct.detailedCategory,
+      productType: productType !== undefined ? productType : existingProduct.productType, // ✅ ENHANCED: 3rd level
       sizes: parsedSizes,
       bestseller: bestseller !== undefined ? (bestseller === "true" || bestseller === true) : existingProduct.bestseller,
       // ✅ NEW FIELDS

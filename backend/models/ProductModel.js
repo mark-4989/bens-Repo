@@ -50,6 +50,14 @@ const productSchema = new mongoose.Schema({
         required: false
         // Examples: 'rice', 'beef', 'smartphones', 'red-wine', 'diapers'
     },
+    // ENHANCED: Product Type for precise 3-level categorization (Category → Subcategory → Type)
+    productType: {
+        type: String,
+        required: false
+        // Examples: 'consoles', 'smartphones', 'milk', 'red-wine', 'disposable-diapers'
+        // This gives more specific categorization than detailedCategory
+        // Used in URLs like: /category/electronics/gaming?type=consoles
+    },
     sizes: { 
         type: Array, 
         required: true 
@@ -143,6 +151,7 @@ const productSchema = new mongoose.Schema({
 
 // Index for faster queries
 productSchema.index({ category: 1, subCategory: 1 });
+productSchema.index({ category: 1, subCategory: 1, productType: 1 }); // 3-level category index
 productSchema.index({ name: 'text', description: 'text' }); // For search functionality
 productSchema.index({ bestseller: 1 });
 productSchema.index({ onPromo: 1 });
@@ -178,6 +187,15 @@ productSchema.statics.getPromotions = function() {
 // Static method to get bestsellers
 productSchema.statics.getBestsellers = function(limit = 10) {
     return this.find({ bestseller: true, inStock: true }).limit(limit);
+};
+
+// Method to get product URL with 3-level categorization
+productSchema.methods.getURL = function() {
+    let url = `/category/${this.category}/${this.subCategory}`;
+    if (this.productType) {
+        url += `?type=${this.productType}`;
+    }
+    return url;
 };
 
 const productModel = mongoose.models.product || mongoose.model("product", productSchema);
