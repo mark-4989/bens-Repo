@@ -73,10 +73,12 @@ app.get("/", (req, res) => {
     },
   });
 });
+
 app.get("/health", (req, res) => {
   res.json({ success: true, message: "Server is healthy", uptime: process.uptime() });
 });
 
+// Error handler
 app.use((err, req, res, next) => {
   console.error("Server Error:", err);
   res.status(500).json({
@@ -86,9 +88,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // ✅ WebSocket Server — Real-time Driver Location Tracking
-// ════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 const httpServer = createServer(app);
 
 const wss = new WebSocketServer({ server: httpServer });
@@ -220,18 +222,18 @@ app.set("wss", wss);
 app.set("adminClients", adminClients);
 app.set("orderSubscriptions", orderSubscriptions);
 
-// ────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────
 httpServer.listen(port, () => {
   console.log("╔═══════════════════════════════════════╗");
   console.log("🚀 Forever Ecommerce Backend Server");
   console.log("╚═══════════════════════════════════════╝");
   console.log(`📡 HTTP  → PORT ${port}`);
   console.log(`🔌 WS    → ws://localhost:${port}`);
-  console.log(`🌐 ENV   → ${process.env.NODE_ENV || "development"}`);
+  console.log(`🌍 ENV   → ${process.env.NODE_ENV || "development"}`);
   console.log("\n✅ Routes:");
   console.log("   /api/user · /api/product · /api/orders");
   console.log("   /api/tracking · /api/dispatch");
-  console.log("   WebSocket: DRIVER_LOCATION_UPDATE ← NEW");
+  console.log("   WebSocket: DRIVER_LOCATION_UPDATE ← ACTIVE");
   console.log("╚═══════════════════════════════════════╝\n");
 });
 
