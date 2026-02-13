@@ -1,4 +1,5 @@
-// UPDATED Add.jsx with ALL subcategories matching Sidebar
+// ENHANCED Add.jsx with 3-Level Cascading Dropdowns (Category → Subcategory → Product Type)
+// Keeps all your existing logic + adds smart category selection
 
 import React, { useState } from "react";
 import { assets } from "../assets/assets";
@@ -17,6 +18,7 @@ const Add = () => {
     category: "",
     subCategory: "",
     detailedCategory: "",
+    productType: "", // ✅ ENHANCED: 3rd level categorization
     sizes: "[]",
     bestseller: false,
     onPromo: false,
@@ -36,6 +38,7 @@ const Add = () => {
   });
 
   const [images, setImages] = useState([null, null, null, null]);
+  const [message, setMessage] = useState({ type: "", text: "" });
 
   // ✅ COMPLETE Category options - matches Sidebar exactly
   const categories = [
@@ -89,45 +92,214 @@ const Add = () => {
     ]
   };
 
-  // ✅ Detailed subcategory items (for reference/autocomplete)
-  const detailedItems = {
+  // ✅ ENHANCED: Product Types (3rd Level) - Smart categorization
+  const productTypes = {
     // Fresh Foods
-    'fruits-vegetables': ['fruits', 'vegetables', 'organic', 'herbs'],
-    'dairy-products': ['milk', 'yoghurt', 'cheese', 'butter'],
-    'meat-poultry': ['beef', 'chicken', 'pork', 'lamb'],
-    'fish-seafood': ['fish', 'frozen', 'prawns', 'squid'],
-    'bakery': ['bread', 'cakes', 'pastries', 'cookies'],
-    
+    'fruits-vegetables': [
+      { value: 'fresh-fruits', label: 'Fresh Fruits' },
+      { value: 'fresh-vegetables', label: 'Fresh Vegetables' },
+      { value: 'organic-produce', label: 'Organic Produce' },
+      { value: 'herbs-spices-fresh', label: 'Fresh Herbs & Spices' },
+      { value: 'salads-greens', label: 'Salads & Greens' }
+    ],
+    'dairy-products': [
+      { value: 'milk', label: 'Milk' },
+      { value: 'cheese', label: 'Cheese' },
+      { value: 'yogurt', label: 'Yogurt' },
+      { value: 'butter-margarine', label: 'Butter & Margarine' },
+      { value: 'eggs', label: 'Eggs' },
+      { value: 'cream', label: 'Cream' }
+    ],
+    'meat-poultry': [
+      { value: 'beef', label: 'Beef' },
+      { value: 'chicken', label: 'Chicken' },
+      { value: 'pork', label: 'Pork' },
+      { value: 'lamb-goat', label: 'Lamb & Goat' },
+      { value: 'turkey', label: 'Turkey' },
+      { value: 'sausages-bacon', label: 'Sausages & Bacon' }
+    ],
+    'fish-seafood': [
+      { value: 'fresh-fish', label: 'Fresh Fish' },
+      { value: 'frozen-fish', label: 'Frozen Fish' },
+      { value: 'prawns-shrimp', label: 'Prawns & Shrimp' },
+      { value: 'shellfish', label: 'Shellfish' },
+      { value: 'seafood-mix', label: 'Seafood Mix' }
+    ],
+    'bakery': [
+      { value: 'bread', label: 'Bread' },
+      { value: 'cakes-pastries', label: 'Cakes & Pastries' },
+      { value: 'cookies-biscuits', label: 'Cookies & Biscuits' },
+      { value: 'donuts-muffins', label: 'Donuts & Muffins' },
+      { value: 'pies-tarts', label: 'Pies & Tarts' }
+    ],
+
     // Baby & Kids
-    'baby-food-formula': ['formula', 'food', 'cereals'],
-    'diapers-wipes': ['diapers', 'wipes', 'training'],
-    'baby-care': ['bath', 'toiletries', 'health'],
-    'toys-games': ['educational', 'action', 'dolls', 'board'],
-    'kids-clothing': ['boys', 'girls', 'uniforms'],
-    
+    'baby-food-formula': [
+      { value: 'infant-formula', label: 'Infant Formula' },
+      { value: 'baby-cereals', label: 'Baby Cereals' },
+      { value: 'baby-purees', label: 'Baby Food Purees' },
+      { value: 'toddler-snacks', label: 'Toddler Snacks' },
+      { value: 'baby-drinks', label: 'Baby Drinks' }
+    ],
+    'diapers-wipes': [
+      { value: 'disposable-diapers', label: 'Disposable Diapers' },
+      { value: 'cloth-diapers', label: 'Cloth Diapers' },
+      { value: 'baby-wipes', label: 'Baby Wipes' },
+      { value: 'diaper-bags', label: 'Diaper Bags' },
+      { value: 'changing-mats', label: 'Changing Mats' },
+      { value: 'training-pants', label: 'Training Pants' }
+    ],
+    'baby-care': [
+      { value: 'baby-bath', label: 'Baby Bath Products' },
+      { value: 'baby-skincare', label: 'Baby Skincare' },
+      { value: 'baby-health', label: 'Baby Health & Safety' },
+      { value: 'baby-grooming', label: 'Baby Grooming' },
+      { value: 'thermometers', label: 'Thermometers' },
+      { value: 'baby-monitors', label: 'Baby Monitors' }
+    ],
+    'toys-games': [
+      { value: 'educational-toys', label: 'Educational Toys' },
+      { value: 'action-figures', label: 'Action Figures & Dolls' },
+      { value: 'building-blocks', label: 'Building Blocks' },
+      { value: 'outdoor-toys', label: 'Outdoor Toys' },
+      { value: 'board-games', label: 'Board Games & Puzzles' },
+      { value: 'stuffed-animals', label: 'Stuffed Animals' }
+    ],
+    'kids-clothing': [
+      { value: 'boys-clothing', label: 'Boys Clothing' },
+      { value: 'girls-clothing', label: 'Girls Clothing' },
+      { value: 'baby-clothing', label: 'Baby Clothing (0-2 years)' },
+      { value: 'kids-shoes', label: 'Kids Shoes' },
+      { value: 'school-uniforms', label: 'School Uniforms' },
+      { value: 'kids-accessories', label: 'Kids Accessories' }
+    ],
+
     // Electronics
-    'mobile-phones': ['smartphones', 'accessories', 'chargers'],
-    'computers-laptops': ['laptops', 'desktops', 'monitors'],
-    'tvs-audio': ['tvs', 'audio', 'headphones'],
-    'home-appliances': ['fridges', 'washing', 'microwaves'],
-    'gaming': ['consoles', 'games', 'accessories'],
-    
+    'gaming': [
+      { value: 'consoles', label: '🎮 Gaming Consoles (PS5, Xbox, Nintendo)' },
+      { value: 'games', label: 'Video Games' },
+      { value: 'controllers', label: 'Controllers & Accessories' },
+      { value: 'gaming-headsets', label: 'Gaming Headsets' },
+      { value: 'gaming-chairs', label: 'Gaming Chairs' },
+      { value: 'vr-headsets', label: 'VR Headsets' }
+    ],
+    'mobile-phones': [
+      { value: 'smartphones', label: 'Smartphones' },
+      { value: 'feature-phones', label: 'Feature Phones' },
+      { value: 'phone-accessories', label: 'Phone Accessories' },
+      { value: 'cases-covers', label: 'Cases & Covers' },
+      { value: 'chargers-cables', label: 'Chargers & Cables' },
+      { value: 'screen-protectors', label: 'Screen Protectors' }
+    ],
+    'computers-laptops': [
+      { value: 'laptops', label: 'Laptops' },
+      { value: 'desktops', label: 'Desktop PCs' },
+      { value: 'monitors', label: 'Monitors' },
+      { value: 'keyboards-mice', label: 'Keyboards & Mice' },
+      { value: 'printers', label: 'Printers & Scanners' },
+      { value: 'storage', label: 'Storage Devices' }
+    ],
+    'tvs-audio': [
+      { value: 'televisions', label: 'Televisions' },
+      { value: 'soundbars', label: 'Soundbars' },
+      { value: 'speakers', label: 'Speakers' },
+      { value: 'headphones', label: 'Headphones' },
+      { value: 'home-theater', label: 'Home Theater Systems' },
+      { value: 'streaming-devices', label: 'Streaming Devices' }
+    ],
+    'home-appliances': [
+      { value: 'refrigerators', label: 'Refrigerators' },
+      { value: 'washing-machines', label: 'Washing Machines' },
+      { value: 'microwaves', label: 'Microwaves' },
+      { value: 'air-conditioners', label: 'Air Conditioners' },
+      { value: 'vacuum-cleaners', label: 'Vacuum Cleaners' },
+      { value: 'irons', label: 'Irons & Steamers' }
+    ],
+
     // Liquor Store
-    'wines': ['red', 'white', 'champagne', 'rose'],
-    'spirits': ['whisky', 'vodka', 'gin', 'rum'],
-    'beer-cider': ['local', 'imported', 'craft'],
-    'liqueurs': ['cream', 'fruit', 'coffee'],
-    'bar-accessories': ['glassware', 'tools', 'ice'],
-    
+    'wines': [
+      { value: 'red-wine', label: 'Red Wine' },
+      { value: 'white-wine', label: 'White Wine' },
+      { value: 'rose-wine', label: 'Rosé Wine' },
+      { value: 'sparkling-wine', label: 'Sparkling Wine & Champagne' },
+      { value: 'dessert-wine', label: 'Dessert Wine' }
+    ],
+    'spirits': [
+      { value: 'whiskey', label: 'Whiskey & Bourbon' },
+      { value: 'vodka', label: 'Vodka' },
+      { value: 'rum', label: 'Rum' },
+      { value: 'gin', label: 'Gin' },
+      { value: 'tequila', label: 'Tequila' },
+      { value: 'brandy-cognac', label: 'Brandy & Cognac' }
+    ],
+    'beer-cider': [
+      { value: 'lager', label: 'Lager' },
+      { value: 'ale', label: 'Ale' },
+      { value: 'stout-porter', label: 'Stout & Porter' },
+      { value: 'craft-beer', label: 'Craft Beer' },
+      { value: 'imported-beer', label: 'Imported Beer' },
+      { value: 'cider', label: 'Cider' }
+    ],
+    'liqueurs': [
+      { value: 'cream-liqueurs', label: 'Cream Liqueurs' },
+      { value: 'fruit-liqueurs', label: 'Fruit Liqueurs' },
+      { value: 'coffee-liqueurs', label: 'Coffee Liqueurs' },
+      { value: 'herbal-liqueurs', label: 'Herbal Liqueurs' }
+    ],
+    'bar-accessories': [
+      { value: 'glassware', label: 'Glassware' },
+      { value: 'bar-tools', label: 'Bar Tools & Shakers' },
+      { value: 'ice-buckets', label: 'Ice Buckets' },
+      { value: 'mixers', label: 'Mixers & Soft Drinks' },
+      { value: 'bar-decor', label: 'Bar Decor' }
+    ],
+
     // Food Cupboard
-    'grains-cereals': ['rice', 'pasta', 'cereals'],
-    'cooking-oils': ['vegetable', 'olive', 'sunflower'],
-    'canned-foods': ['vegetables', 'fruits', 'soups'],
-    'spices-seasonings': ['herbs', 'salt', 'sauces'],
-    'beverages': ['coffee', 'tea', 'soft-drinks'],
-    
+    'grains-cereals': [
+      { value: 'rice', label: 'Rice' },
+      { value: 'pasta', label: 'Pasta & Noodles' },
+      { value: 'breakfast-cereals', label: 'Breakfast Cereals' },
+      { value: 'oatmeal', label: 'Oatmeal & Porridge' },
+      { value: 'quinoa-couscous', label: 'Quinoa & Couscous' }
+    ],
+    'cooking-oils': [
+      { value: 'vegetable-oil', label: 'Vegetable Oil' },
+      { value: 'olive-oil', label: 'Olive Oil' },
+      { value: 'sunflower-oil', label: 'Sunflower Oil' },
+      { value: 'coconut-oil', label: 'Coconut Oil' },
+      { value: 'specialty-oils', label: 'Specialty Oils' }
+    ],
+    'canned-foods': [
+      { value: 'canned-vegetables', label: 'Canned Vegetables' },
+      { value: 'canned-fruits', label: 'Canned Fruits' },
+      { value: 'canned-beans', label: 'Canned Beans & Legumes' },
+      { value: 'canned-fish', label: 'Canned Fish & Seafood' },
+      { value: 'canned-soups', label: 'Canned Soups' }
+    ],
+    'spices-seasonings': [
+      { value: 'herbs-spices', label: 'Herbs & Spices' },
+      { value: 'salt-pepper', label: 'Salt & Pepper' },
+      { value: 'sauces', label: 'Sauces & Condiments' },
+      { value: 'stock-cubes', label: 'Stock & Bouillon Cubes' },
+      { value: 'baking-ingredients', label: 'Baking Ingredients' }
+    ],
+    'beverages': [
+      { value: 'coffee', label: 'Coffee' },
+      { value: 'tea', label: 'Tea' },
+      { value: 'soft-drinks', label: 'Soft Drinks' },
+      { value: 'juices', label: 'Juices' },
+      { value: 'water', label: 'Water' },
+      { value: 'energy-drinks', label: 'Energy Drinks' }
+    ],
+
     // Promos
-    'weekly-deals': ['flash', 'clearance', 'bundles']
+    'weekly-deals': [
+      { value: 'flash-sales', label: 'Flash Sales' },
+      { value: 'clearance', label: 'Clearance Items' },
+      { value: 'bundle-deals', label: 'Bundle Deals' },
+      { value: 'seasonal-offers', label: 'Seasonal Offers' },
+      { value: 'buy-one-get-one', label: 'Buy One Get One' }
+    ]
   };
 
   const handleImageChange = (index, file) => {
@@ -145,16 +317,27 @@ const Add = () => {
       setFormData(prev => ({
         ...prev,
         category: value,
+        subCategory: "",
+        productType: "",
         ageRestricted: true,
         minimumAge: "21"
       }));
     }
 
-    // Reset subCategory when category changes
+    // Reset subCategory and productType when category changes
     if (name === 'category') {
       setFormData(prev => ({
         ...prev,
-        subCategory: ""
+        subCategory: "",
+        productType: ""
+      }));
+    }
+
+    // Reset productType when subcategory changes
+    if (name === 'subCategory') {
+      setFormData(prev => ({
+        ...prev,
+        productType: ""
       }));
     }
   };
@@ -166,6 +349,7 @@ const Add = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage({ type: "", text: "" });
 
     try {
       const token = await getToken({ template: "MilikiAPI" });
@@ -198,7 +382,13 @@ const Add = () => {
       console.log("📦 Result:", result);
 
       if (result.success) {
-        alert("✅ Product added successfully!");
+        const productURL = `/category/${formData.category}/${formData.subCategory}${formData.productType ? `?type=${formData.productType}` : ''}`;
+        
+        setMessage({
+          type: "success",
+          text: `✅ Product added successfully! It will appear at: ${productURL}`
+        });
+
         setFormData({
           name: "",
           description: "",
@@ -206,6 +396,7 @@ const Add = () => {
           category: "",
           subCategory: "",
           detailedCategory: "",
+          productType: "",
           sizes: "[]",
           bestseller: false,
           onPromo: false,
@@ -224,18 +415,31 @@ const Add = () => {
           isNewArrival: false
         });
         setImages([null, null, null, null]);
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        alert("❌ Failed to add product: " + result.message);
+        setMessage({
+          type: "error",
+          text: "❌ Failed to add product: " + result.message
+        });
       }
     } catch (error) {
       console.error("❌ Error:", error);
-      alert("⚠️ Error while uploading product.");
+      setMessage({
+        type: "error",
+        text: "⚠️ Error while uploading product."
+      });
     }
   };
 
   return (
     <form className="form-container" onSubmit={handleSubmit}>
       <h2>Add New Product</h2>
+      
+      {/* Success/Error Messages */}
+      {message.text && (
+        <div className={`form-message ${message.type}`}>{message.text}</div>
+      )}
       
       <p>Upload Images</p>
       <div className="label-container">
@@ -288,6 +492,133 @@ const Add = () => {
           />
         </div>
 
+        {/* ✅ ENHANCED: 3-LEVEL CATEGORY SYSTEM */}
+        <div className="form-section">
+          <h3>📂 Category Selection (3 Levels)</h3>
+          
+          {/* Level 1: Main Category */}
+          <div style={{ marginBottom: "12px" }}>
+            <label style={{
+              display: "block",
+              fontSize: "13px",
+              fontWeight: "600",
+              color: "#374151",
+              marginBottom: "6px"
+            }}>
+              Level 1: Main Category *
+            </label>
+            <select
+              name="category"
+              value={formData.category}
+              onChange={handleInputChange}
+              required
+              style={{ marginBottom: "0" }}
+            >
+              <option value="">Select Main Category</option>
+              {categories.map(cat => (
+                <option key={cat.value} value={cat.value}>{cat.label}</option>
+              ))}
+            </select>
+          </div>
+          
+          {/* Level 2: Subcategory */}
+          <div style={{ marginBottom: "12px" }}>
+            <label style={{
+              display: "block",
+              fontSize: "13px",
+              fontWeight: "600",
+              color: "#374151",
+              marginBottom: "6px"
+            }}>
+              Level 2: Subcategory *
+            </label>
+            <select
+              name="subCategory"
+              value={formData.subCategory}
+              onChange={handleInputChange}
+              required
+              disabled={!formData.category}
+              style={{ marginBottom: "0" }}
+            >
+              <option value="">{formData.category ? "Select Subcategory" : "Select main category first"}</option>
+              {formData.category && subCategories[formData.category]?.map(sub => (
+                <option key={sub} value={sub}>
+                  {sub.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Level 3: Product Type */}
+          <div style={{ marginBottom: "12px" }}>
+            <label style={{
+              display: "block",
+              fontSize: "13px",
+              fontWeight: "600",
+              color: "#374151",
+              marginBottom: "6px"
+            }}>
+              Level 3: Product Type (Optional but Recommended)
+            </label>
+            <select
+              name="productType"
+              value={formData.productType}
+              onChange={handleInputChange}
+              disabled={!formData.subCategory}
+              style={{ marginBottom: "0" }}
+            >
+              <option value="">{formData.subCategory ? "Select Product Type (Optional)" : "Select subcategory first"}</option>
+              {formData.subCategory && productTypes[formData.subCategory]?.map(type => (
+                <option key={type.value} value={type.value}>{type.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Preview URL */}
+          {formData.category && formData.subCategory && (
+            <div style={{
+              marginTop: "16px",
+              padding: "12px",
+              background: "#f0fdf4",
+              border: "1px solid #86efac",
+              borderRadius: "8px"
+            }}>
+              <p style={{
+                fontSize: "12px",
+                fontWeight: "600",
+                color: "#15803d",
+                marginBottom: "4px"
+              }}>
+                📍 Product will appear at:
+              </p>
+              <code style={{
+                fontSize: "12px",
+                color: "#15803d",
+                wordBreak: "break-all"
+              }}>
+                /category/{formData.category}/{formData.subCategory}{formData.productType && `?type=${formData.productType}`}
+              </code>
+            </div>
+          )}
+          
+          <input
+            type="text"
+            name="detailedCategory"
+            placeholder="Detailed Category (legacy field, optional)"
+            value={formData.detailedCategory}
+            onChange={handleInputChange}
+            style={{ marginTop: "12px" }}
+          />
+          
+          <input
+            type="text"
+            name="tags"
+            placeholder="Tags (comma-separated, e.g., organic, fresh, premium)"
+            value={formData.tags}
+            onChange={handleInputChange}
+          />
+        </div>
+
         {/* Pricing */}
         <div className="form-section">
           <h3>💰 Pricing</h3>
@@ -333,61 +664,6 @@ const Add = () => {
               />
             </>
           )}
-        </div>
-
-        {/* Categories */}
-        <div className="form-section">
-          <h3>📂 Categories</h3>
-          
-          <select
-            name="category"
-            value={formData.category}
-            onChange={handleInputChange}
-            required
-          >
-            <option value="">Select Category *</option>
-            {categories.map(cat => (
-              <option key={cat.value} value={cat.value}>{cat.label}</option>
-            ))}
-          </select>
-          
-          <select
-            name="subCategory"
-            value={formData.subCategory}
-            onChange={handleInputChange}
-            required
-            disabled={!formData.category}
-          >
-            <option value="">Select Sub-Category *</option>
-            {formData.category && subCategories[formData.category]?.map(sub => (
-              <option key={sub} value={sub}>
-                {sub.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-              </option>
-            ))}
-          </select>
-          
-          <input
-            type="text"
-            name="detailedCategory"
-            placeholder="Detailed Category (e.g., smartphones, rice, toys)"
-            value={formData.detailedCategory}
-            onChange={handleInputChange}
-          />
-          
-          {/* Show suggested items based on subcategory */}
-          {formData.subCategory && detailedItems[formData.subCategory] && (
-            <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
-              💡 Suggestions: {detailedItems[formData.subCategory].join(', ')}
-            </p>
-          )}
-          
-          <input
-            type="text"
-            name="tags"
-            placeholder="Tags (comma-separated, e.g., organic, fresh, premium)"
-            value={formData.tags}
-            onChange={handleInputChange}
-          />
         </div>
 
         {/* Stock & Sizes */}
