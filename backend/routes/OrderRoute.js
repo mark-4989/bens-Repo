@@ -3,6 +3,7 @@ import express from "express";
 import adminAuth from "../middleware/requireAdmin.js";
 import { verifyClerkToken } from "../middleware/verifyClerkToken.js";
 import Order from "../models/OrderModel.js";
+import { broadcastNewOrder, notifyStatusChange } from "../services/trackingService.js";
 
 const orderRouter = express.Router();
 
@@ -261,35 +262,8 @@ orderRouter.put("/driver/:id/accept", driverAuth, async (req, res) => {
       { new: true }
     );
 
-    // 🔔 Notify admin via WebSocket
-    try {
-      const orderSubscriptions = req.app.get("orderSubscriptions");
-      const adminClients = req.app.get("adminClients");
-
-      const payload = JSON.stringify({
-        type: "DELIVERY_STATUS_UPDATE",
-        orderId: id,
-        status: "Cargo on Route",
-        driverId: req.driverId,
-        driverName: driverName,
-        timestamp: new Date().toISOString(),
-      });
-
-      // Notify subscribers of this order
-      if (orderSubscriptions?.has(id)) {
-        orderSubscriptions.get(id).forEach((ws) => {
-          if (ws.readyState === 1) ws.send(payload);
-        });
-      }
-      // Notify all-watching admins
-      if (adminClients) {
-        adminClients.forEach((ws) => {
-          if (ws._watchAll && ws.readyState === 1) ws.send(payload);
-        });
-      }
-    } catch (wsErr) {
-      console.error("WS notify error:", wsErr);
-    }
+    // ✅ Notify admin & customers via Socket.IO
+    notifyStatusChange(id, "Cargo on Route", req.driverId);
 
     res.json({ success: true, message: "Order accepted! Start delivery.", order: updated });
   } catch (error) {
@@ -322,29 +296,8 @@ orderRouter.put("/driver/:id/status", driverAuth, async (req, res) => {
 
     if (!order) return res.status(404).json({ success: false, message: "Order not found or not yours" });
 
-    // Notify admins via WebSocket
-    try {
-      const orderSubscriptions = req.app.get("orderSubscriptions");
-      const adminClients = req.app.get("adminClients");
-      const payload = JSON.stringify({
-        type: "DELIVERY_STATUS_UPDATE",
-        orderId: id,
-        status,
-        driverId: req.driverId,
-        timestamp: new Date().toISOString(),
-      });
-
-      if (orderSubscriptions?.has(id)) {
-        orderSubscriptions.get(id).forEach((ws) => {
-          if (ws.readyState === 1) ws.send(payload);
-        });
-      }
-      if (adminClients) {
-        adminClients.forEach((ws) => {
-          if (ws._watchAll && ws.readyState === 1) ws.send(payload);
-        });
-      }
-    } catch (wsErr) {}
+    // ✅ Notify admins & customers via Socket.IO
+    notifyStatusChange(id, status, req.driverId);
 
     res.json({ success: true, message: `Status updated to ${status}`, order });
   } catch (error) {
@@ -384,24 +337,14 @@ orderRouter.post("/:id/broadcast", adminAuth, async (req, res) => {
 
     if (!order) return res.status(404).json({ success: false, message: "Order not found" });
 
-    // Notify all driver clients (if any connected via WS) — optional push
-    try {
-      const wss = req.app.get("wss");
-      if (wss) {
-        const newOrderNotification = JSON.stringify({
-          type: "NEW_ORDER_AVAILABLE",
-          orderId: id,
-          orderNumber: id.slice(-8).toUpperCase(),
-          customerName: order.customerName,
-          address: order.address?.street,
-          totalAmount: order.totalAmount,
-          timestamp: new Date().toISOString(),
-        });
-        wss.clients.forEach((ws) => {
-          if (ws._driverId && ws.readyState === 1) ws.send(newOrderNotification);
-        });
-      }
-    } catch (wsErr) {}
+    // ✅ Notify all driver clients via Socket.IO
+    broadcastNewOrder({
+      orderId: id,
+      orderNumber: id.slice(-8).toUpperCase(),
+      customerName: order.customerName,
+      address: order.address?.street,
+      totalAmount: order.totalAmount,
+    });
 
     console.log(`📢 Order ${id} broadcasted to Driver App`);
     res.json({ success: true, message: "Order broadcasted to Driver App", order });
