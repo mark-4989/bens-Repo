@@ -1,70 +1,143 @@
 import React, { useEffect, useState } from "react";
 import { useAuth, useUser, RedirectToSignIn } from "@clerk/clerk-react";
-import { toast } from 'react-toastify';
-import Title from "../components/Title";
+import { toast } from "react-toastify";
+import {
+  ShoppingCart, Package, Truck, CheckCircle, XCircle,
+  Smartphone, Banknote, CreditCard, MapPin, ReceiptText,
+  ShoppingBag, Info, Map, Loader2,
+} from "lucide-react";
 import "./Orders1.css";
 import { backendUrl } from "../config";
 import LiveTracking from "../components/LiveTracking";
 
+// ── Status step config ───────────────────────────────────────────
+const STATUS_STEPS = [
+  { value: "Order Received", label: "Received", Icon: ShoppingCart },
+  { value: "Cargo Packed",   label: "Packed",   Icon: Package },
+  { value: "Cargo on Route", label: "On Route", Icon: Truck },
+  { value: "Delivered",      label: "Delivered",Icon: CheckCircle },
+];
 
+const getProgress = (status) =>
+  STATUS_STEPS.findIndex((s) => s.value === status);
+
+// ── Payment method display ───────────────────────────────────────
+const PaymentMethodDisplay = ({ method }) => {
+  if (method === "mpesa" || method === "m-pesa") {
+    return (
+      <span className="payment-method-info">
+        <Smartphone size={13} /> M-PESA
+      </span>
+    );
+  }
+  if (method === "stripe") {
+    return (
+      <span className="payment-method-info">
+        <CreditCard size={13} /> Stripe
+      </span>
+    );
+  }
+  return (
+    <span className="payment-method-info">
+      <Banknote size={13} /> Cash on Delivery
+    </span>
+  );
+};
+
+// ── Main component ───────────────────────────────────────────────
 const Orders1 = () => {
-  const { isSignedIn, user } = useUser();
-  const { getToken } = useAuth();
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const { isSignedIn } = useUser();
+  const { getToken }   = useAuth();
+
+  const [orders, setOrders]                   = useState([]);
+  const [loading, setLoading]                 = useState(true);
+  const [error, setError]                     = useState("");
   const [trackingOrderId, setTrackingOrderId] = useState(null);
-  const [payingOrderId, setPayingOrderId] = useState(null);
-  const [cancellingOrderId, setCancellingOrderId] = useState(null);
+  const [payingOrderId, setPayingOrderId]     = useState(null);
+  const [cancellingId, setCancellingId]       = useState(null);
 
-
-
-  // Fetch user's orders
   const fetchOrders = async () => {
     if (!isSignedIn) return;
-    
     try {
       setLoading(true);
       const token = await getToken({ template: "MilikiAPI" });
-
-      const res = await fetch(`${backendUrl}/api/orders/user`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const res   = await fetch(`${backendUrl}/api/orders/user`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (!res.ok) {
-        throw new Error(`HTTP error ${res.status}`);
-      }
-
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      if (data.success) {
-        setOrders(data.orders);
-      } else {
-        throw new Error(data.message || "Failed to fetch orders");
-      }
+      if (data.success) setOrders(data.orders);
+      else throw new Error(data.message || "Failed to fetch orders");
     } catch (err) {
-      console.error("Error fetching orders:", err);
-      setError("Failed to load your orders. Please try again later.");
+      setError("Failed to load your orders. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchOrders();
-  }, [isSignedIn]);
+  useEffect(() => { fetchOrders(); }, [isSignedIn]);
 
-  if (!isSignedIn) {
-    return <RedirectToSignIn />;
-  }
+  if (!isSignedIn) return <RedirectToSignIn />;
 
+  // ── Cancel order ──────────────────────────────────────────────
+  const handleCancelOrder = async (orderId) => {
+    if (!window.confirm("Are you sure you want to cancel this order?")) return;
+    try {
+      setCancellingId(orderId);
+      const token = await getToken({ template: "MilikiAPI" });
+      const res   = await fetch(`${backendUrl}/api/orders/${orderId}/cancel`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      });
+      const data = await res.json();
+      if (data.success) { toast.success("Order cancelled"); fetchOrders(); }
+      else toast.error(data.message || "Failed to cancel order");
+    } catch { toast.error("Failed to cancel order"); }
+    finally { setCancellingId(null); }
+  };
+
+  // ── M-Pesa STK push ───────────────────────────────────────────
+  // Only triggered when customer chose M-Pesa but payment is still pending.
+  // COD orders never show this button.
+  // Stripe uses a redirect flow — no "push" equivalent, so no button needed here.
+  const handlePayWithMpesa = async (order) => {
+    const rawPhone = prompt("Enter your M-Pesa number (e.g. 0712345678):");
+    if (!rawPhone) return;
+
+    const phone = rawPhone.replace(/\s/g, "");
+    if (!/^(0|254|\+254)?[17]\d{8}$/.test(phone)) {
+      toast.error("Invalid phone number. Use 07XXXXXXXX or 01XXXXXXXX");
+      return;
+    }
+
+    try {
+      setPayingOrderId(order._id);
+      const token = await getToken({ template: "MilikiAPI" });
+      const res   = await fetch(`${backendUrl}/api/mpesa/stk-push`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: order._id, phoneNumber: phone }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Payment request sent! Enter your M-Pesa PIN on your phone.");
+        // Refresh after 10 s to pick up payment status update from webhook
+        setTimeout(fetchOrders, 10000);
+      } else {
+        toast.error(data.message || "Failed to send payment request");
+      }
+    } catch { toast.error("Payment failed. Please try again."); }
+    finally { setPayingOrderId(null); }
+  };
+
+  // ── States ────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="orders-page-container">
-        <Title text1="MY" text2="ORDERS" />
-        <p>Loading your orders...</p>
+        <div className="orders-state">
+          <div className="spinner" />
+          <p>Loading your orders…</p>
+        </div>
       </div>
     );
   }
@@ -72,8 +145,12 @@ const Orders1 = () => {
   if (error) {
     return (
       <div className="orders-page-container">
-        <Title text1="MY" text2="ORDERS" />
-        <p className="error">{error}</p>
+        <div className="orders-state">
+          <XCircle size={48} strokeWidth={1} className="state-icon" style={{ color: "#f0bbb7" }} />
+          <h3>Something went wrong</h3>
+          <p>{error}</p>
+          <button className="browse-btn" onClick={fetchOrders}>Try Again</button>
+        </div>
       </div>
     );
   }
@@ -81,322 +158,189 @@ const Orders1 = () => {
   if (orders.length === 0) {
     return (
       <div className="orders-page-container">
-        <Title text1="MY" text2="ORDERS" />
-        <p>You have no orders yet.</p>
+        <div className="orders-state">
+          <ShoppingBag size={56} strokeWidth={1} className="state-icon" />
+          <h3>No orders yet</h3>
+          <p>Once you place an order it will appear here</p>
+          <button className="browse-btn" onClick={() => window.location.href = "/collection"}>
+            Browse Products
+          </button>
+        </div>
       </div>
     );
   }
 
-  // Helper for order progress status
-  const getProgressClass = (status) => {
-    switch (status) {
-      case "Order Received":
-        return 1;
-      case "Cargo Packed":
-        return 2;
-      case "Cargo on Route":
-        return 3;
-      case "Delivered":
-        return 4;
-      default:
-        return 0;
-    }
-  };
-
-  // Open tracking modal
-  const handleTrackOrder = (orderId) => {
-    setTrackingOrderId(orderId);
-  };
-
-  // Close tracking modal
-  const closeTrackingModal = () => {
-    setTrackingOrderId(null);
-  };
-
-  // Cancel order
-  const handleCancelOrder = async (orderId) => {
-    if (!window.confirm('Are you sure you want to cancel this order?')) {
-      return;
-    }
-
-    try {
-      setCancellingOrderId(orderId);
-      const token = await getToken({ template: "MilikiAPI" });
-
-      const response = await fetch(`${backendUrl}/api/orders/${orderId}/cancel`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        toast.success('Order cancelled successfully');
-        fetchOrders();
-      } else {
-        toast.error(data.message || 'Failed to cancel order');
-      }
-    } catch (error) {
-      console.error('Cancel error:', error);
-      toast.error('Failed to cancel order');
-    } finally {
-      setCancellingOrderId(null);
-    }
-  };
-
-  // Handle M-Pesa Payment
-  const handlePayWithMpesa = async (order) => {
-    const phoneNumber = prompt(
-      'Enter your M-Pesa phone number (e.g., 0712345678):'
-    );
-
-    if (!phoneNumber) {
-      return;
-    }
-
-    const phoneRegex = /^(0|254|\+254)?[17]\d{8}$/;
-    if (!phoneRegex.test(phoneNumber.replace(/\s/g, ''))) {
-      toast.error('Invalid phone number format. Please use 07XXXXXXXX or 01XXXXXXXX');
-      return;
-    }
-
-    try {
-      setPayingOrderId(order._id);
-      const token = await getToken({ template: "MilikiAPI" });
-
-      const response = await fetch(`${backendUrl}/api/mpesa/stk-push`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          orderId: order._id,
-          phoneNumber: phoneNumber
-        })
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        toast.success('📱 Payment request sent to your phone! Please enter your M-Pesa PIN.');
-        
-        setTimeout(() => {
-          fetchOrders();
-        }, 10000);
-      } else {
-        toast.error(data.message || 'Failed to initiate payment');
-      }
-    } catch (error) {
-      console.error('Payment error:', error);
-      toast.error('Failed to initiate payment. Please try again.');
-    } finally {
-      setPayingOrderId(null);
-    }
-  };
-
+  // ── Render ────────────────────────────────────────────────────
   return (
     <div className="orders-page-container">
-      <div className="header-text-holder">
-        <Title text1="MY" text2="ORDERS" />
+      <div className="orders-page-header">
+        <h1>My Orders</h1>
+        <p>{orders.length} order{orders.length !== 1 ? "s" : ""} placed</p>
       </div>
 
-      {orders.map((order, index) => {
-        const progress = getProgressClass(order.status);
-        const isCancelled = order.status === "Cancelled";
+      <div className="orders-list">
+        {orders.map((order) => {
+          const isCancelled  = order.status === "Cancelled";
+          const progressIdx  = getProgress(order.status);
+          const isMpesa      = order.paymentMethod === "mpesa" || order.paymentMethod === "m-pesa";
+          const isCOD        = order.paymentMethod === "cod"   || order.paymentMethod === "COD";
+          const isStripe     = order.paymentMethod === "stripe";
+          const needsMpesaPay = isMpesa && order.paymentStatus?.toLowerCase() === "pending" && !isCancelled;
+          const canCancel    = order.cancellable && !isCancelled;
+          const canTrack     = order.status === "Cargo on Route" && !isCancelled;
 
-        return (
-          <div key={order._id || index} className={`order-box-container ${isCancelled ? 'cancelled-order' : ''}`}>
-            <div className="order-box">
-              {/* Order Header with Gradient */}
-              <div className="order-header">
-                <div className="order-id">Order #{order._id.slice(-8).toUpperCase()}</div>
-                <div className={`payment-status-badge ${order.paymentStatus?.toLowerCase()}`}>
-                  {order.paymentStatus || 'Pending'}
-                </div>
+          return (
+            <div key={order._id} className={`order-card ${isCancelled ? "is-cancelled" : ""}`}>
+
+              {/* Top bar */}
+              <div className="order-card-topbar">
+                <span className="order-id-label">Order #{order._id.slice(-8).toUpperCase()}</span>
+                <span className="order-date-label">
+                  {new Date(order.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric", month: "short", day: "numeric"
+                  })}
+                </span>
+                <span className={`payment-badge ${order.paymentStatus?.toLowerCase() ?? "pending"}`}>
+                  {order.paymentStatus || "Pending"}
+                </span>
               </div>
 
-              <div className="order-content">
-                {/* Order Details */}
-                <div className="order-details">
+              <div className="order-card-body">
+
+                {/* First item preview */}
+                <div className="order-items-row">
                   <img
                     src={order.items?.[0]?.image || "/placeholder.png"}
                     alt={order.items?.[0]?.name || "Product"}
+                    className="order-item-img"
+                    onError={e => { e.target.src = "/placeholder.png"; }}
                   />
-                  <div className="order-details-mini">
-                    <p id="Order-name">{order.items?.[0]?.name}</p>
-                    {order.items?.length > 1 && (
-                      <p className="more-items">+{order.items.length - 1} more item(s)</p>
-                    )}
-                    <p><strong>💰 Total:</strong> KES {order.totalAmount?.toLocaleString()}</p>
-                    <p><strong>📦 Status:</strong> <b className={isCancelled ? 'cancelled-status' : ''}>{order.status}</b></p>
-                    <p>
-                      <strong>📅 Date:</strong>{" "}
-                      <span className="order-date">
-                        {new Date(order.createdAt).toLocaleDateString()}
+                  <div className="order-item-meta">
+                    <div className="order-item-name">{order.items?.[0]?.name || "—"}</div>
+                    <div className="order-item-sub">
+                      <span className="order-item-tag">
+                        <Package size={10} /> Qty: {order.items?.[0]?.quantity ?? 1}
                       </span>
-                    </p>
-                    <p className="payment-method-text">
-                      💳 Payment: {order.paymentMethod?.toUpperCase() || 'COD'}
-                    </p>
+                      {order.items?.[0]?.size && (
+                        <span className="order-item-tag">Size: {order.items[0].size}</span>
+                      )}
+                    </div>
+                    {order.items?.length > 1 && (
+                      <span className="more-items-pill">+{order.items.length - 1} more item{order.items.length - 1 > 1 ? "s" : ""}</span>
+                    )}
                   </div>
                 </div>
 
-                {/* Status Tracker */}
-                {!isCancelled && (
-                  <div className="status-tracker">
-                    <div className={`step ${progress >= 1 ? "done" : ""}`}>
-                      <span className="step-icon">🛒</span>
-                      <span id="status-statement">Order Received</span>
-                    </div>
-                    <div className={`step ${progress >= 2 ? "done" : ""}`}>
-                      <span className="step-icon">📦</span>
-                      <span>Cargo Packed</span>
-                    </div>
-                    <div className={`step ${progress >= 3 ? "done" : ""}`}>
-                      <span className="step-icon">🚚</span>
-                      <span>On Route</span>
-                    </div>
-                    <div className={`step ${progress >= 4 ? "done" : ""}`}>
-                      <span className="step-icon">✅</span>
-                      <span>Delivered</span>
-                    </div>
+                {/* Summary row: total / status / payment method */}
+                <div className="order-summary-row">
+                  <div className="summary-cell">
+                    <span className="summary-cell-label">Order Total</span>
+                    <span className="summary-cell-value amount">
+                      KES {order.totalAmount?.toLocaleString() ?? "—"}
+                    </span>
+                  </div>
+                  <div className="summary-cell">
+                    <span className="summary-cell-label">Status</span>
+                    <span className="summary-cell-value" style={isCancelled ? { color: "var(--danger)" } : {}}>
+                      {order.status}
+                    </span>
+                  </div>
+                  <div className="summary-cell">
+                    <span className="summary-cell-label">Payment</span>
+                    <PaymentMethodDisplay method={order.paymentMethod} />
+                  </div>
+                </div>
+
+                {/* Stepper or cancelled */}
+                {!isCancelled ? (
+                  <div className="status-stepper">
+                    <div className="stepper-track" />
+                    {STATUS_STEPS.map(({ value, label, Icon }, i) => (
+                      <div key={value} className={`step ${i <= progressIdx ? "done" : ""}`}>
+                        <div className="step-icon-wrap"><Icon size={12} strokeWidth={2} /></div>
+                        <span className="step-label">{label}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="cancelled-badge">
+                    <XCircle size={14} strokeWidth={2} /> Order Cancelled
                   </div>
                 )}
 
-                {/* Action Buttons */}
-                <div className="order-actions">
-                  {/* Track Order */}
-                  {order.status === "Cargo on Route" && !isCancelled && (
-                    <button
-                      className="track-order-btn modern-btn"
-                      onClick={() => handleTrackOrder(order._id)}
-                    >
-                      <span>🚀</span>
-                      <span>TRACK ORDER</span>
-                    </button>
-                  )}
-
-                  {/* Pay with M-Pesa */}
-                  {order.paymentStatus === 'Pending' && order.paymentMethod === 'm-pesa' && !isCancelled && (
-                    <button
-                      className="pay-mpesa-btn modern-btn"
-                      onClick={() => handlePayWithMpesa(order)}
-                      disabled={payingOrderId === order._id}
-                    >
-                      <span>💳</span>
-                      <span>{payingOrderId === order._id ? 'Processing...' : 'Pay with M-Pesa'}</span>
-                    </button>
-                  )}
-
-                  {/* Cancel Order */}
-                  {order.cancellable && !isCancelled && (
-                    <button
-                      className="cancel-order-btn modern-btn"
-                      onClick={() => handleCancelOrder(order._id)}
-                      disabled={cancellingOrderId === order._id}
-                    >
-                      <span>❌</span>
-                      <span>{cancellingOrderId === order._id ? 'Cancelling...' : 'Cancel Order'}</span>
-                    </button>
-                  )}
-                </div>
-
                 {/* Receipt */}
-                {order.paymentStatus === 'Paid' && order.mpesaReceiptNumber && (
-                  <div className="receipt-info">
-                    <p className="receipt-number">
-                      <span>📄</span>
-                      <span>Receipt: {order.mpesaReceiptNumber}</span>
-                    </p>
+                {order.paymentStatus?.toLowerCase() === "paid" && order.mpesaReceiptNumber && (
+                  <div className="receipt-bar">
+                    <ReceiptText size={13} />
+                    M-Pesa Receipt: {order.mpesaReceiptNumber}
+                  </div>
+                )}
+
+                {/* ── Action buttons ── */}
+                {(canTrack || needsMpesaPay || canCancel) && (
+                  <div className="order-actions">
+
+                    {/* Track — only when driver is on route */}
+                    {canTrack && (
+                      <button className="action-btn btn-track" onClick={() => setTrackingOrderId(order._id)}>
+                        <Map size={13} strokeWidth={2} />
+                        Track Driver Live
+                      </button>
+                    )}
+
+                    {/* M-Pesa pay — only when customer chose M-Pesa AND payment is still pending.
+                        COD: no button (customer pays at door).
+                        Stripe: no STK push — handled at checkout via redirect; 
+                        pending stripe orders would need a separate redirect button if you implement that. */}
+                    {needsMpesaPay && (
+                      <>
+                        <button
+                          className="action-btn btn-mpesa"
+                          onClick={() => handlePayWithMpesa(order)}
+                          disabled={payingOrderId === order._id}
+                        >
+                          {payingOrderId === order._id
+                            ? <><div className="btn-spinner" />Sending Request…</>
+                            : <><Smartphone size={13} strokeWidth={2} />Pay KES {order.totalAmount?.toLocaleString()} via M-Pesa</>}
+                        </button>
+                        <div className="mpesa-note">
+                          <Info size={13} style={{ flexShrink: 0, marginTop: 1 }} />
+                          <span>
+                            You'll receive an STK push on your M-Pesa phone. 
+                            Enter your PIN to complete this payment of <strong>KES {order.totalAmount?.toLocaleString()}</strong>.
+                          </span>
+                        </div>
+                      </>
+                    )}
+
+                    {/* Cancel */}
+                    {canCancel && (
+                      <button
+                        className="action-btn btn-cancel"
+                        onClick={() => handleCancelOrder(order._id)}
+                        disabled={cancellingId === order._id}
+                      >
+                        {cancellingId === order._id
+                          ? <><div className="btn-spinner" style={{ borderTopColor: "var(--danger)" }} />Cancelling…</>
+                          : <><XCircle size={13} strokeWidth={2} />Cancel Order</>}
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
             </div>
-          </div>
-        );
-      })}
-
-      {/* Tracking Modal */}
-      {trackingOrderId && (
-  <LiveTracking
-    orderId={trackingOrderId}
-    onClose={closeTrackingModal}
-    getToken={getToken}  // Pass getToken as prop
-  />
-)}
-    </div>
-  );
-};
-
-// Enhanced Tracking Modal Component
-const TrackingModal = ({ orderId, onClose }) => {
-  const [animationProgress, setAnimationProgress] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setAnimationProgress(prev => {
-        if (prev >= 100) return 0;
-        return prev + 2;
-      });
-    }, 100);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="tracking-modal-overlay" onClick={onClose}>
-      <div className="tracking-modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="close-modal-btn" onClick={onClose}>×</button>
-        
-        <h2>🚚 Track Your Order</h2>
-        <p className="order-id-track">Order #{orderId.slice(-8).toUpperCase()}</p>
-
-        <div className="tracking-map">
-          <div className="map-container">
-            <div className="route-line"></div>
-            
-            <div className="location-point warehouse">
-              <div className="point-icon">🏭</div>
-              <div className="point-label">Warehouse</div>
-            </div>
-
-            <div 
-              className="delivery-truck" 
-              style={{ left: `${animationProgress}%` }}
-            >
-              🚚
-            </div>
-
-            <div className="location-point destination">
-              <div className="point-icon">🏠</div>
-              <div className="point-label">Your Location</div>
-            </div>
-          </div>
-
-          <div className="tracking-info">
-            <div className="info-item">
-              <span className="info-icon">📍</span>
-              <span>Current Location: En route to your address</span>
-            </div>
-            <div className="info-item">
-              <span className="info-icon">⏱️</span>
-              <span>Estimated Delivery: 2-3 hours</span>
-            </div>
-            <div className="info-item">
-              <span className="info-icon">👤</span>
-              <span>Driver: John Doe | 📞 +254 700 000 000</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="tracking-note">
-          <p>💡 <strong>Note:</strong> This is a simulated tracking view. Real-time GPS tracking coming soon!</p>
-        </div>
+          );
+        })}
       </div>
+
+      {/* Live tracking modal */}
+      {trackingOrderId && (
+        <LiveTracking
+          orderId={trackingOrderId}
+          onClose={() => setTrackingOrderId(null)}
+          getToken={getToken}
+        />
+      )}
     </div>
   );
 };
