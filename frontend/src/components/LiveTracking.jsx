@@ -1,577 +1,371 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 
-const LiveTracking = ({ orderId, onClose, getToken }) => {
-  const [trackingData, setTrackingData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const mapContainerRef = useRef(null);
-  const mapRef = useRef(null);
-  const driverMarkerRef = useRef(null);
-  const destinationMarkerRef = useRef(null);
+const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2hlZmRyZWR6IiwiYSI6ImNtaDRwY2JhZzFvYXFmMXNiOTVmYnQ5aHkifQ.wdXtoBRNl0xYhiPAZxDRjA';
+const WS_URL       = 'wss://bens-repo-99lb.onrender.com';
 
-  const backendUrl = "https://bens-repo-99lb.onrender.com";
-  const mapboxToken =
-    "pk.eyJ1IjoiY2hlZmRyZWR6IiwiYSI6ImNtaDRwY2JhZzFvYXFmMXNiOTVmYnQ5aHkifQ.wdXtoBRNl0xYhiPAZxDRjA"; // Replace with your token
+/**
+ * Customer-facing LiveTracking modal.
+ * Receives the full `order` object directly from Orders1 — no secondary fetch,
+ * no loading loop. Same pattern as AdminOrders LiveTrackingModal.
+ */
+const LiveTracking = ({ order, onClose }) => {
+  const [isConnected, setIsConnected] = useState(false);
+  const [lastUpdate,  setLastUpdate]  = useState(null);
+  const [eta,         setEta]         = useState(null);
+  const [driverInfo,  setDriverInfo]  = useState(order?.driver || null);
 
-  // Load Mapbox
+  const mapRef         = useRef(null);
+  const mapInstance    = useRef(null);
+  const driverMarker   = useRef(null);
+  const customerMarker = useRef(null);
+  const socketRef      = useRef(null);
+
+  const deliveryLat = order?.address?.latitude  || order?.address?.lat;
+  const deliveryLng = order?.address?.longitude || order?.address?.lng;
+
+  // ══════════ INITIALISE MAPBOX ══════════
   useEffect(() => {
-    if (!mapContainerRef.current) return;
+    if (!mapRef.current) return;
 
-    const loadMapbox = async () => {
-      // Load Mapbox CSS
-      if (!document.querySelector("#mapbox-css")) {
-        const link = document.createElement("link");
-        link.id = "mapbox-css";
-        link.href = "https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css";
-        link.rel = "stylesheet";
+    const initMap = () => {
+      if (!window.mapboxgl || !mapRef.current) return;
+      const mapboxgl = window.mapboxgl;
+      mapboxgl.accessToken = MAPBOX_TOKEN;
+
+      if (mapInstance.current) mapInstance.current.remove();
+
+      mapInstance.current = new mapboxgl.Map({
+        container: mapRef.current,
+        style:     'mapbox://styles/mapbox/dark-v11',
+        center:    [deliveryLng || 36.8219, deliveryLat || -1.2921],
+        zoom:      13,
+        pitch:     45,
+      });
+
+      mapInstance.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      mapInstance.current.addControl(new mapboxgl.FullscreenControl(),  'top-right');
+
+      // Add customer marker after style loads — avoids the race condition
+      mapInstance.current.on('load', () => {
+        if (deliveryLat && deliveryLng) {
+          const el = document.createElement('div');
+          el.innerHTML = `
+            <div style="background:#ef4444;color:white;padding:8px 14px;border-radius:20px;
+              font-weight:700;font-size:12px;box-shadow:0 4px 16px rgba(239,68,68,0.55);
+              white-space:nowrap;border:2px solid rgba(255,255,255,0.2);">
+              📍 Your Location
+            </div>`;
+
+          customerMarker.current = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
+            .setLngLat([deliveryLng, deliveryLat])
+            .setPopup(
+              new mapboxgl.Popup({ offset: 25 }).setHTML(`
+                <div style="padding:12px;background:#1a1a2e;border-radius:8px;">
+                  <strong style="color:#fff;font-size:14px;">📍 Your Delivery Address</strong><br/>
+                  <span style="color:#aaa;font-size:12px;">${order?.address?.street || 'N/A'}</span>
+                </div>`)
+            )
+            .addTo(mapInstance.current);
+        }
+      });
+    };
+
+    if (window.mapboxgl) {
+      initMap();
+    } else {
+      const script  = document.createElement('script');
+      script.src    = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js';
+      script.onload = initMap;
+      document.head.appendChild(script);
+
+      if (!document.querySelector('link[href*="mapbox-gl.css"]')) {
+        const link  = document.createElement('link');
+        link.href   = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css';
+        link.rel    = 'stylesheet';
         document.head.appendChild(link);
       }
-
-      // Load Mapbox JS
-      if (!window.mapboxgl) {
-        const script = document.createElement("script");
-        script.src = "https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js";
-        script.onload = initializeMap;
-        document.head.appendChild(script);
-      } else {
-        initializeMap();
-      }
-    };
-
-    loadMapbox();
+    }
 
     return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
+      if (mapInstance.current) {
+        mapInstance.current.remove();
+        mapInstance.current = null;
       }
     };
-  }, []);
+  }, []); // runs once on mount — order is already available
 
-  const initializeMap = () => {
-    if (!window.mapboxgl || mapRef.current) return;
-
-    window.mapboxgl.accessToken = mapboxToken;
-
-    const map = new window.mapboxgl.Map({
-      container: mapContainerRef.current,
-      style: "mapbox://styles/mapbox/streets-v12",
-      center: [36.8219, -1.2921], // Nairobi [lng, lat]
-      zoom: 13,
-      attributionControl: false,
-    });
-
-    map.addControl(new window.mapboxgl.NavigationControl(), "top-right");
-
-    map.on("load", () => {
-      mapRef.current = map;
-      fetchTrackingData();
-    });
-  };
-
-  const fetchTrackingData = async () => {
-    try {
-      const token = await getToken({ template: "MilikiAPI" });
-      const response = await fetch(`${backendUrl}/api/tracking/${orderId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const data = await response.json();
-
-      console.log("📍 Tracking response:", data); // Debug log
-
-      if (data.success) {
-        setTrackingData(data.tracking);
-        updateMapMarkers(data.tracking);
-        setLoading(false);
-      } else {
-        // ✅ If tracking not available, show helpful error
-        console.error("Tracking error:", data.message);
-
-        // Check if it's because order is not in transit
-        if (data.message && data.message.includes("not currently in transit")) {
-          setError(
-            `This order is currently "${
-              data.status || "being processed"
-            }". Live tracking will be available once the order is "Cargo on Route".`
-          );
-        } else {
-          setError(data.message || "Tracking not available for this order");
-        }
-        setLoading(false);
-      }
-    } catch (err) {
-      console.error("Tracking fetch error:", err);
-
-      // ✅ Better error message based on error type
-      if (err.message.includes("404")) {
-        setError("Tracking system not configured. Please contact support.");
-      } else if (err.message.includes("Failed to fetch")) {
-        setError(
-          "Unable to connect to tracking service. Please check your internet connection."
-        );
-      } else {
-        setError("Failed to load tracking data. Please try again later.");
-      }
-      setLoading(false);
-    }
-  };
-
-  const updateMapMarkers = (tracking) => {
-    if (!mapRef.current || !window.mapboxgl) return;
-
-    const map = mapRef.current;
-
-    // Remove existing markers
-    if (driverMarkerRef.current) driverMarkerRef.current.remove();
-    if (destinationMarkerRef.current) destinationMarkerRef.current.remove();
-
-    // Create driver marker (green car icon)
-    const driverEl = document.createElement("div");
-    driverEl.innerHTML = "🚗";
-    driverEl.style.fontSize = "32px";
-    driverEl.style.cursor = "pointer";
-    driverEl.style.transform = `rotate(${tracking.heading || 0}deg)`;
-
-    driverMarkerRef.current = new window.mapboxgl.Marker({
-      element: driverEl,
-      anchor: "center",
-    })
-      .setLngLat([tracking.currentLocation.lng, tracking.currentLocation.lat])
-      .setPopup(
-        new window.mapboxgl.Popup({ offset: 25 }).setHTML(
-          `<strong>Driver: ${tracking.driver.name}</strong><br/>Vehicle: ${tracking.driver.vehicle}`
-        )
-      )
-      .addTo(map);
-
-    // Create destination marker (red house icon)
-    const destEl = document.createElement("div");
-    destEl.innerHTML = "🏠";
-    destEl.style.fontSize = "32px";
-    destEl.style.cursor = "pointer";
-
-    destinationMarkerRef.current = new window.mapboxgl.Marker({
-      element: destEl,
-      anchor: "bottom",
-    })
-      .setLngLat([tracking.destination.lng, tracking.destination.lat])
-      .setPopup(
-        new window.mapboxgl.Popup({ offset: 25 }).setHTML(
-          "<strong>📍 Your Delivery Location</strong>"
-        )
-      )
-      .addTo(map);
-
-    // Draw route line
-    const routeGeoJSON = {
-      type: "Feature",
-      geometry: {
-        type: "LineString",
-        coordinates: [
-          [tracking.currentLocation.lng, tracking.currentLocation.lat],
-          [tracking.destination.lng, tracking.destination.lat],
-        ],
-      },
-    };
-
-    if (map.getSource("route")) {
-      map.getSource("route").setData(routeGeoJSON);
-    } else {
-      map.addSource("route", {
-        type: "geojson",
-        data: routeGeoJSON,
-      });
-
-      map.addLayer({
-        id: "route",
-        type: "line",
-        source: "route",
-        layout: {
-          "line-join": "round",
-          "line-cap": "round",
-        },
-        paint: {
-          "line-color": "#4CAF50",
-          "line-width": 4,
-          "line-opacity": 0.8,
-        },
-      });
-    }
-
-    // Fit map to show both markers
-    const bounds = new window.mapboxgl.LngLatBounds();
-    bounds.extend([tracking.currentLocation.lng, tracking.currentLocation.lat]);
-    bounds.extend([tracking.destination.lng, tracking.destination.lat]);
-    map.fitBounds(bounds, { padding: 80, maxZoom: 15 });
-  };
-
-  // Poll for updates every 5 seconds
+  // ══════════ WEBSOCKET ══════════
   useEffect(() => {
-    if (!orderId || loading) return;
+    if (!order?._id) return;
 
-    const interval = setInterval(() => {
-      fetchTrackingData();
-    }, 5000);
+    const connect = (url) => {
+      try {
+        const ws = new WebSocket(url);
+        socketRef.current = ws;
 
-    return () => clearInterval(interval);
-  }, [orderId, loading]);
+        ws.onopen = () => {
+          console.log('📡 Customer tracking connected');
+          setIsConnected(true);
+          ws.send(JSON.stringify({ type: 'ADMIN_SUBSCRIBE_ORDER', orderId: order._id }));
+        };
 
-  const formatETA = (minutes) => {
-    if (minutes < 60) return `${minutes} min`;
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours}h ${mins}m`;
-  };
+        ws.onmessage = (e) => {
+          try {
+            const msg = JSON.parse(e.data);
 
-  const callDriver = () => {
-    if (trackingData?.driver?.phone) {
-      window.location.href = `tel:${trackingData.driver.phone}`;
+            if (msg.type === 'DRIVER_LOCATION_UPDATE' && msg.orderId === order._id) {
+              const { lat, lng } = msg.location;
+              setLastUpdate(new Date());
+              if (msg.driverName) setDriverInfo({ name: msg.driverName });
+              updateDriverMarker({ lat, lng });
+              drawRoute({ lat, lng });
+            }
+
+            if (msg.type === 'DELIVERY_STATUS_UPDATE' && msg.orderId === order._id) {
+              if (msg.status === 'Delivered') onClose();
+            }
+          } catch (err) {
+            console.error('WS message error:', err);
+          }
+        };
+
+        ws.onclose = () => {
+          setIsConnected(false);
+          // Reconnect fallback
+          if (url === WS_URL) setTimeout(() => connect('ws://localhost:4000'), 3000);
+        };
+
+        ws.onerror = () => {
+          if (url === WS_URL) { ws.close(); connect('ws://localhost:4000'); }
+        };
+      } catch (err) {
+        console.error('WS connection error:', err);
+      }
+    };
+
+    connect(WS_URL);
+    return () => { if (socketRef.current) socketRef.current.close(); };
+  }, [order?._id]);
+
+  // ══════════ UPDATE DRIVER MARKER ══════════
+  const updateDriverMarker = ({ lat, lng }) => {
+    if (!mapInstance.current || !window.mapboxgl) return;
+
+    if (driverMarker.current) {
+      driverMarker.current.setLngLat([lng, lat]);
+    } else {
+      const el = document.createElement('div');
+      el.innerHTML = `
+        <div style="position:relative;">
+          <div style="background:#10b981;padding:10px 14px;border-radius:22px;font-size:20px;
+            box-shadow:0 4px 18px rgba(16,185,129,0.65);border:2px solid rgba(255,255,255,0.3);">🚗</div>
+          <div style="position:absolute;top:-5px;right:-5px;background:#ef4444;
+            width:11px;height:11px;border-radius:50%;border:2px solid #0d1117;
+            animation:livePing 1.2s infinite;"></div>
+        </div>`;
+
+      driverMarker.current = new window.mapboxgl.Marker({ element: el, anchor: 'center' })
+        .setLngLat([lng, lat])
+        .setPopup(
+          new window.mapboxgl.Popup({ offset: 30 }).setHTML(`
+            <div style="padding:12px;background:#1a1a2e;border-radius:8px;">
+              <strong style="color:#10b981;font-size:14px;">🚗 ${driverInfo?.name || 'Your Driver'} — On The Way</strong><br/>
+              <span style="color:#aaa;font-size:12px;">Live location</span>
+            </div>`)
+        )
+        .addTo(mapInstance.current);
+    }
+
+    // Fit both markers into view
+    if (customerMarker.current) {
+      const bounds = new window.mapboxgl.LngLatBounds();
+      bounds.extend([lng, lat]);
+      bounds.extend(customerMarker.current.getLngLat());
+      mapInstance.current.fitBounds(bounds, { padding: 90, maxZoom: 15, duration: 800 });
     }
   };
 
-  if (loading) {
-    return (
-      <div style={styles.overlay}>
-        <div style={styles.modal}>
-          <div style={styles.loader}>
-            <div style={styles.spinner}></div>
-            <p style={styles.loaderText}>Loading live tracking...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // ══════════ DRAW ROUTE ══════════
+  const drawRoute = async ({ lat, lng }) => {
+    if (!mapInstance.current || !deliveryLat || !deliveryLng) return;
+    if (!mapInstance.current.isStyleLoaded()) return;
 
-  if (error) {
-    return (
-      <div style={styles.overlay} onClick={onClose}>
-        <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-          <button style={styles.closeBtn} onClick={onClose}>
-            ×
-          </button>
-          <div style={styles.errorContainer}>
-            <div style={styles.errorIcon}>⚠️</div>
-            <h3 style={styles.errorTitle}>Unable to Load Tracking</h3>
-            <p style={styles.errorMessage}>{error}</p>
-            <button style={styles.retryBtn} onClick={fetchTrackingData}>
-              🔄 Retry
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+    try {
+      const url  = `https://api.mapbox.com/directions/v5/mapbox/driving/${lng},${lat};${deliveryLng},${deliveryLat}?geometries=geojson&access_token=${MAPBOX_TOKEN}`;
+      const res  = await fetch(url);
+      const data = await res.json();
 
+      if (!data.routes?.[0]) return;
+      const geo = data.routes[0].geometry;
+      const map = mapInstance.current;
+
+      if (map.getSource('driver-route')) {
+        map.getSource('driver-route').setData({ type: 'Feature', geometry: geo });
+      } else {
+        map.addSource('driver-route', { type: 'geojson', data: { type: 'Feature', geometry: geo } });
+        map.addLayer({
+          id:     'driver-route-layer',
+          type:   'line',
+          source: 'driver-route',
+          layout: { 'line-join': 'round', 'line-cap': 'round' },
+          paint:  { 'line-color': '#10b981', 'line-width': 4, 'line-opacity': 0.85, 'line-dasharray': [2, 2] },
+        });
+      }
+
+      setEta(Math.round(data.routes[0].duration / 60));
+    } catch (err) {
+      console.error('Route drawing error:', err);
+    }
+  };
+
+  // ══════════ RENDER ══════════
   return (
-    <div style={styles.overlay} onClick={onClose}>
-      <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <button style={styles.closeBtn} onClick={onClose}>
-          ×
-        </button>
-
-        <div style={styles.header}>
-          <div style={styles.headerContent}>
-            <h2 style={styles.title}>🚚 Live Tracking</h2>
-            <p style={styles.orderId}>
-              Order #{orderId.slice(-8).toUpperCase()}
+    <div
+      style={{
+        position: 'fixed', inset: 0,
+        background: 'rgba(0,0,0,0.88)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        zIndex: 9999, padding: '1rem',
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          background: '#0d1117', borderRadius: '12px',
+          width: '100%', maxWidth: '960px', maxHeight: '95vh',
+          overflow: 'hidden', display: 'flex', flexDirection: 'column',
+          border: '1px solid rgba(255,255,255,0.08)',
+          boxShadow: '0 24px 80px rgba(0,0,0,0.6)',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* ── Header ── */}
+        <div style={{
+          padding: '1.25rem 1.75rem',
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          background: 'rgba(255,255,255,0.015)',
+        }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <h2 style={{ margin: 0, color: '#fff', fontSize: '1.2rem', fontWeight: 700 }}>
+                🗺️ Live Order Tracking
+              </h2>
+              <span style={{
+                padding: '4px 12px', borderRadius: '20px',
+                fontSize: '11px', fontWeight: 700,
+                background: isConnected ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
+                color:      isConnected ? '#10b981' : '#ef4444',
+                border:    `1px solid ${isConnected ? '#10b981' : '#ef4444'}`,
+                display: 'flex', alignItems: 'center', gap: '5px',
+              }}>
+                <span style={{
+                  width: '6px', height: '6px', borderRadius: '50%',
+                  background: isConnected ? '#10b981' : '#ef4444',
+                  animation: isConnected ? 'liveBlip 1.5s infinite' : 'none',
+                }} />
+                {isConnected ? '● Live' : 'Connecting…'}
+              </span>
+            </div>
+            <p style={{ margin: '4px 0 0', color: '#6b7280', fontSize: '0.85rem' }}>
+              Order #{order._id?.slice(-8).toUpperCase()}
+              {driverInfo?.name && (
+                <span style={{ color: '#10b981' }}> · 🚗 {driverInfo.name}</span>
+              )}
             </p>
           </div>
-          <div style={styles.liveIndicator}>
-            <span style={styles.liveDot}></span>
-            LIVE
+
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            {eta !== null && (
+              <div style={{
+                padding: '7px 14px',
+                background: 'rgba(16,185,129,0.12)',
+                border: '1px solid #10b981',
+                borderRadius: '10px',
+                color: '#10b981', fontWeight: 700, fontSize: '0.875rem',
+              }}>
+                ETA ~{eta} min
+              </div>
+            )}
+            {lastUpdate && (
+              <div style={{ color: '#4b5563', fontSize: '0.78rem' }}>
+                Updated {lastUpdate.toLocaleTimeString()}
+              </div>
+            )}
+            <button
+              onClick={onClose}
+              style={{
+                background: 'rgba(255,255,255,0.07)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: '#fff', width: '34px', height: '34px',
+                borderRadius: '50%', cursor: 'pointer',
+                fontSize: '1.25rem', display: 'flex',
+                alignItems: 'center', justifyContent: 'center',
+              }}
+            >×</button>
           </div>
         </div>
 
-        {/* Map Container */}
-        <div ref={mapContainerRef} style={styles.map}></div>
+        {/* ── Map ── */}
+        <div ref={mapRef} style={{ height: '460px', minHeight: '460px', flex: 1 }} />
 
-        {/* Tracking Info Panel */}
-        {trackingData && (
-          <div style={styles.infoPanel}>
-            {/* ETA Card */}
-            <div style={{ ...styles.infoCard, ...styles.etaCard }}>
-              <div style={styles.etaIcon}>⏱️</div>
-              <div>
-                <div style={styles.etaLabel}>Estimated Arrival</div>
-                <div style={styles.etaValue}>{formatETA(trackingData.eta)}</div>
-              </div>
+        {/* ── Footer ── */}
+        <div style={{
+          padding: '1rem 1.75rem',
+          borderTop: '1px solid rgba(255,255,255,0.08)',
+          background: 'rgba(255,255,255,0.015)',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+          gap: '1rem',
+        }}>
+          <div>
+            <div style={{ fontSize: '0.72rem', color: '#4b5563', marginBottom: '3px', textTransform: 'uppercase' }}>
+              Delivery Address
             </div>
-
-            {/* Driver Info Grid */}
-            <div style={styles.infoGrid}>
-              <div style={styles.infoCard}>
-                <span style={styles.cardIcon}>👤</span>
-                <div>
-                  <div style={styles.cardLabel}>Driver</div>
-                  <div style={styles.cardValue}>{trackingData.driver.name}</div>
-                </div>
-              </div>
-
-              <div style={styles.infoCard}>
-                <span style={styles.cardIcon}>🚗</span>
-                <div>
-                  <div style={styles.cardLabel}>Vehicle</div>
-                  <div style={styles.cardValue}>
-                    {trackingData.driver.vehicle}
-                  </div>
-                </div>
-              </div>
-
-              {trackingData.speed > 0 && (
-                <div style={styles.infoCard}>
-                  <span style={styles.cardIcon}>⚡</span>
-                  <div>
-                    <div style={styles.cardLabel}>Speed</div>
-                    <div style={styles.cardValue}>
-                      {Math.round(trackingData.speed)} km/h
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Call Driver Button */}
-            <button style={styles.callBtn} onClick={callDriver}>
-              📞 Call Driver - {trackingData.driver.phone}
-            </button>
-
-            <div style={styles.lastUpdate}>
-              🔄 Last updated:{" "}
-              {new Date(trackingData.lastUpdated).toLocaleTimeString()}
+            <div style={{ fontWeight: 500, color: '#e5e7eb', fontSize: '0.83rem' }}>
+              {order.address?.street || 'N/A'}
             </div>
           </div>
-        )}
+          <div>
+            <div style={{ fontSize: '0.72rem', color: '#4b5563', marginBottom: '3px', textTransform: 'uppercase' }}>
+              Order Total
+            </div>
+            <div style={{ fontWeight: 700, color: '#10b981', fontSize: '1.05rem' }}>
+              KSH {order.totalAmount?.toLocaleString()}
+            </div>
+          </div>
+          {deliveryLat && deliveryLng && (
+            <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+              <button
+                onClick={() => window.open(
+                  `https://www.google.com/maps/dir/?api=1&destination=${deliveryLat},${deliveryLng}`,
+                  '_blank'
+                )}
+                style={{
+                  width: '100%', padding: '10px',
+                  background: 'linear-gradient(135deg,#4285F4,#34A853)',
+                  color: 'white', border: 'none', borderRadius: '8px',
+                  fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem',
+                }}
+              >
+                🗺️ Open in Google Maps
+              </button>
+            </div>
+          )}
+        </div>
+
+        <style>{`
+          @keyframes liveBlip {
+            0%,100% { opacity: 1; transform: scale(1); }
+            50%      { opacity: 0.3; transform: scale(1.4); }
+          }
+          @keyframes livePing {
+            75%,100% { transform: scale(2.2); opacity: 0; }
+          }
+        `}</style>
       </div>
     </div>
   );
 };
-
-const styles = {
-  overlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1000,
-    padding: "20px",
-    backdropFilter: "blur(4px)",
-  },
-  modal: {
-    backgroundColor: "white",
-    borderRadius: "20px",
-    width: "100%",
-    maxWidth: "900px",
-    maxHeight: "95vh",
-    overflow: "hidden",
-    position: "relative",
-    display: "flex",
-    flexDirection: "column",
-    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
-  },
-  closeBtn: {
-    position: "absolute",
-    top: "15px",
-    right: "15px",
-    background: "white",
-    border: "none",
-    fontSize: "28px",
-    color: "#666",
-    cursor: "pointer",
-    width: "36px",
-    height: "36px",
-    borderRadius: "50%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 10,
-    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-    transition: "all 0.2s",
-    fontWeight: "300",
-  },
-  header: {
-    padding: "24px",
-    background: "linear-gradient(135deg, #4CAF50 0%, #45a049 100%)",
-    color: "white",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  headerContent: {
-    flex: 1,
-  },
-  title: {
-    margin: 0,
-    fontSize: "24px",
-    fontWeight: "600",
-  },
-  orderId: {
-    margin: "8px 0 0 0",
-    fontSize: "14px",
-    opacity: 0.9,
-  },
-  liveIndicator: {
-    display: "flex",
-    alignItems: "center",
-    gap: "6px",
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    padding: "6px 12px",
-    borderRadius: "20px",
-    fontSize: "12px",
-    fontWeight: "600",
-  },
-  liveDot: {
-    width: "8px",
-    height: "8px",
-    backgroundColor: "#ff4444",
-    borderRadius: "50%",
-    animation: "pulse 2s infinite",
-  },
-  map: {
-    width: "100%",
-    height: "400px",
-    flexShrink: 0,
-  },
-  infoPanel: {
-    padding: "24px",
-    backgroundColor: "#f8f9fa",
-    overflowY: "auto",
-    flexGrow: 1,
-  },
-  etaCard: {
-    backgroundColor: "#4CAF50",
-    color: "white",
-    marginBottom: "16px",
-    display: "flex",
-    alignItems: "center",
-    gap: "16px",
-    padding: "20px",
-  },
-  etaIcon: {
-    fontSize: "36px",
-  },
-  etaLabel: {
-    fontSize: "13px",
-    opacity: 0.9,
-    marginBottom: "4px",
-  },
-  etaValue: {
-    fontSize: "28px",
-    fontWeight: "700",
-  },
-  infoGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-    gap: "12px",
-    marginBottom: "16px",
-  },
-  infoCard: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    padding: "16px",
-    backgroundColor: "white",
-    borderRadius: "12px",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.08)",
-  },
-  cardIcon: {
-    fontSize: "28px",
-  },
-  cardLabel: {
-    fontSize: "12px",
-    color: "#6c757d",
-    marginBottom: "4px",
-  },
-  cardValue: {
-    fontSize: "16px",
-    fontWeight: "600",
-    color: "#212529",
-  },
-  callBtn: {
-    width: "100%",
-    padding: "16px",
-    backgroundColor: "#4CAF50",
-    color: "white",
-    border: "none",
-    borderRadius: "12px",
-    fontSize: "16px",
-    fontWeight: "600",
-    cursor: "pointer",
-    transition: "all 0.2s",
-    marginBottom: "12px",
-  },
-  lastUpdate: {
-    textAlign: "center",
-    fontSize: "12px",
-    color: "#6c757d",
-  },
-  loader: {
-    padding: "60px 40px",
-    textAlign: "center",
-  },
-  spinner: {
-    width: "50px",
-    height: "50px",
-    margin: "0 auto 20px",
-    border: "4px solid #f3f3f3",
-    borderTop: "4px solid #4CAF50",
-    borderRadius: "50%",
-    animation: "spin 1s linear infinite",
-  },
-  loaderText: {
-    color: "#6c757d",
-    fontSize: "16px",
-  },
-  errorContainer: {
-    padding: "40px 20px",
-    textAlign: "center",
-  },
-  errorIcon: {
-    fontSize: "48px",
-    marginBottom: "16px",
-  },
-  errorTitle: {
-    color: "#212529",
-    marginBottom: "8px",
-  },
-  errorMessage: {
-    color: "#dc3545",
-    marginBottom: "20px",
-  },
-  retryBtn: {
-    padding: "12px 32px",
-    backgroundColor: "#4CAF50",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-    fontSize: "14px",
-    fontWeight: "600",
-  },
-};
-
-// Add animations
-if (typeof document !== "undefined") {
-  const styleSheet = document.createElement("style");
-  styleSheet.textContent = `
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-  `;
-  if (!document.querySelector("#tracking-animations")) {
-    styleSheet.id = "tracking-animations";
-    document.head.appendChild(styleSheet);
-  }
-}
 
 export default LiveTracking;

@@ -49,12 +49,12 @@ const Orders1 = () => {
   const { isSignedIn } = useUser();
   const { getToken }   = useAuth();
 
-  const [orders, setOrders]                   = useState([]);
-  const [loading, setLoading]                 = useState(true);
-  const [error, setError]                     = useState("");
-  const [trackingOrderId, setTrackingOrderId] = useState(null);
-  const [payingOrderId, setPayingOrderId]     = useState(null);
-  const [cancellingId, setCancellingId]       = useState(null);
+  const [orders, setOrders]               = useState([]);
+  const [loading, setLoading]             = useState(true);
+  const [error, setError]                 = useState("");
+  const [trackingOrder, setTrackingOrder] = useState(null); // holds full order object
+  const [payingOrderId, setPayingOrderId] = useState(null);
+  const [cancellingId, setCancellingId]   = useState(null);
 
   const fetchOrders = async () => {
     if (!isSignedIn) return;
@@ -282,7 +282,7 @@ const Orders1 = () => {
 
                     {/* Track — only when driver is on route */}
                     {canTrack && (
-                      <button className="action-btn btn-track" onClick={() => setTrackingOrderId(order._id)}>
+                      <button className="action-btn btn-track" onClick={() => setTrackingOrder(order)}>
                         <Map size={13} strokeWidth={2} />
                         Track Driver Live
                       </button>
@@ -334,11 +334,10 @@ const Orders1 = () => {
       </div>
 
       {/* Live tracking modal */}
-      {trackingOrderId && (
+      {trackingOrder && (
         <LiveTracking
-          orderId={trackingOrderId}
-          onClose={() => setTrackingOrderId(null)}
-          getToken={getToken}
+          order={trackingOrder}
+          onClose={() => setTrackingOrder(null)}
         />
       )}
     </div>
