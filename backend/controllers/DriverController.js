@@ -1,28 +1,20 @@
 // backend/controllers/DriverController.js
 // ═══════════════════════════════════════════════════════════════════════════════
-// Handles all driver-facing API logic:
-//   POST   /api/drivers/login                — phone + password → JWT
-//   GET    /api/drivers/available            — delivery orders with no driver
-//   GET    /api/drivers/mine                 — this driver's orders
-//   PUT    /api/drivers/:orderId/accept      — claim an order
-//   PUT    /api/drivers/:orderId/status      — mark Delivered
-//   PUT    /api/drivers/location             — push GPS update
-//   GET    /api/drivers                      — admin: list all drivers
-//   POST   /api/drivers                      — admin: create driver
-//   PUT    /api/drivers/:id                  — admin: update driver
-//   DELETE /api/drivers/:id                  — admin: remove driver
-//   POST   /api/drivers/seed                 — dev: seed sample drivers
-//   GET    /api/drivers/stats                — admin: dashboard stats
+// Handles all /api/drivers/* logic.
+// KEY FIX: updateLocation now writes to Order.currentDriverLocation AND
+//          updates the in-memory driverLocationCache in trackingService.
+//          This means REST polling (/api/orders/:id/driver-location) always
+//          has fresh data even when WebSocket is down.
 // ═══════════════════════════════════════════════════════════════════════════════
 import jwt    from 'jsonwebtoken';
 import Driver from '../models/DriverModel.js';
 import Order  from '../models/OrderModel.js';
+import { driverLocationCache } from '../services/trackingService.js';
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 const signToken = (driverId) =>
   jwt.sign({ driverId }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
-// Strip password and return a clean driver object + token
 const safeDriver = (driver) => {
   const obj = driver.toObject ? driver.toObject() : { ...driver };
   delete obj.password;
@@ -31,8 +23,6 @@ const safeDriver = (driver) => {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/drivers/login
-// Body: { phone, password }
-// Returns: { success, driver, token }
 // ─────────────────────────────────────────────────────────────────────────────
 export const driverLogin = async (req, res) => {
   try {
@@ -45,9 +35,8 @@ export const driverLogin = async (req, res) => {
       });
     }
 
-    // Find by phone first, fall back to email
-    const query = phone ? { phone } : { email: email.toLowerCase() };
-    const driver = await Driver.findOne(query).select('+password'); // re-include hidden field
+    const query  = phone ? { phone } : { email: email.toLowerCase() };
+    const driver = await Driver.findOne(query).select('+password');
 
     if (!driver) {
       return res.status(401).json({ success: false, message: 'Invalid credentials.' });
@@ -58,7 +47,6 @@ export const driverLogin = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid credentials.' });
     }
 
-    // Update last login
     driver.lastLogin  = new Date();
     driver.lastActive = new Date();
     if (driver.status === 'offline') {
@@ -68,14 +56,13 @@ export const driverLogin = async (req, res) => {
     await driver.save();
 
     const token = signToken(driver._id.toString());
-
     console.log(`✅ Driver logged in: ${driver.driverId} (${driver.firstName} ${driver.lastName})`);
 
     res.json({
       success: true,
       message: 'Login successful',
-      driver:  safeDriver(driver),    // driver app reads data.driver OR data.data
-      data:    safeDriver(driver),    // belt-and-suspenders: both keys present
+      driver:  safeDriver(driver),
+      data:    safeDriver(driver), // belt-and-suspenders
       token,
     });
   } catch (error) {
@@ -85,25 +72,20 @@ export const driverLogin = async (req, res) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// GET /api/drivers/available   (requires driverAuth)
-// Returns all delivery orders that have no driver assigned yet
-// and are in a state a driver can pick up (Order Received / Cargo Packed)
+// GET /api/drivers/available   (driverAuth)
 // ─────────────────────────────────────────────────────────────────────────────
 export const getAvailableOrders = async (req, res) => {
   try {
     const orders = await Order.find({
-      // Delivery orders only (has a delivery address with GPS)
       'address.latitude':  { $exists: true, $ne: null },
       'address.longitude': { $exists: true, $ne: null },
-      // No driver assigned yet
       $or: [
         { 'driver.id': null },
         { 'driver.id': { $exists: false } },
         { 'driver.id': '' },
       ],
-      // Not yet in transit or completed
       status: { $in: ['Order Received', 'Cargo Packed'] },
-    }).sort({ createdAt: 1 }); // oldest first so urgent orders surface first
+    }).sort({ createdAt: 1 });
 
     res.json({ success: true, orders });
   } catch (error) {
@@ -113,17 +95,11 @@ export const getAvailableOrders = async (req, res) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// GET /api/drivers/mine   (requires driverAuth)
-// Returns all orders assigned to the logged-in driver
+// GET /api/drivers/mine   (driverAuth)
 // ─────────────────────────────────────────────────────────────────────────────
 export const getMyOrders = async (req, res) => {
   try {
-    const driverId = req.driverId;
-
-    const orders = await Order.find({
-      'driver.id': driverId,
-    }).sort({ updatedAt: -1 });
-
+    const orders = await Order.find({ 'driver.id': req.driverId }).sort({ updatedAt: -1 });
     res.json({ success: true, orders });
   } catch (error) {
     console.error('❌ getMyOrders error:', error);
@@ -132,34 +108,26 @@ export const getMyOrders = async (req, res) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PUT /api/drivers/:orderId/accept   (requires driverAuth)
-// Body: { driverName, driverPhone }
-// Claims an order — sets driver fields, moves status to "Cargo on Route"
+// PUT /api/drivers/:orderId/accept   (driverAuth)
 // ─────────────────────────────────────────────────────────────────────────────
 export const acceptOrder = async (req, res) => {
   try {
-    const { orderId } = req.params;
+    const { orderId }              = req.params;
     const { driverName, driverPhone } = req.body;
-    const driverId = req.driverId;
-    const driver   = req.driver;
+    const driverId                 = req.driverId;
+    const driver                   = req.driver;
 
     const order = await Order.findById(orderId);
     if (!order) {
       return res.status(404).json({ success: false, message: 'Order not found.' });
     }
-
-    // Check it's still unclaimed (race condition guard)
     if (order.driver?.id && order.driver.id !== '') {
-      return res.status(409).json({
-        success: false,
-        message: 'Order was already claimed by another driver.',
-      });
+      return res.status(409).json({ success: false, message: 'Order already claimed by another driver.' });
     }
 
     const name  = driverName  || `${driver.firstName} ${driver.lastName}`;
     const phone = driverPhone || driver.phone;
 
-    // Write to both driver sub-object (new) and flat fields (legacy compat)
     order.driver = {
       id:      driverId,
       name,
@@ -177,7 +145,6 @@ export const acceptOrder = async (req, res) => {
 
     await order.save();
 
-    // Update driver's currentDelivery + status
     await Driver.findByIdAndUpdate(driverId, {
       status:          'on-delivery',
       isAvailable:     false,
@@ -185,14 +152,13 @@ export const acceptOrder = async (req, res) => {
       lastActive:      new Date(),
     });
 
-    // Emit real-time event to admin / customer via Socket.IO if io is available
+    // Emit via Socket.IO (trackingService will relay to subscribers)
     const io = req.app.get('io');
     if (io) {
       io.emit('ORDER_STATUS_UPDATE', { orderId: order._id, status: order.status, driver: order.driver });
     }
 
     console.log(`✅ Order ${order._id} accepted by driver ${driverId}`);
-
     res.json({ success: true, message: 'Order accepted! Start your delivery.', order });
   } catch (error) {
     console.error('❌ acceptOrder error:', error);
@@ -201,9 +167,7 @@ export const acceptOrder = async (req, res) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PUT /api/drivers/:orderId/status   (requires driverAuth)
-// Body: { status: 'Delivered' }
-// Only "Delivered" is accepted from the driver side for safety
+// PUT /api/drivers/:orderId/status   (driverAuth)
 // ─────────────────────────────────────────────────────────────────────────────
 export const updateDeliveryStatus = async (req, res) => {
   try {
@@ -211,7 +175,6 @@ export const updateDeliveryStatus = async (req, res) => {
     const { status }  = req.body;
     const driverId    = req.driverId;
 
-    // Drivers may only mark as Delivered
     if (status !== 'Delivered') {
       return res.status(400).json({
         success: false,
@@ -223,28 +186,19 @@ export const updateDeliveryStatus = async (req, res) => {
     if (!order) {
       return res.status(404).json({ success: false, message: 'Order not found.' });
     }
-
-    // Ensure the order belongs to this driver
     if (order.driver?.id !== driverId) {
-      return res.status(403).json({
-        success: false,
-        message: 'This order is not assigned to you.',
-      });
+      return res.status(403).json({ success: false, message: 'This order is not assigned to you.' });
     }
 
-    order.status              = 'Delivered';
-    order.cancellable         = false;
-    order.trackingEnabled     = false;
-    order.actualDeliveryTime  = new Date();
+    order.status             = 'Delivered';
+    order.cancellable        = false;
+    order.trackingEnabled    = false;
+    order.actualDeliveryTime = new Date();
 
-    // Auto-mark COD orders as paid on delivery
-    if (order.paymentMethod === 'cod') {
-      order.paymentStatus = 'Paid';
-    }
+    if (order.paymentMethod === 'cod') order.paymentStatus = 'Paid';
 
     await order.save();
 
-    // Free driver back to available
     await Driver.findByIdAndUpdate(driverId, {
       status:          'active',
       isAvailable:     true,
@@ -253,15 +207,16 @@ export const updateDeliveryStatus = async (req, res) => {
       $inc:            { 'performance.completedDeliveries': 1, 'performance.totalDeliveries': 1 },
     });
 
-    // Emit real-time event
+    // Clean up location cache
+    delete driverLocationCache[orderId];
+
     const io = req.app.get('io');
     if (io) {
-      io.emit('ORDER_STATUS_UPDATE', { orderId: order._id, status: 'Delivered' });
-      io.emit('DELIVERY_STATUS_UPDATE', { orderId: order._id, status: 'Delivered' }); // customer tracking
+      io.emit('ORDER_STATUS_UPDATE',    { orderId: order._id, status: 'Delivered' });
+      io.emit('DELIVERY_STATUS_UPDATE', { orderId: order._id, status: 'Delivered' });
     }
 
     console.log(`✅ Order ${order._id} marked Delivered by driver ${driverId}`);
-
     res.json({ success: true, message: 'Order marked as delivered!', order });
   } catch (error) {
     console.error('❌ updateDeliveryStatus error:', error);
@@ -270,40 +225,55 @@ export const updateDeliveryStatus = async (req, res) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PUT /api/drivers/location   (requires driverAuth)
+// PUT /api/drivers/location   (driverAuth)
 // Body: { orderId, latitude, longitude }
-// Driver app pushes GPS update every 5 s via both REST + Socket.IO
+//
+// KEY FIX: Now also updates driverLocationCache so that REST polling customers
+// get fresh location even when the Socket.IO relay hasn't reached them yet.
 // ─────────────────────────────────────────────────────────────────────────────
 export const updateLocation = async (req, res) => {
   try {
     const { orderId, latitude, longitude } = req.body;
     const driverId = req.driverId;
+    const driver   = req.driver;
 
     if (!latitude || !longitude) {
       return res.status(400).json({ success: false, message: 'latitude and longitude required.' });
     }
 
-    // Persist location to Driver doc
+    // 1. Persist to Driver.currentLocation (GeoJSON)
     await Driver.findByIdAndUpdate(driverId, {
       currentLocation:    { type: 'Point', coordinates: [longitude, latitude] },
       lastLocationUpdate: new Date(),
       lastActive:         new Date(),
     });
 
-    // Persist to Order.currentDriverLocation for historical trail
+    // 2. Persist to Order.currentDriverLocation for REST polling fallback
     if (orderId) {
       await Order.findByIdAndUpdate(orderId, {
         currentDriverLocation: { latitude, longitude, timestamp: new Date() },
       });
+
+      // 3. CRITICAL: Update in-memory cache — this is what /:id/driver-location reads
+      const driverName = driver
+        ? `${driver.firstName || ''} ${driver.lastName || ''}`.trim() || 'Driver'
+        : 'Driver';
+
+      driverLocationCache[orderId] = {
+        lat:        latitude,
+        lng:        longitude,
+        driverName,
+        updatedAt:  new Date(),
+      };
     }
 
-    // Broadcast to admin and customer via Socket.IO
+    // 4. Broadcast to Socket.IO subscribers (admin panel + any Socket.IO customer)
     const io = req.app.get('io');
     if (io && orderId) {
       io.emit('DRIVER_LOCATION_UPDATE', {
         orderId,
         driverId,
-        location: { lat: latitude, lng: longitude },
+        location:  { lat: latitude, lng: longitude },
         timestamp: new Date(),
       });
     }
@@ -316,7 +286,7 @@ export const updateLocation = async (req, res) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// GET /api/drivers/stats   (admin — no auth guard added here, add if needed)
+// GET /api/drivers/stats   (admin)
 // ─────────────────────────────────────────────────────────────────────────────
 export const getDriverStats = async (req, res) => {
   try {
@@ -326,7 +296,6 @@ export const getDriverStats = async (req, res) => {
       Driver.countDocuments({ status: 'on-delivery' }),
       Driver.countDocuments({ status: 'offline' }),
     ]);
-
     res.json({ success: true, data: { total, active, onDelivery, offline } });
   } catch (error) {
     console.error('❌ getDriverStats error:', error);
@@ -341,7 +310,7 @@ export const getAllDrivers = async (req, res) => {
   try {
     const { status, available } = req.query;
     const query = {};
-    if (status)    query.status      = status;
+    if (status)              query.status      = status;
     if (available !== undefined) query.isAvailable = available === 'true';
 
     const drivers = await Driver.find(query)
@@ -361,17 +330,15 @@ export const getAllDrivers = async (req, res) => {
 export const createDriver = async (req, res) => {
   try {
     const { password, ...rest } = req.body;
-
     if (!password) {
       return res.status(400).json({ success: false, message: 'Password is required.' });
     }
 
-    // Auto-generate profile image from initials
-    const initials = `${rest.firstName?.charAt(0) || 'D'}${rest.lastName?.charAt(0) || 'R'}`;
+    const initials    = `${rest.firstName?.charAt(0) || 'D'}${rest.lastName?.charAt(0) || 'R'}`;
     const profileImage = `https://ui-avatars.com/api/?name=${initials}&background=10b981&color=fff&size=150&bold=true`;
 
     const driver = new Driver({ ...rest, password, profileImage });
-    await driver.save(); // pre-save hook hashes password + generates driverId
+    await driver.save();
 
     res.status(201).json({
       success: true,
@@ -380,7 +347,6 @@ export const createDriver = async (req, res) => {
     });
   } catch (error) {
     console.error('❌ createDriver error:', error);
-    // Duplicate key errors (email / phone already used)
     if (error.code === 11000) {
       const field = Object.keys(error.keyPattern)[0];
       return res.status(400).json({ success: false, message: `${field} is already registered.` });
@@ -395,17 +361,15 @@ export const createDriver = async (req, res) => {
 export const updateDriver = async (req, res) => {
   try {
     const { password, ...updateData } = req.body;
-
     const driver = await Driver.findById(req.params.id).select('+password');
     if (!driver) {
       return res.status(404).json({ success: false, message: 'Driver not found.' });
     }
 
     Object.assign(driver, updateData);
-    if (password) driver.password = password; // pre-save hook hashes it
+    if (password) driver.password = password;
 
     await driver.save();
-
     res.json({ success: true, message: 'Driver updated.', driver: safeDriver(driver) });
   } catch (error) {
     console.error('❌ updateDriver error:', error);
@@ -431,8 +395,6 @@ export const deleteDriver = async (req, res) => {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/drivers/seed   (dev / initial setup)
-// Seeds 3 sample drivers so you can test login immediately.
-// Default password for all: driver123
 // ─────────────────────────────────────────────────────────────────────────────
 export const seedDrivers = async (req, res) => {
   try {
@@ -447,7 +409,7 @@ export const seedDrivers = async (req, res) => {
 
     const samples = [
       {
-        firstName: 'John',      lastName: 'Mwangi',
+        firstName: 'John', lastName: 'Mwangi',
         email: 'john.mwangi@bens.com', phone: '+254712345678',
         password: 'driver123',
         licenseNumber: 'DL123456', vehicleType: 'motorcycle',
@@ -456,7 +418,7 @@ export const seedDrivers = async (req, res) => {
         currentLocation: { type: 'Point', coordinates: [36.8219, -1.2921] },
       },
       {
-        firstName: 'Mary',      lastName: 'Kamau',
+        firstName: 'Mary', lastName: 'Kamau',
         email: 'mary.kamau@bens.com', phone: '+254723456789',
         password: 'driver123',
         licenseNumber: 'DL234567', vehicleType: 'car',
@@ -465,7 +427,7 @@ export const seedDrivers = async (req, res) => {
         currentLocation: { type: 'Point', coordinates: [36.8300, -1.2800] },
       },
       {
-        firstName: 'Peter',     lastName: 'Ochieng',
+        firstName: 'Peter', lastName: 'Ochieng',
         email: 'peter.ochieng@bens.com', phone: '+254734567890',
         password: 'driver123',
         licenseNumber: 'DL345678', vehicleType: 'motorcycle',
@@ -475,7 +437,6 @@ export const seedDrivers = async (req, res) => {
       },
     ];
 
-    // Use create() so the pre-save hook runs per document (hashes passwords + generates IDs)
     const created = [];
     for (const d of samples) {
       const doc = new Driver(d);
@@ -484,7 +445,6 @@ export const seedDrivers = async (req, res) => {
     }
 
     console.log(`✅ Seeded ${created.length} sample drivers`);
-
     res.status(201).json({
       success: true,
       count:   created.length,

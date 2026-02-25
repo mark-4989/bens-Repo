@@ -1,347 +1,301 @@
 // backend/services/trackingService.js
-// Real-time GPS tracking service for e-commerce delivery system
+// ═══════════════════════════════════════════════════════════════════════════════
+// Real-time GPS tracking — bridges raw WebSocket clients (driver app + customer
+// LiveTracking) with Socket.IO named-event clients (admin panel).
+//
+// ROOT CAUSE FIXED:
+//   Driver app uses:  new WebSocket(url)  →  sends { type: 'DRIVER_LOCATION_UPDATE', ... }
+//   Old service used: socket.on('driver:location:update', ...)  ← NEVER matched
+//
+//   Raw WebSocket frames arrive on the 'message' event in Socket.IO.
+//   We parse those AND keep named-event handlers so both client types work.
+// ═══════════════════════════════════════════════════════════════════════════════
 
 let io;
 
-// Track connections by role
-const adminClients = new Map();      // socketId → socket (admins watching deliveries)
-const driverClients = new Map();     // driverId → socket (drivers sending GPS)
-const customerClients = new Map();   // userId → socket (customers tracking orders)
-const orderSubscriptions = new Map(); // orderId → Set of socketIds
+// ── Connection maps ────────────────────────────────────────────────────────────
+const adminClients    = new Map(); // socketId → socket
+const driverClients   = new Map(); // driverId → socket
+const customerClients = new Map(); // userId   → socket
+const orderSubscriptions = new Map(); // orderId → Set<socketId>
 
-/**
- * Initialize Socket.IO tracking service
- * @param {Server} socketIo - Socket.IO server instance
- */
+// ── In-memory location cache ───────────────────────────────────────────────────
+// Written every time a DRIVER_LOCATION_UPDATE arrives.
+// Read by REST polling endpoint GET /api/orders/:id/driver-location.
+export const driverLocationCache = {};
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+const addSubscriber = (orderId, socketId) => {
+  if (!orderSubscriptions.has(orderId)) orderSubscriptions.set(orderId, new Set());
+  orderSubscriptions.get(orderId).add(socketId);
+};
+
+const removeSubscriber = (orderId, socketId) => {
+  const subs = orderSubscriptions.get(orderId);
+  if (!subs) return;
+  subs.delete(socketId);
+  if (subs.size === 0) orderSubscriptions.delete(orderId);
+};
+
+// Send to ALL sockets subscribed to an order EXCEPT the sender
+const relayToOrder = (orderId, senderSocketId, rawPayload, namedEvent, namedPayload) => {
+  const subs = orderSubscriptions.get(orderId);
+  if (!subs) return;
+  subs.forEach((sid) => {
+    if (sid === senderSocketId) return; // don't echo back
+    const sock = io?.sockets?.sockets?.get(sid);
+    if (!sock) return;
+    // Raw WS clients receive 'message' event with JSON string
+    sock.emit('message', typeof rawPayload === 'string' ? rawPayload : JSON.stringify(rawPayload));
+    // Socket.IO clients receive named events
+    if (namedEvent) sock.emit(namedEvent, namedPayload || rawPayload);
+  });
+};
+
+// ── Core message dispatcher ────────────────────────────────────────────────────
+// Called for BOTH raw WebSocket 'message' events AND Socket.IO named events.
+const dispatch = (socket, msg) => {
+  const { type } = msg;
+
+  // ── DRIVER_REGISTER ─────────────────────────────────────────────────────────
+  if (type === 'DRIVER_REGISTER') {
+    const { driverId, driverName } = msg;
+    driverClients.set(driverId, socket);
+    socket.role       = 'driver';
+    socket.driverId   = driverId;
+    socket.driverName = driverName;
+    console.log(`🚗 Driver registered: ${driverName} (${driverId})`);
+
+    // ACK in raw format so driver app console confirms connection
+    socket.emit('message', JSON.stringify({
+      type: 'DRIVER_REGISTERED',
+      driverId,
+      driverName,
+      timestamp: new Date().toISOString(),
+    }));
+    socket.emit('driver:registered', { driverId, driverName, timestamp: new Date().toISOString() });
+    return;
+  }
+
+  // ── DRIVER_LOCATION_UPDATE ──────────────────────────────────────────────────
+  if (type === 'DRIVER_LOCATION_UPDATE') {
+    const { orderId, location, driverId, driverName } = msg;
+    const resolvedDriverId   = driverId   || socket.driverId   || 'unknown';
+    const resolvedDriverName = driverName || socket.driverName || 'Driver';
+
+    if (!orderId || !location?.lat || !location?.lng) {
+      console.warn('⚠️  DRIVER_LOCATION_UPDATE missing orderId or location');
+      return;
+    }
+
+    // 1. Update in-memory cache (read by REST polling fallback)
+    driverLocationCache[orderId] = {
+      lat:        location.lat,
+      lng:        location.lng,
+      driverName: resolvedDriverName,
+      updatedAt:  new Date(),
+    };
+
+    console.log(
+      `📍 ${resolvedDriverName}: [${location.lat.toFixed(5)}, ${location.lng.toFixed(5)}] → order ${orderId.slice(-6)}`
+    );
+
+    // 2. Build the outbound payloads
+    const rawOut = JSON.stringify({
+      type:       'DRIVER_LOCATION_UPDATE',
+      orderId,
+      driverId:   resolvedDriverId,
+      driverName: resolvedDriverName,
+      location,
+      timestamp:  new Date().toISOString(),
+    });
+    const namedOut = {
+      type: 'location:update', orderId,
+      driverId: resolvedDriverId, driverName: resolvedDriverName,
+      location, timestamp: new Date().toISOString(),
+    };
+
+    // 3. Relay to all order subscribers (customers + watching admins)
+    relayToOrder(orderId, socket.id, rawOut, 'driver:location:update', namedOut);
+
+    // 4. Also push to all-watching admins who aren't subscribed to a specific order
+    adminClients.forEach((adminSock) => {
+      if (adminSock.watchAll && adminSock.id !== socket.id) {
+        adminSock.emit('message', rawOut);
+        adminSock.emit('driver:location:update', namedOut);
+      }
+    });
+    return;
+  }
+
+  // ── ADMIN_SUBSCRIBE_ORDER (raw WS name used by customer LiveTracking.jsx) ───
+  if (type === 'ADMIN_SUBSCRIBE_ORDER') {
+    const { orderId } = msg;
+    if (!orderId) return;
+
+    addSubscriber(orderId, socket.id);
+    socket.role = socket.role || 'subscriber';
+    socket.subscribedOrder = orderId;
+    adminClients.set(socket.id, socket);
+
+    console.log(`👁️  Socket ${socket.id} (${socket.role}) subscribed to order ${orderId.slice(-6)}`);
+
+    // ACK in raw format
+    socket.emit('message', JSON.stringify({
+      type: 'SUBSCRIBED', orderId, timestamp: new Date().toISOString(),
+    }));
+    socket.emit('subscribed', { orderId, timestamp: new Date().toISOString() });
+
+    // Immediately send cached location if we have one
+    const cached = driverLocationCache[orderId];
+    if (cached) {
+      console.log(`📦 Sending cached location for order ${orderId.slice(-6)}`);
+      const cachedMsg = JSON.stringify({
+        type:       'DRIVER_LOCATION_UPDATE',
+        orderId,
+        driverName: cached.driverName,
+        location:   { lat: cached.lat, lng: cached.lng },
+        timestamp:  cached.updatedAt.toISOString(),
+      });
+      socket.emit('message', cachedMsg);
+      socket.emit('driver:location:update', {
+        type: 'location:update', orderId,
+        driverName: cached.driverName,
+        location: { lat: cached.lat, lng: cached.lng },
+        timestamp: cached.updatedAt.toISOString(),
+      });
+    }
+    return;
+  }
+
+  // ── DELIVERY_STATUS_UPDATE ──────────────────────────────────────────────────
+  if (type === 'DELIVERY_STATUS_UPDATE') {
+    const { orderId, status, driverId } = msg;
+    const rawOut = JSON.stringify({ type, orderId, status, driverId, timestamp: new Date().toISOString() });
+    relayToOrder(orderId, socket.id, rawOut, 'delivery:status:update', { orderId, status, driverId });
+    adminClients.forEach((s) => {
+      s.emit('message', rawOut);
+      s.emit('delivery:status:update', { orderId, status, driverId });
+    });
+    return;
+  }
+};
+
+// ── Initialize ─────────────────────────────────────────────────────────────────
 export const initializeTracking = (socketIo) => {
   io = socketIo;
 
   io.on('connection', (socket) => {
-    console.log('📡 New Socket.IO connection:', socket.id);
+    console.log('📡 New connection:', socket.id);
 
-    // ════════════════════════════════════════════════════
-    // ADMIN: SUBSCRIBE TO SPECIFIC ORDER
-    // ════════════════════════════════════════════════════
-    socket.on('admin:subscribe:order', (data) => {
-      const { orderId } = data;
-      
-      adminClients.set(socket.id, socket);
-      socket.role = 'admin';
-      socket.subscribedOrder = orderId;
-      
-      // Add to order subscriptions
-      if (!orderSubscriptions.has(orderId)) {
-        orderSubscriptions.set(orderId, new Set());
+    // ════════════════════════════════════════════════════════
+    // RAW WEBSOCKET messages — driver app + customer LiveTracking
+    // Socket.IO delivers plain WS frames as the 'message' event.
+    // ════════════════════════════════════════════════════════
+    socket.on('message', (data) => {
+      try {
+        const msg = typeof data === 'string' ? JSON.parse(data) : data;
+        dispatch(socket, msg);
+      } catch (err) {
+        console.error('❌ Bad WS message:', err.message);
       }
-      orderSubscriptions.get(orderId).add(socket.id);
-      
-      console.log(`👁️  Admin ${socket.id} subscribed to order: ${orderId}`);
-      
-      socket.emit('subscribed', {
-        orderId,
-        timestamp: new Date().toISOString()
-      });
     });
 
-    // ════════════════════════════════════════════════════
-    // ADMIN: WATCH ALL DELIVERIES
-    // ════════════════════════════════════════════════════
+    // ════════════════════════════════════════════════════════
+    // SOCKET.IO NAMED EVENTS — admin panel / future clients
+    // ════════════════════════════════════════════════════════
+    socket.on('driver:register',        (d) => dispatch(socket, { type: 'DRIVER_REGISTER',        ...d }));
+    socket.on('driver:location:update', (d) => dispatch(socket, { type: 'DRIVER_LOCATION_UPDATE', ...d }));
+    socket.on('admin:subscribe:order',  (d) => dispatch(socket, { type: 'ADMIN_SUBSCRIBE_ORDER',  ...d }));
+    socket.on('delivery:status:update', (d) => dispatch(socket, { type: 'DELIVERY_STATUS_UPDATE', ...d }));
+
+    // Admin watch-all  
     socket.on('admin:watch:all', () => {
       adminClients.set(socket.id, socket);
-      socket.role = 'admin';
+      socket.role     = 'admin';
       socket.watchAll = true;
-      
       console.log(`👁️  Admin ${socket.id} watching all deliveries`);
-      
-      socket.emit('watching:all', {
-        timestamp: new Date().toISOString()
-      });
+      socket.emit('watching:all', { timestamp: new Date().toISOString() });
     });
 
-    // ════════════════════════════════════════════════════
-    // CUSTOMER: SUBSCRIBE TO THEIR ORDER
-    // ════════════════════════════════════════════════════
-    socket.on('customer:subscribe:order', (data) => {
-      const { orderId, userId } = data;
-      
+    // Customer subscribe (Socket.IO style, keeps backward compat)
+    socket.on('customer:subscribe:order', ({ orderId, userId }) => {
       customerClients.set(userId, socket);
-      socket.role = 'customer';
-      socket.userId = userId;
+      socket.role           = 'customer';
+      socket.userId         = userId;
       socket.subscribedOrder = orderId;
-      
-      // Add to order subscriptions
-      if (!orderSubscriptions.has(orderId)) {
-        orderSubscriptions.set(orderId, new Set());
-      }
-      orderSubscriptions.get(orderId).add(socket.id);
-      
-      console.log(`👤 Customer ${userId} subscribed to order: ${orderId}`);
-      
-      socket.emit('subscribed', {
-        orderId,
-        timestamp: new Date().toISOString()
-      });
+      addSubscriber(orderId, socket.id);
+      console.log(`👤 Customer ${userId} subscribed to order ${orderId.slice(-6)}`);
+      socket.emit('subscribed', { orderId, timestamp: new Date().toISOString() });
     });
 
-    // ════════════════════════════════════════════════════
-    // DRIVER: REGISTER
-    // ════════════════════════════════════════════════════
-    socket.on('driver:register', (data) => {
-      const { driverId, driverName } = data;
-      
-      driverClients.set(driverId, socket);
-      socket.role = 'driver';
-      socket.driverId = driverId;
-      socket.driverName = driverName;
-      
-      console.log(`🚗 Driver registered: ${driverName} (${driverId})`);
-      
-      socket.emit('driver:registered', {
-        driverId,
-        driverName,
-        timestamp: new Date().toISOString()
-      });
-    });
+    // Ping/pong
+    socket.on('ping', () => socket.emit('pong', { timestamp: new Date().toISOString() }));
 
-    // ════════════════════════════════════════════════════
-    // DRIVER: SEND GPS LOCATION UPDATE
-    // ════════════════════════════════════════════════════
-    socket.on('driver:location:update', (data) => {
-      const { driverId, orderId, location } = data;
-      const driverName = socket.driverName || 'Driver';
-      
-      const payload = {
-        type: 'location:update',
-        driverId,
-        driverName,
-        orderId,
-        location, // { lat, lng }
-        timestamp: new Date().toISOString()
-      };
-
-      // Log location update
-      if (location?.lat && location?.lng) {
-        console.log(
-          `📍 Location from ${driverName}: [${location.lat.toFixed(5)}, ${location.lng.toFixed(5)}] for order ${orderId}`
-        );
-      }
-
-      // Broadcast to all subscribers of this order
-      const subscribers = orderSubscriptions.get(orderId);
-      if (subscribers) {
-        subscribers.forEach((subscriberSocketId) => {
-          const subscriberSocket = io.sockets.sockets.get(subscriberSocketId);
-          if (subscriberSocket) {
-            subscriberSocket.emit('driver:location:update', payload);
-          }
-        });
-      }
-
-      // Broadcast to all-watching admins
-      adminClients.forEach((adminSocket) => {
-        if (adminSocket.watchAll) {
-          adminSocket.emit('driver:location:update', payload);
-        }
-      });
-    });
-
-    // ════════════════════════════════════════════════════
-    // DELIVERY STATUS UPDATE
-    // ════════════════════════════════════════════════════
-    socket.on('delivery:status:update', (data) => {
-      const { orderId, status, driverId } = data;
-      
-      const payload = {
-        type: 'status:update',
-        orderId,
-        status,
-        driverId,
-        timestamp: new Date().toISOString()
-      };
-
-      console.log(`📦 Delivery status update: ${orderId} → ${status}`);
-
-      // Broadcast to all subscribers of this order
-      const subscribers = orderSubscriptions.get(orderId);
-      if (subscribers) {
-        subscribers.forEach((subscriberSocketId) => {
-          const subscriberSocket = io.sockets.sockets.get(subscriberSocketId);
-          if (subscriberSocket) {
-            subscriberSocket.emit('delivery:status:update', payload);
-          }
-        });
-      }
-
-      // Broadcast to all admins
-      adminClients.forEach((adminSocket) => {
-        adminSocket.emit('delivery:status:update', payload);
-      });
-    });
-
-    // ════════════════════════════════════════════════════
-    // NEW ORDER NOTIFICATION (from admin broadcast)
-    // ════════════════════════════════════════════════════
-    socket.on('order:broadcast', (data) => {
-      const { orderId, orderNumber, customerName, address, totalAmount } = data;
-      
-      const payload = {
-        type: 'order:available',
-        orderId,
-        orderNumber,
-        customerName,
-        address,
-        totalAmount,
-        timestamp: new Date().toISOString()
-      };
-
-      console.log(`📢 Broadcasting new order ${orderNumber} to all drivers`);
-
-      // Broadcast to all connected drivers
-      driverClients.forEach((driverSocket) => {
-        driverSocket.emit('order:available', payload);
-      });
-    });
-
-    // ════════════════════════════════════════════════════
-    // PING/PONG FOR CONNECTION HEALTH
-    // ════════════════════════════════════════════════════
-    socket.on('ping', () => {
-      socket.emit('pong', { timestamp: new Date().toISOString() });
-    });
-
-    // ════════════════════════════════════════════════════
-    // DISCONNECT HANDLER
-    // ════════════════════════════════════════════════════
+    // ════════════════════════════════════════════════════════
+    // DISCONNECT cleanup
+    // ════════════════════════════════════════════════════════
     socket.on('disconnect', () => {
-      console.log(`📡 Socket disconnected: ${socket.id} (${socket.role || 'unknown'})`);
+      console.log(`📡 Disconnected: ${socket.id} (${socket.role || 'unknown'})`);
 
-      // Clean up admin
-      if (socket.role === 'admin') {
-        adminClients.delete(socket.id);
-        
-        // Clean up order subscriptions
-        if (socket.subscribedOrder) {
-          const subs = orderSubscriptions.get(socket.subscribedOrder);
-          if (subs) {
-            subs.delete(socket.id);
-            if (subs.size === 0) {
-              orderSubscriptions.delete(socket.subscribedOrder);
-            }
-          }
-        }
-      }
-
-      // Clean up driver
-      if (socket.role === 'driver' && socket.driverId) {
-        driverClients.delete(socket.driverId);
-        console.log(`🚗 Driver disconnected: ${socket.driverId}`);
-      }
-
-      // Clean up customer
-      if (socket.role === 'customer' && socket.userId) {
-        customerClients.delete(socket.userId);
-        
-        // Clean up order subscriptions
-        if (socket.subscribedOrder) {
-          const subs = orderSubscriptions.get(socket.subscribedOrder);
-          if (subs) {
-            subs.delete(socket.id);
-            if (subs.size === 0) {
-              orderSubscriptions.delete(socket.subscribedOrder);
-            }
-          }
-        }
-        console.log(`👤 Customer disconnected: ${socket.userId}`);
-      }
+      if (socket.subscribedOrder) removeSubscriber(socket.subscribedOrder, socket.id);
+      adminClients.delete(socket.id);
+      if (socket.driverId)  driverClients.delete(socket.driverId);
+      if (socket.userId)    customerClients.delete(socket.userId);
     });
 
-    // ════════════════════════════════════════════════════
-    // ERROR HANDLER
-    // ════════════════════════════════════════════════════
-    socket.on('error', (error) => {
-      console.error(`❌ Socket error (${socket.id}):`, error.message);
-    });
+    socket.on('error', (err) => console.error(`❌ Socket error (${socket.id}):`, err.message));
   });
 
-  // Log stats every 60 seconds
   setInterval(() => {
-    console.log(`
-📊 Socket.IO Stats:
-   • Admin clients: ${adminClients.size}
-   • Driver clients: ${driverClients.size}
-   • Customer clients: ${customerClients.size}
-   • Active subscriptions: ${orderSubscriptions.size}
-    `);
+    console.log(
+      `📊 WS — admins:${adminClients.size} drivers:${driverClients.size}` +
+      ` customers:${customerClients.size} subscriptions:${orderSubscriptions.size}` +
+      ` cache:${Object.keys(driverLocationCache).length}`
+    );
   }, 60000);
 };
 
-/**
- * Broadcast new order to all drivers (called from HTTP route)
- */
+// ── Called from HTTP routes ────────────────────────────────────────────────────
 export const broadcastNewOrder = (orderData) => {
   if (!io) return;
-
-  const payload = {
-    type: 'order:available',
-    ...orderData,
-    timestamp: new Date().toISOString()
-  };
-
-  console.log(`📢 Broadcasting new order ${orderData.orderNumber} to ${driverClients.size} drivers`);
-
-  driverClients.forEach((driverSocket) => {
-    driverSocket.emit('order:available', payload);
+  const rawMsg = JSON.stringify({ type: 'NEW_ORDER_AVAILABLE', ...orderData, timestamp: new Date().toISOString() });
+  console.log(`📢 Broadcasting order to ${driverClients.size} drivers`);
+  driverClients.forEach((sock) => {
+    sock.emit('message',         rawMsg);         // raw WS (driver app)
+    sock.emit('order:available', orderData);       // Socket.IO
   });
 };
 
-/**
- * Notify status change (called from HTTP route)
- */
 export const notifyStatusChange = (orderId, status, driverId) => {
   if (!io) return;
+  const rawMsg  = JSON.stringify({ type: 'DELIVERY_STATUS_UPDATE', orderId, status, driverId, timestamp: new Date().toISOString() });
+  const payload = { orderId, status, driverId, timestamp: new Date().toISOString() };
+  console.log(`📦 Status: ${orderId.slice(-6)} → ${status}`);
 
-  const payload = {
-    type: 'status:update',
-    orderId,
-    status,
-    driverId,
-    timestamp: new Date().toISOString()
-  };
-
-  console.log(`📦 Notifying status change: ${orderId} → ${status}`);
-
-  // Notify subscribers
-  const subscribers = orderSubscriptions.get(orderId);
-  if (subscribers) {
-    subscribers.forEach((subscriberSocketId) => {
-      const socket = io.sockets.sockets.get(subscriberSocketId);
-      if (socket) {
-        socket.emit('delivery:status:update', payload);
+  const subs = orderSubscriptions.get(orderId);
+  if (subs) {
+    subs.forEach((sid) => {
+      const sock = io?.sockets?.sockets?.get(sid);
+      if (sock) {
+        sock.emit('message', rawMsg);
+        sock.emit('delivery:status:update', payload);
+        sock.emit('DELIVERY_STATUS_UPDATE',  payload); // extra alias for LiveTracking.jsx
       }
     });
   }
-
-  // Notify all admins
-  adminClients.forEach((adminSocket) => {
-    adminSocket.emit('delivery:status:update', payload);
+  adminClients.forEach((sock) => {
+    sock.emit('message', rawMsg);
+    sock.emit('delivery:status:update', payload);
   });
 };
 
-/**
- * Get connection stats
- */
-export const getStats = () => {
-  return {
-    adminClients: adminClients.size,
-    driverClients: driverClients.size,
-    customerClients: customerClients.size,
-    activeSubscriptions: orderSubscriptions.size,
-  };
-};
+export const getStats = () => ({
+  adminClients:        adminClients.size,
+  driverClients:       driverClients.size,
+  customerClients:     customerClients.size,
+  activeSubscriptions: orderSubscriptions.size,
+  cachedOrders:        Object.keys(driverLocationCache).length,
+});
 
-export default {
-  initializeTracking,
-  broadcastNewOrder,
-  notifyStatusChange,
-  getStats,
-};
+export default { initializeTracking, broadcastNewOrder, notifyStatusChange, getStats };
