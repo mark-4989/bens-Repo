@@ -18,6 +18,7 @@ const PlaceOrder = () => {
     products,
     navigate,
     currency,
+    clearCart,
   } = useContext(ShopContext);
 
   const [method, setMethod] = useState("cod");
@@ -186,6 +187,7 @@ const PlaceOrder = () => {
       console.log("📦 Order response:", data);
 
       if (data.success) {
+        clearCart();
         alert("✅ Order placed successfully!");
         navigate("/Orders1");
       } else {

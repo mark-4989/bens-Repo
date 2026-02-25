@@ -106,6 +106,13 @@ const ShopContextProvider = (props) => {
     setCartItems(cartData);
   };
 
+  // Clear entire cart (called after successful order)
+  const clearCart = () => {
+    setCartItems({});
+    localStorage.removeItem("cartItems");
+    console.log("🧹 Cart cleared after order");
+  };
+
   // Get cart amount
   const getCartAmount = () => {
     let totalAmount = 0;
@@ -153,11 +160,9 @@ const ShopContextProvider = (props) => {
     }
   }, []);
 
-  // Save cart to localStorage whenever it changes
+  // Save cart to localStorage whenever it changes (including when cleared)
   useEffect(() => {
-    if (Object.keys(cartItems).length > 0) {
-      localStorage.setItem("cartItems", JSON.stringify(cartItems));
-    }
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
   const value = {
@@ -172,6 +177,7 @@ const ShopContextProvider = (props) => {
     addToCart,
     getCartCount,
     updateQuantity,
+    clearCart,
     getCartAmount,
     backendUrl,
     loading,
