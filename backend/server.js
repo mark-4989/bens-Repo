@@ -11,6 +11,7 @@ import connectCloudinary from "./config/cloudinary.js";
 import userRouter from "./routes/UserRoute.js";
 import productRouter from "./routes/ProductRoute.js";
 import orderRouter from "./routes/OrderRoute.js";
+import driverRouter from "./routes/DriverRoute.js";           // ← NEW
 
 const app = express();
 const server = http.createServer(app);
@@ -26,6 +27,7 @@ const io = new Server(server, {
       'https://clientside-teal.vercel.app',
       'https://www.bens-repo.vercel.app',
       'https://www.clientside-teal.vercel.app',
+      'https://bens-repo-driver-app.vercel.app', // ← Driver PWA
       // Development URLs
       'http://localhost:5173', // Admin Dashboard
       'http://localhost:5174', // Client App
@@ -66,6 +68,7 @@ const corsOptions = {
     'https://clientside-teal.vercel.app',
     'https://www.bens-repo.vercel.app',
     'https://www.clientside-teal.vercel.app',
+    'https://bens-repo-driver-app.vercel.app', // ← Driver PWA
     'http://localhost:5173',
     'http://localhost:5174',
     'http://localhost:5175',
@@ -103,10 +106,11 @@ app.get('/', (req, res) => {
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
     endpoints: {
-      users: '/api/user',
-      products: '/api/product',
-      orders: '/api/orders',
-      health: '/health',
+      users:   '/api/user',
+      products:'/api/product',
+      orders:  '/api/orders',
+      drivers: '/api/drivers',  // ← NEW
+      health:  '/health',
     }
   });
 });
@@ -144,9 +148,10 @@ app.get('/health', (req, res) => {
 // ════════════════════════════════════════════════════════
 // API ROUTES
 // ════════════════════════════════════════════════════════
-app.use("/api/user", userRouter);
+app.use("/api/user",    userRouter);
 app.use("/api/product", productRouter);
-app.use("/api/orders", orderRouter);
+app.use("/api/orders",  orderRouter);
+app.use("/api/drivers", driverRouter);  // ← NEW: Driver app backend
 
 // ════════════════════════════════════════════════════════
 // ERROR HANDLING MIDDLEWARE
