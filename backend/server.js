@@ -220,4 +220,4 @@ process.on('SIGINT', () => {
   });
 });
 
-export default app;
+export default ;
