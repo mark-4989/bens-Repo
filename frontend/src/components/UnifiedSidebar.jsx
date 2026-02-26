@@ -41,12 +41,10 @@ const UnifiedSidebar = ({ isExpanded, setIsExpanded }) => {
   const sidebarRef = useRef(null);
   const categoryRefs = useRef({});
 
-  // Close mobile menu when clicking outside (desktop clicks only, no touch to prevent scroll conflicts)
+  // Close mobile menu when tapping outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      // Only on mobile
+    const handleOutside = (event) => {
       if (window.innerWidth > 768) return;
-      
       if (
         mobileOpen &&
         sidebarRef.current &&
@@ -58,12 +56,14 @@ const UnifiedSidebar = ({ isExpanded, setIsExpanded }) => {
     };
 
     if (mobileOpen) {
-      // Only mousedown - touchstart conflicts with scrolling
-      document.addEventListener('mousedown', handleClickOutside);
+      // Use both mousedown and touchend so mobile tap reliably closes
+      document.addEventListener('mousedown', handleOutside);
+      document.addEventListener('touchend', handleOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('touchend', handleOutside);
     };
   }, [mobileOpen]);
 
@@ -264,10 +264,16 @@ const UnifiedSidebar = ({ isExpanded, setIsExpanded }) => {
     <>
       {/* Mobile Toggle Button */}
       <button 
-        className="unified-mobile-toggle"
-        onClick={() => setMobileOpen(!mobileOpen)}
+        className={`unified-mobile-toggle ${mobileOpen ? 'is-open' : ''}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          setMobileOpen(prev => !prev);
+        }}
+        aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
       >
-        {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+        <span className="unified-mobile-toggle-icon">
+          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+        </span>
       </button>
 
       {/* Unified Sidebar */}
