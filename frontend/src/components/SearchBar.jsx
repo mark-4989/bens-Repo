@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Search } from 'lucide-react';
 import './SearchBar.css';
 
 const SearchBar = () => {
@@ -10,7 +11,7 @@ const SearchBar = () => {
   const searchRef = useRef(null);
   const navigate = useNavigate();
 
-  // Debounced search
+  // Debounced search - unchanged logic
   useEffect(() => {
     if (query.length < 2) {
       setSuggestions([]);
@@ -37,7 +38,7 @@ const SearchBar = () => {
     return () => clearTimeout(timer);
   }, [query]);
 
-  // Close on click outside
+  // Close on click outside - unchanged logic
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (searchRef.current && !searchRef.current.contains(e.target)) {
@@ -61,52 +62,67 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="search-bar-container" ref={searchRef}>
-      <div className="search-input-wrapper">
-        <input
-          type="text"
-          className="search-input"
-          placeholder="Search products..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-        />
-        <button className="search-btn" onClick={handleSearch}>
-          🔍
-        </button>
-      </div>
+    // Outer sticky dark bar
+    <div className="search-bar-topbar">
+      <div className="search-bar-container" ref={searchRef}>
 
-      {isOpen && (
-        <div className="search-dropdown">
-          {loading ? (
-            <div className="search-loading">Searching...</div>
-          ) : suggestions.length > 0 ? (
-            <>
-              {suggestions.map((item) => (
-                <div
-                  key={item.id}
-                  className="suggestion-item"
-                  onClick={() => handleProductClick(item.id)}
-                >
-                  <img src={item.images[0]} alt={item.name} />
-                  <div className="suggestion-info">
-                    <div className="suggestion-name">{item.name}</div>
-                    <div className="suggestion-meta">
-                      <span className="category-badge">{item.categoryName}</span>
-                      <span className="price">KSH {item.price}</span>
+        {/* Input row */}
+        <div className="search-input-wrapper">
+          <span className="search-input-icon">
+            <Search size={17} strokeWidth={2.2} />
+          </span>
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Search products..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+            autoComplete="off"
+            spellCheck="false"
+          />
+        </div>
+
+        {/* Search button */}
+        <button className="search-btn" onClick={handleSearch} type="button">
+          <Search size={16} strokeWidth={2.5} />
+          <span className="search-btn-text">Search</span>
+        </button>
+
+        {/* Dropdown - unchanged structure */}
+        {isOpen && (
+          <div className="search-dropdown">
+            {loading ? (
+              <div className="search-loading">Searching...</div>
+            ) : suggestions.length > 0 ? (
+              <>
+                {suggestions.map((item) => (
+                  <div
+                    key={item.id}
+                    className="suggestion-item"
+                    onClick={() => handleProductClick(item.id)}
+                  >
+                    <img src={item.images[0]} alt={item.name} />
+                    <div className="suggestion-info">
+                      <div className="suggestion-name">{item.name}</div>
+                      <div className="suggestion-meta">
+                        <span className="category-badge">{item.categoryName}</span>
+                        <span className="price">KSH {item.price}</span>
+                      </div>
                     </div>
                   </div>
+                ))}
+                <div className="view-all" onClick={handleSearch}>
+                  View all results →
                 </div>
-              ))}
-              <div className="view-all" onClick={handleSearch}>
-                View all results →
-              </div>
-            </>
-          ) : (
-            <div className="no-results">No products found</div>
-          )}
-        </div>
-      )}
+              </>
+            ) : (
+              <div className="no-results">No products found</div>
+            )}
+          </div>
+        )}
+
+      </div>
     </div>
   );
 };
