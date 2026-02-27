@@ -1,113 +1,41 @@
 // backend/routes/NotificationRoute.js
+// ─── REPLACE your existing NotificationRoute.js with this ───────────────────
 import express from 'express';
 import { verifyClerkToken } from '../middleware/verifyClerkToken.js';
-import Notification from '../models/NotificationModel.js';
+import {
+  getNotifications,
+  getUnreadCount,
+  markAsRead,
+  markAllRead,
+  deleteNotification,
+  clearAllNotifications,
+  triggerWelcome,
+} from '../controllers/NotificationController.js';
 
-const router = express.Router();
+const notificationRouter = express.Router();
 
-// Get user notifications
-router.get('/', verifyClerkToken, async (req, res) => {
-  try {
-    const userId = req.userId;
-    const userRole = req.user?.role || req.user?.publicMetadata?.role;
+// All routes require Clerk authentication
+notificationRouter.use(verifyClerkToken);
 
-    // If admin, get admin notifications, else get user notifications
-    const query = userRole === 'admin' ? { userId: 'admin' } : { userId };
+// GET    /api/notifications               — paginated list
+notificationRouter.get('/', getNotifications);
 
-    const notifications = await Notification.find(query)
-      .sort({ createdAt: -1 })
-      .limit(50);
+// GET    /api/notifications/unread-count  — badge number
+notificationRouter.get('/unread-count', getUnreadCount);
 
-    const unreadCount = await Notification.countDocuments({ ...query, read: false });
+// POST   /api/notifications/welcome       — trigger welcome (call on sign-in)
+notificationRouter.post('/welcome', triggerWelcome);
 
-    res.json({
-      success: true,
-      notifications,
-      unreadCount
-    });
-  } catch (error) {
-    console.error('❌ Get notifications error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch notifications'
-    });
-  }
-});
+// PUT    /api/notifications/mark-all-read
+notificationRouter.put('/mark-all-read', markAllRead);
 
-// Mark notification as read
-router.put('/:id/read', verifyClerkToken, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const userId = req.userId;
+// DELETE /api/notifications/clear-all
+notificationRouter.delete('/clear-all', clearAllNotifications);
 
-    const notification = await Notification.findOneAndUpdate(
-      { _id: id, userId },
-      { read: true },
-      { new: true }
-    );
+// PUT    /api/notifications/:id/read
+notificationRouter.put('/:id/read', markAsRead);
 
-    if (!notification) {
-      return res.status(404).json({
-        success: false,
-        message: 'Notification not found'
-      });
-    }
+// DELETE /api/notifications/:id
+notificationRouter.delete('/:id', deleteNotification);
 
-    res.json({
-      success: true,
-      notification
-    });
-  } catch (error) {
-    console.error('❌ Mark read error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to update notification'
-    });
-  }
-});
-
-// Mark all as read
-router.put('/read-all', verifyClerkToken, async (req, res) => {
-  try {
-    const userId = req.userId;
-    const userRole = req.user?.role || req.user?.publicMetadata?.role;
-
-    const query = userRole === 'admin' ? { userId: 'admin' } : { userId };
-
-    await Notification.updateMany(query, { read: true });
-
-    res.json({
-      success: true,
-      message: 'All notifications marked as read'
-    });
-  } catch (error) {
-    console.error('❌ Mark all read error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to update notifications'
-    });
-  }
-});
-
-// Delete notification
-router.delete('/:id', verifyClerkToken, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const userId = req.userId;
-
-    await Notification.findOneAndDelete({ _id: id, userId });
-
-    res.json({
-      success: true,
-      message: 'Notification deleted'
-    });
-  } catch (error) {
-    console.error('❌ Delete notification error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to delete notification'
-    });
-  }
-});
-
-export default router;
+export default notificationRouter;
