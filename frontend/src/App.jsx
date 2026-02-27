@@ -13,6 +13,7 @@ import DriverTracking from "./pages/DriverTracking";
 import Footer from "./components/Footer";
 import SearchBar from "./components/SearchBar";
 import UnifiedSidebar from "./components/UnifiedSidebar"; // NEW Unified Sidebar
+import NotificationPanel from "./components/NotificationPanel";
 import { ToastContainer } from "react-toastify";
 import CategoryPage from "./pages/CategoryPage";
 import "./styles/global.css";
@@ -34,6 +35,9 @@ const App = () => {
         draggable
         pauseOnHover
       />
+
+      {/* Global Notification Panel - slide-in from right */}
+      <NotificationPanel />
       
       {/* Unified Sidebar - Combines Navigation + Categories */}
       <UnifiedSidebar 

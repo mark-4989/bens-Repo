@@ -26,6 +26,7 @@ import {
 import { ShopContext } from '../context/ShopContext';
 import { backendUrl } from '../config';
 import gsap from 'gsap';
+import NotificationBell from './NotificationBell';
 import './UnifiedSidebar.css';
 
 const UnifiedSidebar = ({ isExpanded, setIsExpanded }) => {
@@ -387,6 +388,9 @@ const UnifiedSidebar = ({ isExpanded, setIsExpanded }) => {
                   <div className="unified-tooltip">Cart ({getCartCount()})</div>
                 )}
               </Link>
+
+              {/* Notifications */}
+              <NotificationBell collapsed={!isExpanded} />
             </nav>
           </div>
 
