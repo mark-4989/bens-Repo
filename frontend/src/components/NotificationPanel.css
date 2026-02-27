@@ -1,54 +1,113 @@
-/* NotificationPanel.css */
+/* ═══════════════════════════════════════════════════════════════════════
+   NotificationPanel.css  —  iPhone-glass floating bubble design
+   Floats over the sidebar, soft rounded corners, deep blur, no hard edges
+   ═══════════════════════════════════════════════════════════════════════ */
 
-/* ── Backdrop ──────────────────────────────────────────────────────────── */
+/* ── Backdrop (soft, not full black) ──────────────────────────────────── */
 .notif-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.3);
-  z-index: 1299;
-  animation: fadeIn 0.2s ease;
+  background: rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 1399;
+  animation: notifFadeIn 0.22s ease;
 }
 
-@keyframes fadeIn {
+@keyframes notifFadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
 
-/* ── Panel ─────────────────────────────────────────────────────────────── */
+/* ── Floating Panel ────────────────────────────────────────────────────── */
 .notif-panel {
   position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 380px;
-  max-width: 100vw;
-  background: rgba(12, 12, 20, 0.97);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-left: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.6);
-  z-index: 1300;
+
+  /* Floats over sidebar left edge — offset 60px from left so it sits
+     halfway over the sidebar and halfway into the page content         */
+  left: 200px;
+  top: 50%;
+  transform: translateY(-50%) translateX(-30px) scale(0.94);
+
+  /* Floating bubble dimensions */
+  width: 370px;
+  max-height: min(82vh, 680px);
+
+  /* iPhone-quality glass */
+  background: rgba(18, 18, 28, 0.82);
+  backdrop-filter: blur(40px) saturate(1.8);
+  -webkit-backdrop-filter: blur(40px) saturate(1.8);
+
+  /* Soft rounded corners like an iOS widget */
+  border-radius: 28px;
+
+  /* Subtle layered border — white on top, darker on sides (iOS feel) */
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-top-color: rgba(255, 255, 255, 0.22);
+  border-bottom-color: rgba(0, 0, 0, 0.3);
+
+  /* Deep shadow for floating illusion */
+  box-shadow:
+    0 0 0 0.5px rgba(255, 255, 255, 0.06),
+    0 8px 32px rgba(0, 0, 0, 0.55),
+    0 32px 80px rgba(0, 0, 0, 0.35),
+    0 0 60px rgba(102, 126, 234, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+
+  z-index: 1400;
   display: flex;
   flex-direction: column;
-  transform: translateX(100%);
-  transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
   overflow: hidden;
+
+  /* Closed state */
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.38s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
+/* Open state */
 .notif-panel.open {
-  transform: translateX(0);
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(-50%) translateX(0) scale(1);
 }
 
-/* Ambient purple glow strip at left edge */
+/* Prismatic shimmer strip across the top */
 .notif-panel::before {
   content: '';
   position: absolute;
   top: 0;
-  left: 0;
-  bottom: 0;
-  width: 2px;
-  background: linear-gradient(180deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%);
-  z-index: 1;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.5) 30%,
+    rgba(102, 126, 234, 0.8) 50%,
+    rgba(255, 255, 255, 0.5) 70%,
+    transparent 100%
+  );
+  border-radius: 1px;
+  z-index: 2;
+}
+
+/* Ambient inner glow */
+.notif-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 28px;
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    rgba(102, 126, 234, 0.07) 0%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* ── Header ─────────────────────────────────────────────────────────────── */
@@ -56,48 +115,52 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 20px 16px;
+  padding: 18px 18px 14px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(255, 255, 255, 0.02);
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .notif-header-left {
   display: flex;
   align-items: center;
-  gap: 10px;
-  color: #f9fafb;
+  gap: 9px;
 }
 
 .notif-header-left h3 {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 700;
-  color: #f9fafb;
+  color: rgba(255, 255, 255, 0.95);
   margin: 0;
   font-family: 'Outfit', sans-serif;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.4px;
 }
 
 .notif-header-left svg {
   color: rgba(102, 126, 234, 0.9);
+  filter: drop-shadow(0 0 6px rgba(102, 126, 234, 0.5));
 }
 
 .notif-header-badge {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #fff;
-  border-radius: 10px;
+  border-radius: 20px;
   padding: 2px 8px;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 10.5px;
+  font-weight: 800;
   min-width: 20px;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.5);
-  animation: badgePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow:
+    0 2px 8px rgba(102, 126, 234, 0.55),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+  font-family: 'Outfit', sans-serif;
+  animation: badgePop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @keyframes badgePop {
-  from { transform: scale(0); }
-  to   { transform: scale(1); }
+  from { transform: scale(0) rotate(-15deg); }
+  to   { transform: scale(1) rotate(0deg); }
 }
 
 .notif-header-actions {
@@ -110,38 +173,40 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 6px 10px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: rgba(156, 163, 175, 0.9);
-  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(200, 206, 220, 0.85);
+  font-size: 11.5px;
   font-weight: 600;
   font-family: 'Outfit', sans-serif;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  backdrop-filter: blur(10px);
 }
 
 .notif-action-btn:hover {
-  background: rgba(102, 126, 234, 0.15);
-  border-color: rgba(102, 126, 234, 0.3);
-  color: rgba(102, 126, 234, 0.9);
+  background: rgba(102, 126, 234, 0.18);
+  border-color: rgba(102, 126, 234, 0.35);
+  color: rgba(130, 150, 255, 0.95);
+  box-shadow: 0 0 12px rgba(102, 126, 234, 0.2);
 }
 
 .notif-action-btn.danger:hover {
-  background: rgba(239, 68, 68, 0.12);
+  background: rgba(239, 68, 68, 0.14);
   border-color: rgba(239, 68, 68, 0.3);
-  color: rgba(239, 68, 68, 0.9);
+  color: rgba(255, 100, 100, 0.9);
 }
 
 .notif-close-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: rgba(156, 163, 175, 0.8);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(180, 185, 200, 0.8);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -150,34 +215,38 @@
 }
 
 .notif-close-btn:hover {
-  background: rgba(239, 68, 68, 0.12);
-  border-color: rgba(239, 68, 68, 0.2);
-  color: rgba(239, 68, 68, 0.9);
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: rgba(255, 100, 100, 0.9);
+  transform: rotate(90deg);
 }
 
 /* ── Body ───────────────────────────────────────────────────────────────── */
 .notif-body {
   flex: 1;
   overflow-y: auto;
-  padding: 8px 0;
+  padding: 6px 0 10px;
+  position: relative;
+  z-index: 1;
 }
 
-.notif-body::-webkit-scrollbar { width: 4px; }
+.notif-body::-webkit-scrollbar { width: 3px; }
 .notif-body::-webkit-scrollbar-track  { background: transparent; }
-.notif-body::-webkit-scrollbar-thumb  { background: rgba(255,255,255,0.1); border-radius: 2px; }
+.notif-body::-webkit-scrollbar-thumb  {
+  background: rgba(102, 126, 234, 0.25);
+  border-radius: 2px;
+}
 
 /* ── Groups ─────────────────────────────────────────────────────────────── */
-.notif-group {
-  margin-bottom: 8px;
-}
+.notif-group { margin-bottom: 4px; }
 
 .notif-group-label {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1.2px;
-  color: rgba(156, 163, 175, 0.5);
-  padding: 8px 20px 6px;
+  letter-spacing: 1.4px;
+  color: rgba(156, 163, 175, 0.4);
+  padding: 8px 16px 4px;
   font-family: 'Outfit', sans-serif;
 }
 
@@ -186,92 +255,92 @@
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 14px 20px;
+  gap: 11px;
+  padding: 11px 16px;
   cursor: pointer;
-  transition: background 0.2s ease;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-}
-
-.notif-item:last-child {
-  border-bottom: none;
+  transition: background 0.18s ease;
+  margin: 2px 8px;
+  border-radius: 16px;
 }
 
 .notif-item.unread {
-  background: rgba(102, 126, 234, 0.05);
+  background: rgba(102, 126, 234, 0.07);
 }
 
 .notif-item:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .notif-item.unread:hover {
-  background: rgba(102, 126, 234, 0.09);
+  background: rgba(102, 126, 234, 0.12);
 }
 
 /* Unread indicator dot */
 .notif-unread-dot {
   position: absolute;
-  left: 8px;
+  left: 5px;
   top: 50%;
   transform: translateY(-50%);
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  box-shadow: 0 0 6px rgba(102, 126, 234, 0.7);
+  background: linear-gradient(135deg, #667eea, #a78bfa);
+  box-shadow: 0 0 8px rgba(102, 126, 234, 0.9);
   flex-shrink: 0;
 }
 
-/* Icon circle */
+/* Icon circle — iOS app-icon style */
 .notif-icon-wrap {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: 18px;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
 }
 
 .notif-item:hover .notif-icon-wrap {
-  background: rgba(var(--notif-color, 102, 126, 234), 0.12);
+  background: rgba(102, 126, 234, 0.14);
+  border-color: rgba(102, 126, 234, 0.2);
 }
 
 .notif-emoji {
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
 }
 
 /* Text */
 .notif-content {
   flex: 1;
   min-width: 0;
-  padding-right: 20px;
+  padding-right: 18px;
 }
 
 .notif-title {
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 700;
-  color: #f3f4f6;
-  margin: 0 0 3px;
+  color: rgba(240, 242, 255, 0.95);
+  margin: 0 0 2px;
   font-family: 'Outfit', sans-serif;
   line-height: 1.3;
+  letter-spacing: -0.2px;
 }
 
 .notif-item.read .notif-title {
-  color: rgba(156, 163, 175, 0.8);
+  color: rgba(156, 163, 175, 0.75);
   font-weight: 500;
 }
 
 .notif-message {
-  font-size: 12.5px;
-  color: rgba(156, 163, 175, 0.75);
-  margin: 0 0 5px;
+  font-size: 12px;
+  color: rgba(156, 163, 175, 0.65);
+  margin: 0 0 4px;
   line-height: 1.45;
   font-family: 'Outfit', sans-serif;
   display: -webkit-box;
@@ -281,8 +350,8 @@
 }
 
 .notif-time {
-  font-size: 11px;
-  color: rgba(156, 163, 175, 0.45);
+  font-size: 10.5px;
+  color: rgba(156, 163, 175, 0.38);
   font-weight: 500;
   font-family: 'Outfit', sans-serif;
 }
@@ -290,30 +359,29 @@
 /* Delete button */
 .notif-delete-btn {
   position: absolute;
-  right: 14px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
   width: 22px;
   height: 22px;
-  border-radius: 6px;
+  border-radius: 50%;
   background: transparent;
   border: none;
-  color: rgba(156, 163, 175, 0.4);
+  color: rgba(156, 163, 175, 0.35);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: all 0.2s ease;
+  transition: all 0.18s ease;
 }
 
-.notif-item:hover .notif-delete-btn {
-  opacity: 1;
-}
+.notif-item:hover .notif-delete-btn { opacity: 1; }
 
 .notif-delete-btn:hover {
   background: rgba(239, 68, 68, 0.15);
-  color: rgba(239, 68, 68, 0.9);
+  color: rgba(255, 100, 100, 0.9);
+  transform: translateY(-50%) scale(1.1);
 }
 
 /* ── Empty state ────────────────────────────────────────────────────────── */
@@ -322,49 +390,57 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 24px;
-  gap: 12px;
+  padding: 50px 24px;
+  gap: 10px;
   text-align: center;
 }
 
 .notif-empty-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(156, 163, 175, 0.3);
-  margin-bottom: 4px;
+  color: rgba(156, 163, 175, 0.25);
+  margin-bottom: 6px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.07);
 }
 
 .notif-empty p {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 700;
-  color: rgba(156, 163, 175, 0.7);
+  color: rgba(156, 163, 175, 0.6);
   margin: 0;
   font-family: 'Outfit', sans-serif;
+  letter-spacing: -0.2px;
 }
 
 .notif-empty span {
-  font-size: 13px;
-  color: rgba(156, 163, 175, 0.4);
+  font-size: 12.5px;
+  color: rgba(156, 163, 175, 0.35);
   font-family: 'Outfit', sans-serif;
 }
 
-/* ── Mobile ─────────────────────────────────────────────────────────────── */
-@media (max-width: 480px) {
+/* ── Mobile: shifts anchor point to be near bell button ──────────────── */
+@media (max-width: 768px) {
   .notif-panel {
-    width: 100vw;
+    left: 12px;
+    right: 12px;
+    top: auto;
+    bottom: 80px;
+    width: auto;
+    max-width: 100%;
+    transform: translateY(20px) scale(0.95);
+    transform-origin: bottom left;
   }
 
-  .notif-action-btn span {
-    display: none;
+  .notif-panel.open {
+    transform: translateY(0) scale(1);
   }
 
-  .notif-action-btn {
-    padding: 6px 8px;
-  }
+  .notif-action-btn span { display: none; }
+  .notif-action-btn { padding: 5px 8px; }
 }

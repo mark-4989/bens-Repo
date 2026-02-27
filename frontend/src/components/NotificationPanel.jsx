@@ -1,65 +1,66 @@
 // frontend/src/components/NotificationPanel.jsx
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Bell, Check, CheckCheck, Trash2, Package, CreditCard, Truck, ShoppingBag, AlertCircle, Star } from 'lucide-react';
+import {
+  X, Bell, CheckCheck, Trash2,
+  Package, CreditCard, Truck, ShoppingBag, AlertCircle, Sparkles
+} from 'lucide-react';
 import { useNotifications } from '../context/NotificationContext';
 import './NotificationPanel.css';
 
-// Map notification type → lucide icon component
+// Map type → lucide icon
 const TYPE_ICON = {
   order_placed:    ShoppingBag,
   order_packed:    Package,
   order_on_route:  Truck,
-  order_delivered: Check,
+  order_delivered: CheckCheck,
   order_cancelled: AlertCircle,
   driver_assigned: Truck,
   payment_success: CreditCard,
   payment_failed:  AlertCircle,
   payment_pending: CreditCard,
-  welcome:         Star,
-  promo:           Star,
+  welcome:         Sparkles,
+  promo:           Sparkles,
   general:         Bell,
-  // legacy
-  payment_success: CreditCard,
   new_payment:     CreditCard,
   order_status:    Package,
 };
 
+// Map type → accent colour (used for icon tint)
 const TYPE_COLOR = {
-  order_placed:    '#667eea',
-  order_packed:    '#f59e0b',
-  order_on_route:  '#3b82f6',
-  order_delivered: '#10b981',
-  order_cancelled: '#ef4444',
-  driver_assigned: '#3b82f6',
-  payment_success: '#10b981',
-  payment_failed:  '#ef4444',
-  payment_pending: '#f59e0b',
-  welcome:         '#8b5cf6',
-  promo:           '#ec4899',
-  general:         '#6b7280',
+  order_placed:    '#818cf8',
+  order_packed:    '#fbbf24',
+  order_on_route:  '#60a5fa',
+  order_delivered: '#34d399',
+  order_cancelled: '#f87171',
+  driver_assigned: '#60a5fa',
+  payment_success: '#34d399',
+  payment_failed:  '#f87171',
+  payment_pending: '#fbbf24',
+  welcome:         '#c084fc',
+  promo:           '#f472b6',
+  general:         '#94a3b8',
 };
 
 const formatTime = (dateStr) => {
   const date = new Date(dateStr);
-  const now  = new Date();
-  const diff = now - date; // ms
-
-  if (diff < 60_000)             return 'Just now';
-  if (diff < 3_600_000)          return `${Math.floor(diff / 60_000)}m ago`;
-  if (diff < 86_400_000)         return `${Math.floor(diff / 3_600_000)}h ago`;
-  if (diff < 7 * 86_400_000)     return `${Math.floor(diff / 86_400_000)}d ago`;
+  const diff  = Date.now() - date;
+  if (diff < 60_000)           return 'Just now';
+  if (diff < 3_600_000)        return `${Math.floor(diff / 60_000)}m ago`;
+  if (diff < 86_400_000)       return `${Math.floor(diff / 3_600_000)}h ago`;
+  if (diff < 7 * 86_400_000)   return `${Math.floor(diff / 86_400_000)}d ago`;
   return date.toLocaleDateString('en-KE', { day: 'numeric', month: 'short' });
 };
 
+/* ── Single notification row ────────────────────────────────────────────── */
 const NotificationItem = ({ notification, onRead, onDelete, onNavigate }) => {
   const { _id, type, title, message, icon, read, createdAt, orderId } = notification;
-  const IconComponent = TYPE_ICON[type] || Bell;
-  const color         = TYPE_COLOR[type] || '#6b7280';
+  const IconComp = TYPE_ICON[type] || Bell;
+  const color    = TYPE_COLOR[type] || '#94a3b8';
 
   const handleClick = () => {
     if (!read) onRead(_id);
-    if (orderId) onNavigate(`/orders1`);
+    if (orderId) onNavigate('/orders1');
   };
 
   return (
@@ -67,37 +68,42 @@ const NotificationItem = ({ notification, onRead, onDelete, onNavigate }) => {
       className={`notif-item ${read ? 'read' : 'unread'}`}
       onClick={handleClick}
     >
-      {/* Unread dot */}
       {!read && <span className="notif-unread-dot" />}
 
-      {/* Icon */}
-      <div className="notif-icon-wrap" style={{ '--notif-color': color }}>
-        <span className="notif-emoji">{icon || '🔔'}</span>
+      {/* iOS-style icon square */}
+      <div
+        className="notif-icon-wrap"
+        style={{ background: `${color}18`, borderColor: `${color}28` }}
+      >
+        {icon
+          ? <span className="notif-emoji">{icon}</span>
+          : <IconComp size={18} strokeWidth={2.5} color={color} />
+        }
       </div>
 
-      {/* Content */}
       <div className="notif-content">
         <p className="notif-title">{title}</p>
         <p className="notif-message">{message}</p>
         <span className="notif-time">{formatTime(createdAt)}</span>
       </div>
 
-      {/* Delete */}
       <button
         className="notif-delete-btn"
         onClick={(e) => { e.stopPropagation(); onDelete(_id); }}
-        aria-label="Delete notification"
+        aria-label="Delete"
       >
-        <X size={13} strokeWidth={2.5} />
+        <X size={12} strokeWidth={3} />
       </button>
     </div>
   );
 };
 
+/* ── Main panel ─────────────────────────────────────────────────────────── */
 const NotificationPanel = () => {
   const {
     notifications, unreadCount, panelOpen,
-    closePanel, markAsRead, markAllRead, deleteNotification, clearAll,
+    closePanel, markAsRead, markAllRead,
+    deleteNotification, clearAll,
   } = useNotifications();
 
   const navigate  = useNavigate();
@@ -106,73 +112,77 @@ const NotificationPanel = () => {
   // Close on outside click
   useEffect(() => {
     const handler = (e) => {
-      if (panelOpen && panelRef.current && !panelRef.current.contains(e.target) &&
-          !e.target.closest('.notif-trigger-btn')) {
-        closePanel();
-      }
+      if (!panelOpen) return;
+      if (panelRef.current?.contains(e.target)) return;
+      if (e.target.closest('.notif-bell')) return;
+      closePanel();
     };
     document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    document.addEventListener('touchend', handler);
+    return () => {
+      document.removeEventListener('mousedown', handler);
+      document.removeEventListener('touchend', handler);
+    };
   }, [panelOpen, closePanel]);
 
-  // Close on Escape
+  // Escape key
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') closePanel(); };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [closePanel]);
 
+  // Group by Today / Earlier
   const grouped = React.useMemo(() => {
-    const today     = [];
-    const earlier   = [];
-    const cutoff    = new Date(); cutoff.setHours(0, 0, 0, 0);
-
-    notifications.forEach(n => {
-      new Date(n.createdAt) >= cutoff ? today.push(n) : earlier.push(n);
-    });
+    const cutoff = new Date(); cutoff.setHours(0, 0, 0, 0);
+    const today  = [];
+    const earlier = [];
+    notifications.forEach(n =>
+      new Date(n.createdAt) >= cutoff ? today.push(n) : earlier.push(n)
+    );
     return { today, earlier };
   }, [notifications]);
 
   return (
     <>
-      {/* Backdrop */}
       {panelOpen && <div className="notif-backdrop" onClick={closePanel} />}
 
-      {/* Panel */}
       <div ref={panelRef} className={`notif-panel ${panelOpen ? 'open' : ''}`}>
-        {/* Header */}
+
+        {/* ── Header ── */}
         <div className="notif-header">
           <div className="notif-header-left">
-            <Bell size={18} strokeWidth={2.5} />
+            <Bell size={17} strokeWidth={2.5} />
             <h3>Notifications</h3>
             {unreadCount > 0 && (
               <span className="notif-header-badge">{unreadCount}</span>
             )}
           </div>
+
           <div className="notif-header-actions">
             {unreadCount > 0 && (
               <button className="notif-action-btn" onClick={markAllRead} title="Mark all read">
-                <CheckCheck size={15} strokeWidth={2.5} />
+                <CheckCheck size={13} strokeWidth={2.5} />
                 <span>All read</span>
               </button>
             )}
             {notifications.length > 0 && (
               <button className="notif-action-btn danger" onClick={clearAll} title="Clear all">
-                <Trash2 size={14} strokeWidth={2.5} />
+                <Trash2 size={13} strokeWidth={2.5} />
               </button>
             )}
-            <button className="notif-close-btn" onClick={closePanel}>
-              <X size={18} strokeWidth={2.5} />
+            <button className="notif-close-btn" onClick={closePanel} aria-label="Close">
+              <X size={15} strokeWidth={2.5} />
             </button>
           </div>
         </div>
 
-        {/* Body */}
+        {/* ── Body ── */}
         <div className="notif-body">
           {notifications.length === 0 ? (
             <div className="notif-empty">
               <div className="notif-empty-icon">
-                <Bell size={32} strokeWidth={1.5} />
+                <Bell size={28} strokeWidth={1.5} />
               </div>
               <p>You're all caught up!</p>
               <span>No notifications yet</span>
