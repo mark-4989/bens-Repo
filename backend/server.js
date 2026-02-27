@@ -12,6 +12,7 @@ import userRouter from "./routes/UserRoute.js";
 import productRouter from "./routes/ProductRoute.js";
 import orderRouter from "./routes/OrderRoute.js";
 import driverRouter from "./routes/DriverRoute.js";           // ← NEW
+import notificationRouter from "./routes/NotificationRoute.js"; // ← NOTIFICATIONS
 
 const app = express();
 const server = http.createServer(app);
@@ -148,10 +149,11 @@ app.get('/health', (req, res) => {
 // ════════════════════════════════════════════════════════
 // API ROUTES
 // ════════════════════════════════════════════════════════
-app.use("/api/user",    userRouter);
-app.use("/api/product", productRouter);
-app.use("/api/orders",  orderRouter);
-app.use("/api/drivers", driverRouter);  // ← NEW: Driver app backend
+app.use("/api/user",          userRouter);
+app.use("/api/product",      productRouter);
+app.use("/api/orders",       orderRouter);
+app.use("/api/drivers",      driverRouter);         // ← Driver app backend
+app.use("/api/notifications", notificationRouter);  // ← Notifications
 
 // ════════════════════════════════════════════════════════
 // ERROR HANDLING MIDDLEWARE
@@ -185,10 +187,12 @@ server.listen(PORT, () => {
   ║   URL: http://localhost:${PORT}
   ╠══════════════════════════════════════════════════╣
   ║   📋 API ENDPOINTS:
-  ║   • Users:     /api/user
-  ║   • Products:  /api/product
-  ║   • Orders:    /api/orders
-  ║   • Health:    /health
+  ║   • Users:         /api/user
+  ║   • Products:      /api/product
+  ║   • Orders:        /api/orders
+  ║   • Drivers:       /api/drivers
+  ║   • Notifications: /api/notifications
+  ║   • Health:        /health
   ╠══════════════════════════════════════════════════╣
   ║   🔌 Socket.IO: ENABLED
   ║   📱 Driver App: ENABLED
